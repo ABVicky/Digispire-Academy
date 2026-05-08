@@ -29,6 +29,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "firebase": "^12.12.1",
+    "firebase-tools": "^15.17.0",
     "globals": "^17.5.0",
     "lucide-react": "^1.14.0",
     "postcss": "^8.5.14",
