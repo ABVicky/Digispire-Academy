@@ -1,0 +1,13 @@
+[build]
+  # When the netlify.toml is inside the app folder, 
+  # we don't need the 'base' setting or we set it to '.'
+  command = "npm install && npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
