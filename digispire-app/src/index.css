@@ -13,12 +13,18 @@
 }
 
 /* Base Styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   font-family: var(--font-inter);
   background-color: var(--bg-main);
   color: #1e293b;
   -webkit-tap-highlight-color: transparent;
-  user-select: none; /* Disable text selection for app-like feel */
+  user-select: none;
   overflow-x: hidden;
   /* Support for iOS Notches */
   padding-top: env(safe-area-inset-top);
@@ -27,9 +33,23 @@ body {
   padding-right: env(safe-area-inset-right);
 }
 
+/* Fix for 100vh on mobile */
+:root {
+  --vh: 1vh;
+}
+
+.min-h-screen-ios {
+  min-height: calc(var(--vh, 1vh) * 100);
+}
+
+.h-screen-ios {
+  height: calc(var(--vh, 1vh) * 100);
+}
+
 /* Allow selection only in specific fields */
 input, textarea, [contenteditable="true"] {
   user-select: text;
+  font-size: 16px !important; /* Prevent auto-zoom on iOS */
 }
 
 /* Hide scrollbars for a cleaner PWA look */
@@ -41,6 +61,15 @@ input, textarea, [contenteditable="true"] {
   scrollbar-width: none;
 }
 
+/* Touch Target Sizes */
+button, a, input, select {
+  min-height: 44px;
+}
+
+.touch-target-small {
+  min-height: 32px;
+}
+
 /* Premium Text Shadows & Gradients */
 .text-premium {
   background: linear-gradient(135deg, #255A84 0%, #3a7ba6 100%);
@@ -50,11 +79,11 @@ input, textarea, [contenteditable="true"] {
 
 /* PWA App-like transitions */
 .page-transition {
-  animation: slideIn 0.3s ease-out;
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -63,15 +92,37 @@ input, textarea, [contenteditable="true"] {
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
 }
 .touch-card:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
-/* Custom Checkbox/Radio Styling for PWA */
-input[type="checkbox"], input[type="radio"] {
-  accent-color: var(--primary);
-}
-
-/* Responsive Grid Fixes */
-.grid-auto-fit {
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+/* Mobile-friendly Table */
+@media (max-width: 768px) {
+  .responsive-table thead {
+    display: none;
+  }
+  .responsive-table tr {
+    display: block;
+    margin-bottom: 1rem;
+    background: white;
+    border-radius: 1.5rem;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .responsive-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f8fafc;
+  }
+  .responsive-table td:last-child {
+    border-bottom: none;
+  }
+  .responsive-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 10px;
+    color: #94a3b8;
+  }
 }

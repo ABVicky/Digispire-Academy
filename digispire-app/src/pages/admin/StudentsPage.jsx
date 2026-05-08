@@ -163,7 +163,7 @@ export default function StudentsPage() {
         </button>
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
+      <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
         <StatChip label="Morning" value={students.filter(s => s.batchId === 'morning').length} icon={Users} color="bg-[#255A84]" />
         <StatChip label="Evening" value={students.filter(s => s.batchId === 'evening').length} icon={Users} color="bg-orange-500" />
         <StatChip label="Interns" value={students.filter(s => s.isIntern).length} icon={Briefcase} color="bg-emerald-500" />
@@ -171,21 +171,21 @@ export default function StudentsPage() {
 
       {/* List */}
       <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-        <div className="p-6 border-b border-slate-50 flex flex-col sm:flex-row gap-4">
+        <div className="p-6 border-b border-slate-50 flex flex-col lg:flex-row gap-4">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
             <input
               type="text" value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Search students..."
-              className="w-full pl-11 pr-4 py-3 bg-slate-50 border-transparent rounded-2xl text-sm focus:bg-white focus:border-[#255A84] transition outline-none"
+              className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl text-sm focus:bg-white focus:border-[#255A84] transition outline-none"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
             {['all', 'morning', 'evening', 'internship'].map(b => (
               <button
                 key={b}
                 onClick={() => setFilterBatch(b)}
-                className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${filterBatch === b ? 'bg-[#255A84] text-white shadow-md' : 'bg-slate-50 text-slate-400 hover:text-slate-600'}`}
+                className={`px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap ${filterBatch === b ? 'bg-[#255A84] text-white shadow-md' : 'bg-slate-50 text-slate-400 hover:text-slate-600'}`}
               >
                 {b}
               </button>
@@ -204,7 +204,7 @@ export default function StudentsPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm responsive-table">
               <thead>
                 <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
                   <th className="text-left px-8 py-4">Student Info</th>
@@ -219,29 +219,29 @@ export default function StudentsPage() {
                   const progress = calcProgress(s.uid || s.id);
                   return (
                     <tr key={s.id} className="group hover:bg-slate-50/80 transition-colors">
-                      <td className="px-8 py-4">
+                      <td className="px-8 py-4" data-label="Student Info">
                         <div className="flex items-center gap-4">
-                          <div className={`h-10 w-10 rounded-2xl flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden ${s.batchId === 'morning' ? 'bg-[#255A84]' : 'bg-orange-500'}`}>
+                          <div className={`h-11 w-11 rounded-2xl flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden shrink-0 ${s.batchId === 'morning' ? 'bg-[#255A84]' : 'bg-orange-500'}`}>
                             {s.photoURL ? (
                               <img src={s.photoURL} alt={s.name} className="h-full w-full object-cover" />
                             ) : (
                               s.name?.charAt(0)
                             )}
                           </div>
-                          <div>
-                            <p className="font-bold text-slate-800">{s.name}</p>
+                          <div className="min-w-0">
+                            <p className="font-bold text-slate-800 truncate">{s.name}</p>
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{s.studentId}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4" data-label="Batch">
                         <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                           s.batchId === 'morning' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'
                         }`}>
                           {s.batchId}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4" data-label="Internship">
                         {s.isIntern ? (
                           <div className="flex items-center gap-2 text-emerald-600">
                             <Briefcase size={14} />
@@ -251,21 +251,21 @@ export default function StudentsPage() {
                           <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">No</span>
                         )}
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3 max-w-[120px]">
-                          <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <td className="px-6 py-4" data-label="Progress">
+                        <div className="flex items-center gap-3 w-full sm:max-w-[120px]">
+                          <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
                             <div className={`h-full ${s.isIntern ? 'bg-emerald-500' : 'bg-[#F48B1F]'} rounded-full`} style={{ width: `${progress}%` }} />
                           </div>
                           <span className="text-[10px] font-bold text-slate-500">{progress}%</span>
                         </div>
                       </td>
-                      <td className="px-8 py-4 text-right">
-                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => openEdit(s)} className="p-2 text-slate-400 hover:text-[#255A84] hover:bg-white rounded-xl shadow-sm border border-transparent hover:border-slate-100 transition">
-                            <Pencil size={16} />
+                      <td className="px-8 py-4 text-right" data-label="Actions">
+                        <div className="flex items-center justify-end gap-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => openEdit(s)} className="p-3 text-slate-400 hover:text-[#255A84] hover:bg-white rounded-xl shadow-sm border border-slate-100 sm:border-transparent hover:border-slate-100 transition active:scale-95">
+                            <Pencil size={18} />
                           </button>
-                          <button onClick={() => handleDelete(s.id)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-white rounded-xl shadow-sm border border-transparent hover:border-slate-100 transition">
-                            <Trash2 size={16} />
+                          <button onClick={() => handleDelete(s.id)} className="p-3 text-slate-400 hover:text-red-500 hover:bg-white rounded-xl shadow-sm border border-slate-100 sm:border-transparent hover:border-slate-100 transition active:scale-95">
+                            <Trash2 size={18} />
                           </button>
                         </div>
                       </td>
@@ -280,28 +280,28 @@ export default function StudentsPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-300">
+          <div className="bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden animate-in slide-in-from-bottom-10 sm:zoom-in duration-300 max-h-[90vh] overflow-y-auto">
+            <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between sticky top-0 bg-white z-10">
               <h2 className="text-xl font-bold text-slate-800">{editingId ? 'Update Student' : 'New Enrollment'}</h2>
-              <button onClick={() => setShowModal(false)} className="text-slate-300 hover:text-slate-500 transition"><X size={24} /></button>
+              <button onClick={() => setShowModal(false)} className="p-2 text-slate-300 hover:text-slate-500 transition"><X size={24} /></button>
             </div>
-            <form onSubmit={finalHandleSave} className="p-8 space-y-5">
+            <form onSubmit={finalHandleSave} className="p-6 sm:p-8 space-y-5">
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Full Name *</label>
                 <div className="relative">
                   <Users size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
                   <input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                    className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl text-sm focus:bg-white focus:border-[#255A84] transition outline-none" placeholder="John Doe" />
+                    className="w-full pl-11 pr-4 py-4 bg-slate-50 border-transparent rounded-2xl text-sm focus:bg-white focus:border-[#255A84] transition outline-none" placeholder="John Doe" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Phone *</label>
                   <div className="relative">
                     <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
                     <input required value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-                      className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl text-sm focus:bg-white focus:border-[#255A84] transition outline-none" placeholder="+91..." />
+                      className="w-full pl-11 pr-4 py-4 bg-slate-50 border-transparent rounded-2xl text-sm focus:bg-white focus:border-[#255A84] transition outline-none" placeholder="+91..." />
                   </div>
                 </div>
                 {!editingId ? (
@@ -310,27 +310,27 @@ export default function StudentsPage() {
                     <div className="relative">
                       <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
                       <input required value={form.tempPassword} onChange={e => setForm(f => ({ ...f, tempPassword: e.target.value }))}
-                        className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl text-sm focus:bg-white focus:border-[#255A84] transition outline-none" placeholder="Access code" />
+                        className="w-full pl-11 pr-4 py-4 bg-slate-50 border-transparent rounded-2xl text-sm focus:bg-white focus:border-[#255A84] transition outline-none" placeholder="Access code" />
                     </div>
                   </div>
                 ) : (
                   <div>
                     <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Student ID</label>
-                    <input readOnly value={form.studentId} className="w-full px-4 py-3.5 bg-slate-100 border-transparent rounded-2xl text-sm text-slate-400 font-mono" />
+                    <input readOnly value={form.studentId} className="w-full px-4 py-4 bg-slate-100 border-transparent rounded-2xl text-sm text-slate-400 font-mono" />
                   </div>
                 )}
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Academic Batch</label>
-                  <div className="flex bg-slate-50 p-1 rounded-xl">
+                  <div className="flex bg-slate-50 p-1.5 rounded-2xl">
                     {['morning', 'evening'].map(b => (
                       <button
                         key={b}
                         type="button"
                         onClick={() => setForm(f => ({ ...f, batchId: b }))}
-                        className={`flex-1 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${form.batchId === b ? 'bg-white text-[#255A84] shadow-sm' : 'text-slate-400'}`}
+                        className={`flex-1 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${form.batchId === b ? 'bg-white text-[#255A84] shadow-sm' : 'text-slate-400'}`}
                       >
                         {b}
                       </button>
@@ -342,7 +342,7 @@ export default function StudentsPage() {
                   <button
                     type="button"
                     onClick={() => setForm(f => ({ ...f, isIntern: !f.isIntern }))}
-                    className={`w-full py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest border transition-all flex items-center justify-center gap-2 ${
+                    className={`w-full py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest border transition-all flex items-center justify-center gap-2 ${
                       form.isIntern 
                         ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/20' 
                         : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300'
@@ -354,9 +354,9 @@ export default function StudentsPage() {
                 </div>
               </div>
 
-              <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-4 text-sm font-bold text-slate-400 hover:bg-slate-50 rounded-2xl transition">Cancel</button>
-                <button type="submit" disabled={saving} className="flex-1 py-4 bg-[#255A84] hover:bg-[#1a4261] text-white text-sm font-bold rounded-2xl transition shadow-xl shadow-[#255A84]/20">
+              <div className="pt-4 flex flex-col-reverse sm:flex-row gap-3">
+                <button type="button" onClick={() => setShowModal(false)} className="w-full py-4 text-sm font-bold text-slate-400 hover:bg-slate-50 rounded-2xl transition active:scale-95">Cancel</button>
+                <button type="submit" disabled={saving} className="w-full py-4 bg-[#255A84] hover:bg-[#1a4261] text-white text-sm font-bold rounded-2xl transition shadow-xl shadow-[#255A84]/20 active:scale-95">
                   {saving ? 'Processing...' : editingId ? 'Update Info' : 'Enroll Student'}
                 </button>
               </div>

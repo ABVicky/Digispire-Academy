@@ -103,13 +103,13 @@ export default function StudentDashboard() {
   );
 
   return (
-    <div className="space-y-6 pb-10">
+    <div className="space-y-6 pb-24">
       {/* Welcome Card */}
-      <div className="relative bg-gradient-to-br from-[#255A84] to-[#1a4261] rounded-[2.5rem] p-8 text-white overflow-hidden shadow-lg border border-white/10">
+      <div className="relative bg-gradient-to-br from-[#255A84] to-[#1a4261] rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 text-white overflow-hidden shadow-lg border border-white/10">
         <div className="relative z-10">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-6">
-            <div className="h-20 w-20 rounded-3xl bg-white/20 backdrop-blur-md p-1 border border-white/20 shadow-xl overflow-hidden flex-shrink-0">
-              <div className="h-full w-full rounded-2xl bg-white/10 flex items-center justify-center text-white font-bold text-2xl overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6">
+            <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl sm:rounded-3xl bg-white/20 backdrop-blur-md p-1 border border-white/20 shadow-xl overflow-hidden flex-shrink-0">
+              <div className="h-full w-full rounded-xl sm:rounded-2xl bg-white/10 flex items-center justify-center text-white font-bold text-xl sm:text-2xl overflow-hidden">
                 {userProfile?.photoURL ? (
                   <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover" />
                 ) : (
@@ -118,16 +118,16 @@ export default function StudentDashboard() {
               </div>
             </div>
             <div>
-              <p className="text-blue-100 text-[10px] font-bold uppercase tracking-[0.2em]">Academy Member</p>
-              <h1 className="text-3xl font-bold mt-1 tracking-tight">{userProfile?.name || 'Marketer'}</h1>
-              <div className="flex items-center gap-3 mt-4">
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
-                  <span className="text-[10px] font-bold uppercase tracking-wider">
+              <p className="text-blue-100 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em]">Academy Member</p>
+              <h1 className="text-2xl sm:text-3xl font-bold mt-1 tracking-tight truncate max-w-[200px] sm:max-w-none">{userProfile?.name || 'Marketer'}</h1>
+              <div className="flex items-center gap-2 sm:gap-3 mt-3 sm:mt-4">
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-lg sm:rounded-xl border border-white/10 shrink-0">
+                  <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">
                     {userProfile?.batchId === 'morning' ? '🌅 Morning' : '🌆 Evening'}
                   </span>
                 </div>
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
-                  <span className="text-[10px] font-mono font-bold tracking-widest">
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-lg sm:rounded-xl border border-white/10 shrink-0">
+                  <span className="text-[9px] sm:text-[10px] font-mono font-bold tracking-widest">
                     {userProfile?.studentId}
                   </span>
                 </div>
@@ -140,61 +140,61 @@ export default function StudentDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
           { icon: Zap, label: 'Attendance', value: `${attendancePct}%`, color: 'text-[#255A84]', bg: 'bg-blue-50' },
           { icon: Briefcase, label: 'Portfolio', value: data.portfolioCount, color: 'text-purple-600', bg: 'bg-purple-50' },
           { icon: Award, label: 'Completion', value: `${courseProgress}%`, color: 'text-[#F48B1F]', bg: 'bg-orange-50' },
           { icon: Sparkles, label: 'Academy ID', value: userProfile?.studentId?.substring(2) || '---', color: 'text-emerald-600', bg: 'bg-emerald-50' },
         ].map(({ icon: Icon, label, value, color, bg }) => (
-          <div key={label} className="bg-white rounded-3xl p-5 shadow-sm border border-slate-50 hover:shadow-md transition-all duration-300 group">
-            <div className={`h-11 w-11 rounded-2xl ${bg} flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
-              <Icon size={22} className={color} />
+          <div key={label} className="bg-white rounded-[1.5rem] sm:rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-50 hover:shadow-md transition-all duration-300 group active:scale-95">
+            <div className={`h-10 w-10 sm:h-11 sm:w-11 rounded-xl sm:rounded-2xl ${bg} flex items-center justify-center mb-3 sm:mb-4 transition-transform group-hover:scale-110`}>
+              <Icon size={20} className={color} />
             </div>
-            <p className={`text-2xl font-bold tracking-tight ${color}`}>{value}</p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{label}</p>
+            <p className={`text-xl sm:text-2xl font-bold tracking-tight ${color}`}>{value}</p>
+            <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{label}</p>
           </div>
         ))}
       </div>
 
       {/* Quick Access Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
         {/* Certification Card */}
-        <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-50 relative overflow-hidden">
+        <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 shadow-sm border border-slate-50 relative overflow-hidden">
           <div className="relative z-10">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="font-bold text-slate-800 text-xs uppercase tracking-[0.15em] flex items-center gap-2">
+            <div className="flex items-center justify-between mb-6 sm:mb-8">
+              <h2 className="font-bold text-slate-800 text-[10px] sm:text-xs uppercase tracking-[0.15em] flex items-center gap-2">
                 <Award size={18} className="text-[#F48B1F]" /> Certification
               </h2>
             </div>
             <div className="space-y-4">
               <div className="flex items-end justify-between">
-                <span className="text-3xl font-bold text-slate-800">{courseProgress}%</span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pb-1.5">Mastery Level</span>
+                <span className="text-2xl sm:text-3xl font-bold text-slate-800">{courseProgress}%</span>
+                <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest pb-1.5">Mastery Level</span>
               </div>
               <div className="h-3 bg-slate-50 rounded-full overflow-hidden border border-slate-100 p-0.5">
                 <div 
-                  className="h-full bg-gradient-to-r from-[#F48B1F] to-[#f7a552] rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(244,139,31,0.2)]"
+                  className="h-full bg-gradient-to-r from-[#F48B1F] to-[#f7a552] rounded-full transition-all duration-1000"
                   style={{ width: `${courseProgress}%` }}
                 />
               </div>
-              <p className="text-[10px] font-medium text-slate-400 leading-relaxed">
+              <p className="text-[9px] sm:text-[10px] font-medium text-slate-400 leading-relaxed">
                 Complete {Math.max(0, 100 - courseProgress)}% more of the curriculum to unlock your final Digital Marketing Master certification.
               </p>
             </div>
           </div>
-          <div className="absolute -right-4 -top-4 opacity-[0.03]">
+          <div className="absolute -right-4 -top-4 opacity-[0.03] pointer-events-none">
              <Award size={120} />
           </div>
         </div>
 
         {/* Marketing Tools Card */}
-        <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-50">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="font-bold text-slate-800 text-xs uppercase tracking-[0.15em] flex items-center gap-2">
+        <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 shadow-sm border border-slate-50">
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <h2 className="font-bold text-slate-800 text-[10px] sm:text-xs uppercase tracking-[0.15em] flex items-center gap-2">
               <Zap size={18} className="text-[#255A84]" /> Tool Arsenal
             </h2>
-            <Link to="/student/tools" className="text-[10px] font-bold text-[#255A84] hover:underline uppercase tracking-widest">Explore</Link>
+            <Link to="/student/tools" className="text-[9px] sm:text-[10px] font-bold text-[#255A84] hover:underline uppercase tracking-widest">Explore</Link>
           </div>
           <div className="space-y-3">
              {[
@@ -202,63 +202,59 @@ export default function StudentDashboard() {
                { name: 'Analytics', icon: TrendingUp, color: 'text-emerald-500' },
                { name: 'Keyword Hub', icon: Search, color: 'text-blue-500' }
              ].map((t, idx) => (
-               <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors">
+               <Link key={idx} to="/student/tools" className="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors active:scale-95">
                   <div className="flex items-center gap-3">
                     <t.icon size={14} className={t.color} />
                     <span className="text-xs font-bold text-slate-600">{t.name}</span>
                   </div>
                   <ArrowRight size={12} className="text-slate-300" />
-               </div>
+               </Link>
              ))}
           </div>
         </div>
 
         {/* Industry Trends Card */}
-        <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100">
-           <div className="flex items-center justify-between mb-8">
-            <h2 className="font-bold text-slate-800 text-xs uppercase tracking-[0.15em] flex items-center gap-2">
+        <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 shadow-sm border border-slate-100">
+           <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <h2 className="font-bold text-slate-800 text-[10px] sm:text-xs uppercase tracking-[0.15em] flex items-center gap-2">
               <Newspaper size={18} className="text-emerald-600" /> Market Trends
             </h2>
           </div>
           <div className="space-y-4">
-             <div className="flex gap-4">
-                <div className="flex-shrink-0 h-10 w-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
-                  <Star size={16} />
-                </div>
-                <div>
-                   <h4 className="text-xs font-bold text-slate-700">AI in Meta Ads</h4>
-                   <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-2">How Advantage+ campaigns are changing the game for small businesses...</p>
-                </div>
-             </div>
-             <div className="flex gap-4">
-                <div className="flex-shrink-0 h-10 w-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
-                  <Globe size={16} />
-                </div>
-                <div>
-                   <h4 className="text-xs font-bold text-slate-700">Google SGE Update</h4>
-                   <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-2">Understanding Search Generative Experience and its impact on SEO...</p>
-                </div>
-             </div>
+             {[
+               { title: 'AI in Meta Ads', desc: 'How Advantage+ campaigns are changing the game...', icon: Star, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+               { title: 'Google SGE Update', desc: 'Search Generative Experience and its impact on SEO...', icon: Globe, color: 'text-blue-600', bg: 'bg-blue-50' }
+             ].map((trend, idx) => (
+               <div key={idx} className="flex gap-4 p-1">
+                  <div className={`flex-shrink-0 h-11 w-11 ${trend.bg} rounded-xl flex items-center justify-center ${trend.color} shadow-sm`}>
+                    <trend.icon size={18} />
+                  </div>
+                  <div className="min-w-0">
+                     <h4 className="text-xs font-bold text-slate-700 truncate">{trend.title}</h4>
+                     <p className="text-[9px] sm:text-[10px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">{trend.desc}</p>
+                  </div>
+               </div>
+             ))}
           </div>
         </div>
       </div>
 
       {/* Date & Check-in Bar */}
-      <div className="bg-white rounded-[2.5rem] p-5 shadow-sm border border-slate-50 flex flex-col sm:flex-row items-center gap-6">
-        <div className="flex items-center gap-4 w-full sm:w-auto">
+      <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-4 sm:p-5 shadow-sm border border-slate-50 flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
+        <div className="flex items-center gap-4 w-full sm:w-auto p-2">
           <div className="h-14 w-14 rounded-2xl bg-[#255A84] flex flex-col items-center justify-center text-white flex-shrink-0 shadow-lg shadow-[#255A84]/20">
-            <span className="text-[10px] font-bold uppercase leading-none opacity-80">{new Date().toLocaleString('en-IN', { month: 'short' })}</span>
+            <span className="text-[9px] sm:text-[10px] font-bold uppercase leading-none opacity-80">{new Date().toLocaleString('en-IN', { month: 'short' })}</span>
             <span className="text-2xl font-bold leading-tight">{new Date().getDate()}</span>
           </div>
           <div>
             <p className="text-base font-bold text-slate-800 leading-tight">{new Date().toLocaleDateString('en-IN', { weekday: 'long' })}</p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">{new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
           </div>
         </div>
-        <div className="w-full sm:ml-auto sm:w-auto">
+        <div className="w-full sm:ml-auto sm:w-auto pb-2 sm:pb-0">
           <Link
             to="/student/attendance"
-            className="flex items-center justify-center gap-3 w-full sm:w-auto px-10 py-4 bg-[#F48B1F] hover:bg-[#cc7214] text-white text-[10px] font-bold rounded-2xl transition-all shadow-lg shadow-[#F48B1F]/20 uppercase tracking-widest active:scale-95"
+            className="flex items-center justify-center gap-3 w-full sm:w-auto px-10 py-4.5 bg-[#F48B1F] hover:bg-[#cc7214] text-white text-[11px] font-bold rounded-2xl transition-all shadow-lg shadow-[#F48B1F]/20 uppercase tracking-widest active:scale-95"
           >
             <QrCode size={18} /> Daily Check-in
           </Link>

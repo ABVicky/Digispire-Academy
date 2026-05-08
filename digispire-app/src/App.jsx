@@ -1,6 +1,8 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { AdminRoute, StudentRoute } from './components/ProtectedRoute';
+import InstallPrompt from './components/InstallPrompt';
 
 import AdminLayout from './layouts/AdminLayout';
 import StudentLayout from './layouts/StudentLayout';
@@ -29,9 +31,27 @@ import CommunityPortfolioPage from './pages/student/CommunityPortfolioPage';
 import ProfilePage from './pages/ProfilePage';
 
 function App() {
+  useEffect(() => {
+    // Fix for 100vh on mobile
+    const setVh = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+
+    setVh();
+    window.addEventListener('resize', setVh);
+    window.addEventListener('orientationchange', setVh);
+
+    return () => {
+      window.removeEventListener('resize', setVh);
+      window.removeEventListener('orientationchange', setVh);
+    };
+  }, []);
+
   return (
     <AuthProvider>
-      <Router>
+      <BrowserRouter>
+        <InstallPrompt />
         <Routes>
           {/* Public */}
           <Route path="/login" element={<LoginPage />} />
