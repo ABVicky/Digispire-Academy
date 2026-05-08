@@ -1,0 +1,18 @@
+[build]
+  # The directory to change to before starting a build.
+  # This is where your package.json is located.
+  base = "digispire-app"
+
+  # The command to run to build your project
+  command = "npm run build"
+
+  # The directory that contains the deploy-ready HTML files and assets
+  # This is relative to the 'base' directory.
+  publish = "dist"
+
+[[redirects]]
+  # This redirect rule is necessary for Single Page Applications (SPA) 
+  # to handle client-side routing properly.
+  from = "/*"
+  to = "/index.html"
+  status = 200
