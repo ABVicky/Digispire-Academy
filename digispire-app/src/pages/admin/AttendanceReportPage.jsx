@@ -137,7 +137,7 @@ export default function AttendanceReportPage() {
           <div className="py-20 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-[#255A84] border-t-transparent rounded-full" /></div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm responsive-table">
               <thead>
                 <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
                   <th className="text-left px-8 py-4">Student Name</th>
@@ -151,37 +151,37 @@ export default function AttendanceReportPage() {
               <tbody className="divide-y divide-slate-50">
                 {filteredReport.map(s => (
                   <tr key={s.id} className="hover:bg-slate-50/50 transition-colors group">
-                    <td className="px-8 py-4">
+                    <td className="px-8 py-4" data-label="Student Name">
                       <div className="flex items-center gap-4">
-                        <div className={`h-10 w-10 rounded-2xl flex items-center justify-center text-white font-bold text-xs shadow-sm ${reportType === 'internship' ? 'bg-emerald-500' : 'bg-[#255A84]'}`}>
+                        <div className={`h-11 w-11 rounded-2xl flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0 ${reportType === 'internship' ? 'bg-emerald-500' : 'bg-[#255A84]'}`}>
                           {s.name?.charAt(0)}
                         </div>
-                        <div>
-                          <p className="font-bold text-slate-800">{s.name}</p>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{s.studentId} · {s.batchId}</p>
+                        <div className="min-w-0">
+                          <p className="font-bold text-slate-800 truncate">{s.name}</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate">{s.studentId} · {s.batchId}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-center font-bold text-slate-500">{s.totalHeld}</td>
-                    <td className="px-4 py-4 text-center font-bold text-emerald-600 bg-emerald-50/20">{s.attended}</td>
-                    <td className="px-4 py-4 text-center font-bold text-red-400 bg-red-50/20">{s.absent}</td>
-                    <td className="px-4 py-4 text-center">
-                      <div className="flex flex-col items-center gap-1">
+                    <td className="px-4 py-4 text-center font-bold text-slate-500" data-label="Total Sessions">{s.totalHeld}</td>
+                    <td className="px-4 py-4 text-center font-bold text-emerald-600 bg-emerald-50/20" data-label="Attended">{s.attended}</td>
+                    <td className="px-4 py-4 text-center font-bold text-red-400 bg-red-50/20" data-label="Missed">{s.absent}</td>
+                    <td className="px-4 py-4 text-center" data-label="Score (%)">
+                      <div className="flex flex-col items-center gap-1 w-full sm:w-auto">
                         <span className={`text-xs font-bold ${s.percentage >= 75 ? 'text-emerald-600' : s.percentage >= 50 ? 'text-[#F48B1F]' : 'text-red-500'}`}>
                           {s.percentage}%
                         </span>
-                        <div className="w-16 h-1 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                           <div className={`h-full ${s.percentage >= 75 ? 'bg-emerald-500' : 'bg-red-400'}`} style={{ width: `${s.percentage}%` }} />
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-4 text-right">
-                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-widest ${
+                    <td className="px-8 py-4 text-right" data-label="Verdict">
+                      <span className={`text-[10px] font-bold px-3 py-1.5 rounded-xl uppercase tracking-widest ${
                         s.percentage >= 75 ? 'bg-emerald-50 text-emerald-600' : 
                         s.percentage >= 40 ? 'bg-orange-50 text-[#F48B1F]' : 
                         'bg-red-50 text-red-500'
                       }`}>
-                        {s.percentage >= 75 ? 'Excellent' : s.percentage >= 40 ? 'Needs Attention' : 'Critical'}
+                        {s.percentage >= 75 ? 'Excellent' : s.percentage >= 40 ? 'Review' : 'Alert'}
                       </span>
                     </td>
                   </tr>
