@@ -126,3 +126,14 @@ button, a, input, select {
     color: #94a3b8;
   }
 }
+
+/* Scanner Animation */
+@keyframes scan-line {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(248px); }
+  100% { transform: translateY(0); }
+}
+
+.animate-scan-line {
+  animation: scan-line 3s ease-in-out infinite;
+}

@@ -1,49 +1,104 @@
-import { useState, useEffect } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { useState, useEffect, useRef } from 'react';
+import { Html5Qrcode } from 'html5-qrcode';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useAuth } from '../../context/AuthContext';
 import { 
   QrCode, CheckCircle2, AlertCircle, RefreshCw, 
-  Clock, Calendar, Briefcase, Camera
+  Clock, Calendar, Briefcase, Camera, X
 } from 'lucide-react';
 
 export default function StudentAttendancePage() {
   const { userProfile } = useAuth();
-  const [status, setStatus] = useState('idle'); // idle, scanning, success, error
+  const [status, setStatus] = useState('idle'); // idle, scanning, success, error, processing
   const [message, setMessage] = useState('');
   const [lastAttendance, setLastAttendance] = useState(null);
+  const scannerRef = useRef(null);
 
   useEffect(() => {
     if (!userProfile?.studentId) return;
 
     const fetchLast = async () => {
-      const q = query(
-        collection(db, 'attendance'),
-        where('studentId', '==', userProfile.studentId),
-        orderBy('timestamp', 'desc'),
-        limit(1)
-      );
-      const snap = await getDocs(q);
-      if (!snap.empty) setLastAttendance(snap.docs[0].data());
-    };
-    // Note: requires index, fallback to simple fetch
-    getDocs(query(collection(db, 'attendance'), where('studentId', '==', userProfile.studentId)))
-      .then(snap => {
-        const sorted = snap.docs.map(d => d.data()).sort((a, b) => b.timestamp - a.timestamp);
+      try {
+        const q = query(
+          collection(db, 'attendance'),
+          where('studentId', '==', userProfile.studentId),
+          orderBy('timestamp', 'desc'),
+          limit(1)
+        );
+        const snap = await getDocs(q);
+        if (!snap.empty) setLastAttendance(snap.docs[0].data());
+      } catch (err) {
+        // Fallback for missing index
+        const snap = await getDocs(query(collection(db, 'attendance'), where('studentId', '==', userProfile.studentId)));
+        const sorted = snap.docs.map(d => d.data()).sort((a, b) => (b.timestamp?.toMillis?.() || 0) - (a.timestamp?.toMillis?.() || 0));
         if (sorted[0]) setLastAttendance(sorted[0]);
-      });
+      }
+    };
+    fetchLast();
   }, [userProfile]);
 
   useEffect(() => {
+    let html5QrCode = null;
+
     if (status === 'scanning') {
-      const scanner = new Html5QrcodeScanner('qr-reader', { fps: 10, qrbox: 250 });
-      scanner.render(onScanSuccess, onScanError);
-      return () => scanner.clear();
+      const startScanner = async () => {
+        try {
+          html5QrCode = new Html5Qrcode("qr-reader");
+          scannerRef.current = html5QrCode;
+          
+          const config = { 
+            fps: 15, 
+            qrbox: (viewWidth, viewHeight) => {
+              const size = Math.min(viewWidth, viewHeight) * 0.7;
+              return { width: size, height: size };
+            },
+            aspectRatio: 1.0
+          };
+
+          await html5QrCode.start(
+            { facingMode: "environment" },
+            config,
+            onScanSuccess,
+            (errorMessage) => { /* ignore minor scan errors */ }
+          );
+        } catch (err) {
+          console.error("Scanner start error:", err);
+          setStatus('error');
+          setMessage("Could not access camera. Please ensure permissions are granted.");
+        }
+      };
+
+      startScanner();
     }
+
+    return () => {
+      const cleanup = async () => {
+        if (scannerRef.current) {
+          try {
+            if (scannerRef.current.isScanning) {
+              await scannerRef.current.stop();
+            }
+            scannerRef.current.clear();
+          } catch (err) {
+            console.error("Cleanup error:", err);
+          }
+        }
+      };
+      cleanup();
+    };
   }, [status]);
 
   const onScanSuccess = async (decodedText) => {
+    // Immediately stop scanning to avoid duplicate processing
+    if (scannerRef.current) {
+      try {
+        await scannerRef.current.stop();
+      } catch (e) {
+        console.error("Stop failed", e);
+      }
+    }
+
     setStatus('processing');
     try {
       const data = JSON.parse(decodedText);
@@ -99,10 +154,6 @@ export default function StudentAttendancePage() {
     }
   };
 
-  const onScanError = (err) => {
-    // console.warn(err);
-  };
-
   return (
     <div className="max-w-md mx-auto space-y-6">
       <div className="text-center space-y-2">
@@ -111,15 +162,15 @@ export default function StudentAttendancePage() {
       </div>
 
       {/* Main Container */}
-      <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
+      <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden relative min-h-[400px] flex flex-col">
         {status === 'idle' && (
-          <div className="p-10 flex flex-col items-center text-center space-y-8 animate-in fade-in zoom-in duration-300">
+          <div className="flex-1 p-10 flex flex-col items-center justify-center text-center space-y-8 animate-in fade-in zoom-in duration-300">
             <div className="h-24 w-24 bg-blue-50 rounded-[2rem] flex items-center justify-center text-[#255A84] shadow-inner">
               <QrCode size={48} strokeWidth={1.5} />
             </div>
             <div>
               <p className="text-lg font-bold text-slate-800">Ready to Scan?</p>
-              <p className="text-xs text-slate-400 mt-2 font-medium px-4">Ensure you are scanning the correct session (Academic or Internship)</p>
+              <p className="text-xs text-slate-400 mt-2 font-medium px-4 leading-relaxed">Ensure you are scanning the correct session (Academic or Internship)</p>
             </div>
             <button
               onClick={() => setStatus('scanning')}
@@ -131,13 +182,29 @@ export default function StudentAttendancePage() {
         )}
 
         {status === 'scanning' && (
-          <div className="p-6 space-y-6">
-            <div id="qr-reader" className="overflow-hidden rounded-[2rem] border-2 border-[#255A84]/10 shadow-inner"></div>
+          <div className="relative flex-1 flex flex-col">
+            <div className="absolute inset-0 z-10 pointer-events-none flex flex-col items-center justify-center">
+              {/* Custom Overlay */}
+              <div className="w-[250px] h-[250px] border-2 border-white/20 rounded-[2rem] relative overflow-hidden">
+                {/* Scanning Laser Line */}
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.8)] animate-scan-line"></div>
+                
+                {/* Corners */}
+                <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-blue-500 rounded-tl-2xl"></div>
+                <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-blue-500 rounded-tr-2xl"></div>
+                <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-blue-500 rounded-bl-2xl"></div>
+                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-blue-500 rounded-br-2xl"></div>
+              </div>
+              <p className="mt-8 text-white text-[10px] font-bold uppercase tracking-[0.2em] bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm">Align QR Code within frame</p>
+            </div>
+
+            <div id="qr-reader" className="flex-1 bg-black"></div>
+            
             <button
               onClick={() => setStatus('idle')}
-              className="w-full py-4 bg-slate-50 text-slate-400 font-bold rounded-2xl text-sm hover:bg-slate-100 transition"
+              className="absolute top-4 right-4 z-20 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md transition-colors"
             >
-              Cancel Scan
+              <X size={20} />
             </button>
           </div>
         )}
