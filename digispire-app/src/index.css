@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@theme {
+  --font-inter: "Inter", sans-serif;
+}
+
+:root {
+  --primary: #255A84;
+  --primary-dark: #1a4261;
+  --secondary: #F48B1F;
+  --accent: #E2E8F0;
+  --bg-main: #F8FAFC;
+}
+
+/* Base Styles */
+body {
+  font-family: var(--font-inter);
+  background-color: var(--bg-main);
+  color: #1e293b;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none; /* Disable text selection for app-like feel */
+  overflow-x: hidden;
+  /* Support for iOS Notches */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Allow selection only in specific fields */
+input, textarea, [contenteditable="true"] {
+  user-select: text;
+}
+
+/* Hide scrollbars for a cleaner PWA look */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Premium Text Shadows & Gradients */
+.text-premium {
+  background: linear-gradient(135deg, #255A84 0%, #3a7ba6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* PWA App-like transitions */
+.page-transition {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Card Hover Effects for Touch */
+.touch-card {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+}
+.touch-card:active {
+  transform: scale(0.98);
+}
+
+/* Custom Checkbox/Radio Styling for PWA */
+input[type="checkbox"], input[type="radio"] {
+  accent-color: var(--primary);
+}
+
+/* Responsive Grid Fixes */
+.grid-auto-fit {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
