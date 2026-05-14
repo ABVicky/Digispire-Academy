@@ -192,7 +192,7 @@ export default function StudentDashboard() {
         <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 shadow-sm border border-slate-50">
           <div className="flex items-center justify-between mb-6 sm:mb-8">
             <h2 className="font-bold text-slate-800 text-[10px] sm:text-xs uppercase tracking-[0.15em] flex items-center gap-2">
-              <Zap size={18} className="text-[#255A84]" /> Tool Arsenal
+              <Zap size={18} className="text-[#255A84]" /> Tools
             </h2>
             <Link to="/student/tools" className="text-[9px] sm:text-[10px] font-bold text-[#255A84] hover:underline uppercase tracking-widest">Explore</Link>
           </div>

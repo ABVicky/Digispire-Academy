@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   collection, addDoc, getDocs, query, where, orderBy, limit, serverTimestamp,
-  doc, setDoc, deleteDoc
+  doc, setDoc, deleteDoc, onSnapshot
 } from 'firebase/firestore';
 import { db } from '../../firebase';
 import {
   QrCode, RefreshCw, Clock, Calendar, Users, ChevronRight,
-  TrendingUp, CheckCircle2, History, Trash2, ArrowRight, Briefcase
+  TrendingUp, CheckCircle2, History, Trash2, ArrowRight, Briefcase, X
 } from 'lucide-react';
 import QRCode from 'qrcode';
 
@@ -18,12 +18,34 @@ export default function AttendancePage() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ total: 0, today: 0 });
+  const [courses, setCourses] = useState([]);
+  const [modules, setModules] = useState([]);
+  const [topics, setTopics] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState('');
+  const [selectedModule, setSelectedModule] = useState('');
+  const [selectedTopics, setSelectedTopics] = useState([]);
 
-  const fetchRecords = async () => {
-    setLoading(true);
+  const fetchCurriculum = async () => {
     try {
-      const q = query(collection(db, 'attendance'), orderBy('timestamp', 'desc'), limit(50));
-      const snap = await getDocs(q);
+      const [cSnap, mSnap, tSnap] = await Promise.all([
+        getDocs(collection(db, 'courses')),
+        getDocs(collection(db, 'modules')),
+        getDocs(collection(db, 'topics'))
+      ]);
+      setCourses(cSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setModules(mSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setTopics(tSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (err) {
+      console.error('Failed to fetch curriculum:', err);
+    }
+  };
+
+  useEffect(() => { 
+    fetchCurriculum();
+    setLoading(true);
+    
+    const q = query(collection(db, 'attendance'), orderBy('timestamp', 'desc'), limit(50));
+    const unsubscribe = onSnapshot(q, (snap) => {
       const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       setRecords(docs);
 
@@ -32,14 +54,14 @@ export default function AttendancePage() {
         total: docs.length,
         today: docs.filter(r => r.date === today).length
       });
-    } catch (err) {
-      console.error(err);
-    } finally {
       setLoading(false);
-    }
-  };
+    }, (err) => {
+      console.error('Realtime sync error:', err);
+      setLoading(false);
+    });
 
-  useEffect(() => { fetchRecords(); }, []);
+    return () => unsubscribe();
+  }, []);
 
   const generateQR = async () => {
     const sessionId = Math.random().toString(36).substring(7);
@@ -50,7 +72,10 @@ export default function AttendancePage() {
       batchId: activeTab,
       sessionId,
       expiresAt,
-      date: new Date().toISOString().split('T')[0]
+      date: new Date().toISOString().split('T')[0],
+      coveredCourse: selectedCourse,
+      coveredModule: selectedModule,
+      coveredTopics: selectedTopics
     };
 
     try {
@@ -64,6 +89,23 @@ export default function AttendancePage() {
       });
       setQrImageUrl(url);
       await setDoc(doc(db, 'qr_sessions', activeTab), newQr);
+      
+      // Log session permanently (wrapped in try-catch to not block UI if rules fail)
+      try {
+        await addDoc(collection(db, 'class_sessions'), {
+          type: newQr.type,
+          batchId: newQr.batchId,
+          date: newQr.date,
+          sessionId: newQr.sessionId,
+          timestamp: serverTimestamp(),
+          coveredCourse: selectedCourse,
+          coveredModule: selectedModule,
+          coveredTopics: selectedTopics
+        });
+      } catch (logErr) {
+        console.error('Failed to log permanent session:', logErr);
+      }
+
       setQrData(newQr);
       setTimeLeft(300);
     } catch (err) {
@@ -71,17 +113,30 @@ export default function AttendancePage() {
     }
   };
 
+  const discardQR = async () => {
+    try {
+      await deleteDoc(doc(db, 'qr_sessions', activeTab));
+    } catch (err) {
+      console.error('Failed to discard QR:', err);
+    }
+    setQrData(null);
+    setQrImageUrl('');
+    setTimeLeft(0);
+  };
+
   useEffect(() => {
-    if (timeLeft <= 0) return;
+    if (timeLeft <= 0) {
+      if (qrData) discardQR();
+      return;
+    }
     const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
     return () => clearInterval(timer);
-  }, [timeLeft]);
+  }, [timeLeft, qrData]);
 
   const deleteRecord = async (id) => {
     if (!window.confirm('Remove this attendance entry?')) return;
     try {
       await deleteDoc(doc(db, 'attendance', id));
-      fetchRecords();
     } catch (err) { console.error(err); }
   };
 
@@ -139,13 +194,73 @@ export default function AttendancePage() {
             )}
           </div>
 
-          <button
-            onClick={generateQR}
-            className={`w-full mt-8 py-4.5 text-white rounded-2xl font-bold text-sm transition shadow-xl flex items-center justify-center gap-3 active:scale-95 ${activeTab === 'internship' ? 'bg-emerald-600 shadow-emerald-500/20' : 'bg-[#255A84] shadow-[#255A84]/20'}`}
-          >
-            <RefreshCw size={18} className={timeLeft > 0 ? 'animate-spin' : ''} />
-            {qrData ? 'Reset Code' : `Start ${activeTab} Session`}
-          </button>
+          {/* Topic Selection */}
+          {!qrData && (
+            <div className="w-full text-left mt-6 space-y-3">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Curriculum Covered (Optional)</label>
+              
+              <select 
+                value={selectedCourse} 
+                onChange={e => { setSelectedCourse(e.target.value); setSelectedModule(''); setSelectedTopics([]); }}
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#255A84] bg-slate-50"
+              >
+                <option value="">Select Course...</option>
+                {courses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+
+              <select 
+                value={selectedModule} 
+                onChange={e => { setSelectedModule(e.target.value); setSelectedTopics([]); }}
+                disabled={!selectedCourse}
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#255A84] bg-slate-50 disabled:opacity-50"
+              >
+                <option value="">Select Module...</option>
+                {modules.filter(m => m.courseId === selectedCourse).map(m => (
+                  <option key={m.id} value={m.id}>{m.title}</option>
+                ))}
+              </select>
+
+              {selectedModule && (
+                <div className="mt-2 max-h-32 overflow-y-auto no-scrollbar border border-slate-100 rounded-xl p-2 bg-slate-50/50">
+                  {topics.filter(t => t.moduleId === selectedModule).length === 0 ? (
+                    <p className="text-xs text-slate-400 p-2 text-center">No topics found in this module.</p>
+                  ) : (
+                    topics.filter(t => t.moduleId === selectedModule).map(topic => (
+                      <label key={topic.id} className="flex items-start gap-2 px-2 py-2 hover:bg-white rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-100">
+                        <input 
+                          type="checkbox" 
+                          className="mt-0.5 rounded text-[#255A84] focus:ring-[#255A84] border-slate-300 flex-shrink-0"
+                          checked={selectedTopics.includes(topic.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) setSelectedTopics(prev => [...prev, topic.id]);
+                            else setSelectedTopics(prev => prev.filter(id => id !== topic.id));
+                          }}
+                        />
+                        <span className="text-xs font-medium text-slate-700 leading-tight">{topic.title}</span>
+                      </label>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {qrData ? (
+            <button
+              onClick={discardQR}
+              className="w-full mt-8 py-4.5 bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 rounded-2xl font-bold text-sm transition flex items-center justify-center gap-3 active:scale-95"
+            >
+              <X size={18} /> Discard Session
+            </button>
+          ) : (
+            <button
+              onClick={generateQR}
+              className={`w-full mt-8 py-4.5 text-white rounded-2xl font-bold text-sm transition shadow-xl flex items-center justify-center gap-3 active:scale-95 ${activeTab === 'internship' ? 'bg-emerald-600 shadow-emerald-500/20' : 'bg-[#255A84] shadow-[#255A84]/20'}`}
+            >
+              <RefreshCw size={18} />
+              Start {activeTab} Session
+            </button>
+          )}
           <p className="mt-5 text-[9px] sm:text-[10px] text-slate-400 font-medium italic leading-relaxed">
             {activeTab === 'internship' ? '* Only enrolled interns can scan this.' : '* Only students in this batch can scan.'}
           </p>
@@ -157,7 +272,7 @@ export default function AttendancePage() {
             <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
               <History size={18} className="text-[#255A84]" /> Live Feed
             </h2>
-            <button onClick={fetchRecords} className="p-3 text-slate-400 hover:text-[#255A84] transition active:rotate-180 duration-500">
+            <button onClick={fetchCurriculum} className="p-3 text-slate-400 hover:text-[#255A84] transition active:rotate-180 duration-500" title="Refresh Curriculum">
               <RefreshCw size={18} />
             </button>
           </div>
@@ -171,6 +286,7 @@ export default function AttendancePage() {
                   <tr>
                     <th className="text-left px-8 py-3">Student</th>
                     <th className="text-left px-4 py-3">Track</th>
+                    <th className="text-left px-4 py-3">Topic</th>
                     <th className="text-left px-4 py-3">Time</th>
                     <th className="text-right px-8 py-3">Actions</th>
                   </tr>
@@ -189,6 +305,21 @@ export default function AttendancePage() {
                         }`}>
                           {record.type === 'internship' ? 'Internship' : record.batchId}
                         </span>
+                      </td>
+                      <td className="px-4 py-4" data-label="Topic">
+                        {record.coveredCourse ? (
+                          <div>
+                            <p className="text-xs font-bold text-slate-700">
+                              {courses.find(c => c.id === record.coveredCourse)?.name || 'Unknown Course'}
+                            </p>
+                            <p className="text-[10px] text-slate-500">
+                              {modules.find(m => m.id === record.coveredModule)?.title || 'Unknown Module'}
+                              {record.coveredTopics?.length > 0 && ` • ${record.coveredTopics.length} Topics`}
+                            </p>
+                          </div>
+                        ) : (
+                          <span className="text-[10px] text-slate-400 font-medium italic">General</span>
+                        )}
                       </td>
                       <td className="px-4 py-4 text-slate-500 font-medium" data-label="Time">
                         <div className="flex items-center gap-2">

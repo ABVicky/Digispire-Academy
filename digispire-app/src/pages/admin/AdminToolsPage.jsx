@@ -69,7 +69,7 @@ export default function AdminToolsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Arsenal Manager</h1>
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Tools Manager</h1>
           <p className="text-sm text-slate-500 font-medium">Manage the digital marketing tools repository</p>
         </div>
         <button 
@@ -85,7 +85,7 @@ export default function AdminToolsPage() {
       ) : tools.length === 0 ? (
         <div className="bg-white rounded-[2.5rem] p-12 text-center border border-dashed border-slate-200">
           <Zap size={48} className="mx-auto mb-4 text-slate-200" />
-          <h3 className="font-bold text-slate-800">No tools in the arsenal</h3>
+          <h3 className="font-bold text-slate-800">No tools found</h3>
           <p className="text-sm text-slate-400 mt-2">Start by adding tools that students should use.</p>
         </div>
       ) : (
@@ -158,7 +158,7 @@ export default function AdminToolsPage() {
 
               <button disabled={saving} type="submit" className="w-full py-5 bg-[#255A84] text-white rounded-[2rem] font-bold text-sm uppercase tracking-widest shadow-xl shadow-[#255A84]/20 active:scale-95 transition-all flex items-center justify-center gap-3">
                 {saving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-                {saving ? 'Saving...' : (editingId ? 'Update Tool' : 'Add to Arsenal')}
+                {saving ? 'Saving...' : (editingId ? 'Update Tool' : 'Add Tool')}
               </button>
             </form>
           </div>

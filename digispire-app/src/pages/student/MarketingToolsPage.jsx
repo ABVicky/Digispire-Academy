@@ -44,7 +44,7 @@ export default function MarketingToolsPage() {
   return (
     <div className="space-y-6 pb-20">
       <div className="px-2">
-        <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Marketing Arsenal</h1>
+        <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Marketing Tools</h1>
         <p className="text-sm text-slate-500 font-medium mt-1">Professional tools curated by your educators</p>
       </div>
 

@@ -8,10 +8,11 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Helper: check if caller has admin role
+    // Helper: check if caller has admin or educator role
     function isAdmin() {
       return isAuth() &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'educator');
     }
 
     // Users collection
@@ -72,6 +73,12 @@ service cloud.firestore {
 
     // Marketing Arsenal (Tools)
     match /marketing_tools/{id} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+
+    // Class Sessions (Permanent logs)
+    match /class_sessions/{id} {
       allow read: if isAuth();
       allow write: if isAdmin();
     }

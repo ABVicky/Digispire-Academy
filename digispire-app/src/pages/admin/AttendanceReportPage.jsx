@@ -16,6 +16,7 @@ export default function AttendanceReportPage() {
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState([]);
   const [attendance, setAttendance] = useState([]);
+  const [sessions, setSessions] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [search, setSearch] = useState('');
@@ -24,12 +25,14 @@ export default function AttendanceReportPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [uSnap, aSnap] = await Promise.all([
+      const [uSnap, aSnap, sSnap] = await Promise.all([
         getDocs(query(collection(db, 'users'), where('role', '==', 'student'))),
-        getDocs(collection(db, 'attendance'))
+        getDocs(collection(db, 'attendance')),
+        getDocs(collection(db, 'class_sessions'))
       ]);
       setStudents(uSnap.docs.map(d => ({ id: d.id, ...d.data() })));
       setAttendance(aSnap.docs.map(d => d.data()));
+      setSessions(sSnap.docs.map(d => d.data()));
     } catch (err) {
       console.error(err);
     } finally {
@@ -45,13 +48,14 @@ export default function AttendanceReportPage() {
     // 1. Filter attendance by type (Academic vs Internship)
     const filteredAttendance = attendance.filter(r => (r.type || 'academic') === reportType);
 
-    // 2. Identify "Class Dates" held for each batch
+    // 2. Identify "Class Dates" held for each batch using official class sessions
     const classDates = {}; 
-    filteredAttendance.forEach(record => {
-      if (record.date?.startsWith(monthStr)) {
-        const key = reportType === 'internship' ? 'internship' : record.batchId;
+    const filteredSessions = sessions.filter(r => (r.type || 'academic') === reportType);
+    filteredSessions.forEach(session => {
+      if (session.date?.startsWith(monthStr)) {
+        const key = reportType === 'internship' ? 'internship' : session.batchId;
         if (!classDates[key]) classDates[key] = new Set();
-        classDates[key].add(record.date);
+        classDates[key].add(session.date);
       }
     });
 

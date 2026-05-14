@@ -70,8 +70,8 @@ export default function InstallPrompt() {
         {/* Background Accent */}
         <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full -mr-12 -mt-12 opacity-50" />
         
-        <div className="h-14 w-14 bg-[#255A84] rounded-2xl flex items-center justify-center shadow-lg shadow-[#255A84]/20 shrink-0 relative z-10">
-          <img src="/logo.png" alt="App Icon" className="h-8 w-8 invert brightness-0" />
+        <div className="h-14 w-14 bg-white border border-slate-100 rounded-2xl flex items-center justify-center shadow-sm shrink-0 relative z-10">
+          <img src="/logo.png" alt="App Icon" className="h-10 w-10 object-contain" />
         </div>
 
         <div className="flex-1 relative z-10">

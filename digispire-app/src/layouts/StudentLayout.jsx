@@ -10,7 +10,7 @@ import {
 const navItems = [
   { path: 'dashboard', label: 'Home', icon: LayoutDashboard },
   { path: 'courses', label: 'Academy', icon: BookOpen },
-  { path: 'tools', label: 'Arsenal', icon: Zap },
+  { path: 'tools', label: 'Tools', icon: Zap },
   { path: 'portfolio', label: 'Portfolio', icon: Briefcase },
   { path: 'community', label: 'Wall of Fame', icon: Globe },
   { path: 'attendance', label: 'Check-in', icon: QrCode },
@@ -33,8 +33,8 @@ export default function StudentLayout() {
       {/* Mobile Top Header */}
       <div className="md:hidden bg-white px-6 py-4 flex items-center justify-between border-b border-slate-100 sticky top-0 z-40">
         <div className="flex items-center gap-2">
-          <div className="h-9 w-9 bg-[#255A84] rounded-xl flex items-center justify-center shadow-sm">
-            <img src="/logo.png" alt="Logo" className="h-5 w-5 invert brightness-0" />
+          <div className="h-9 w-9 bg-white border border-slate-100 rounded-xl flex items-center justify-center shadow-sm">
+            <img src="/logo.png" alt="Logo" className="h-6 w-6 object-contain" />
           </div>
           <span className="font-bold text-slate-800 tracking-tight text-lg">DIGISPIRE</span>
         </div>
@@ -59,8 +59,8 @@ export default function StudentLayout() {
         <div className="flex flex-col h-full p-6">
           <div className="flex items-center justify-between md:block mb-8">
             <div className="flex items-center gap-3 px-2">
-              <div className="h-10 w-10 bg-[#255A84] rounded-xl flex items-center justify-center shadow-lg shadow-[#255A84]/20">
-                <img src="/logo.png" alt="Logo" className="h-6 w-6 invert brightness-0" />
+              <div className="h-10 w-10 bg-white border border-slate-100 rounded-xl flex items-center justify-center shadow-sm">
+                <img src="/logo.png" alt="Logo" className="h-7 w-7 object-contain" />
               </div>
               <h1 className="font-bold text-slate-800 tracking-tight leading-none text-xl">DIGISPIRE</h1>
             </div>
@@ -119,7 +119,13 @@ export default function StudentLayout() {
 
       {/* Mobile Bottom Navigation Bar (PWA Style) */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-3 pt-3 pb-[calc(env(safe-area-inset-bottom)+8px)] z-40 flex justify-around items-center">
-        {navItems.slice(0, 5).map((item) => {
+        {[
+          navItems.find(i => i.path === 'dashboard'),
+          navItems.find(i => i.path === 'courses'),
+          navItems.find(i => i.path === 'tools'),
+          navItems.find(i => i.path === 'attendance'),
+          navItems.find(i => i.path === 'community')
+        ].map((item) => {
           const isActive = location.pathname.includes(item.path);
           return (
             <NavLink

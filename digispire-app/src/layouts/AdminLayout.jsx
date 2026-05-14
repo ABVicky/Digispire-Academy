@@ -15,7 +15,7 @@ const navItems = [
   { path: 'content', label: 'Resources', icon: FileText },
   { path: 'analytics', label: 'Analytics', icon: BarChart3 },
   { path: 'reports', label: 'Reports', icon: FileSpreadsheet },
-  { path: 'tools', label: 'Arsenal', icon: Zap },
+  { path: 'tools', label: 'Tools', icon: Zap },
   { path: 'community', label: 'Wall of Fame', icon: Globe },
 ];
 
@@ -36,8 +36,8 @@ export default function AdminLayout() {
       {/* Mobile Header */}
       <div className="md:hidden bg-white px-6 py-4 flex items-center justify-between border-b border-slate-100 sticky top-0 z-40">
         <div className="flex items-center gap-2">
-          <div className="h-9 w-9 bg-[#255A84] rounded-xl flex items-center justify-center shadow-sm">
-            <img src="/logo.png" alt="Logo" className="h-5 w-5 invert brightness-0" />
+          <div className="h-9 w-9 bg-white border border-slate-100 rounded-xl flex items-center justify-center shadow-sm">
+            <img src="/logo.png" alt="Logo" className="h-6 w-6 object-contain" />
           </div>
           <span className="font-bold text-slate-800 tracking-tight text-lg">DIGISPIRE</span>
         </div>
@@ -57,8 +57,8 @@ export default function AdminLayout() {
           {/* Logo */}
           <div className="flex items-center justify-between md:block mb-8">
             <div className="flex items-center gap-3 px-2">
-              <div className="h-10 w-10 bg-[#255A84] rounded-xl flex items-center justify-center shadow-lg shadow-[#255A84]/20">
-                <img src="/logo.png" alt="Logo" className="h-6 w-6 invert brightness-0" />
+              <div className="h-10 w-10 bg-white border border-slate-100 rounded-xl flex items-center justify-center shadow-sm">
+                <img src="/logo.png" alt="Logo" className="h-7 w-7 object-contain" />
               </div>
               <div>
                 <h1 className="font-bold text-slate-800 tracking-tight leading-none text-xl">DIGISPIRE</h1>

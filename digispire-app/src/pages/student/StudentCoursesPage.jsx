@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { collection, getDocs, updateDoc, doc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useAuth } from '../../context/AuthContext';
 import { BookOpen, ChevronDown, ChevronRight, Check, Trophy, BookMarked } from 'lucide-react';
@@ -28,29 +28,6 @@ export default function StudentCoursesPage() {
   };
 
   useEffect(() => { fetchAll(); }, []);
-
-  const toggleTopic = async (topicId, isCompleted) => {
-    if (!userProfile?.uid) return;
-    try {
-      const topicRef = doc(db, 'topics', topicId);
-      await updateDoc(topicRef, {
-        completedStudents: isCompleted
-          ? arrayRemove(userProfile.uid)
-          : arrayUnion(userProfile.uid)
-      });
-      // Update local state for instant feedback
-      setTopics(prev => prev.map(t =>
-        t.id === topicId
-          ? {
-            ...t,
-            completedStudents: isCompleted
-              ? (t.completedStudents || []).filter(uid => uid !== userProfile.uid)
-              : [...(t.completedStudents || []), userProfile.uid]
-          }
-          : t
-      ));
-    } catch (err) { console.error('Error toggling topic:', err); }
-  };
 
   const calcProgress = (courseId) => {
     const courseMods = modules.filter(m => m.courseId === courseId);
@@ -154,19 +131,18 @@ export default function StudentCoursesPage() {
                                 ) : modTopics.map(topic => {
                                   const isCompleted = topic.completedStudents?.includes(userProfile?.uid);
                                   return (
-                                    <button
+                                    <div
                                       key={topic.id}
-                                      onClick={() => toggleTopic(topic.id, isCompleted)}
-                                      className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all ${isCompleted ? 'bg-emerald-50/50' : 'bg-white hover:bg-slate-100/50'}`}
+                                      className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all cursor-default ${isCompleted ? 'bg-emerald-50/50' : 'bg-white border border-slate-50'}`}
                                     >
-                                      <div className={`h-6 w-6 rounded-xl border-2 flex items-center justify-center transition-all ${isCompleted ? 'bg-emerald-500 border-emerald-500 shadow-lg shadow-emerald-500/20' : 'border-slate-200 bg-white'}`}>
+                                      <div className={`h-6 w-6 rounded-xl border-2 flex items-center justify-center transition-all ${isCompleted ? 'bg-emerald-500 border-emerald-500 shadow-lg shadow-emerald-500/20' : 'border-slate-200 bg-slate-50'}`}>
                                         {isCompleted && <Check size={12} className="text-white" strokeWidth={4} />}
                                       </div>
                                       <span className={`text-sm font-medium transition-colors ${isCompleted ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
                                         {topic.title}
                                       </span>
                                       {isCompleted && <span className="ml-auto text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Completed</span>}
-                                    </button>
+                                    </div>
                                   );
                                 })}
                               </div>

@@ -72,8 +72,8 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo & Brand */}
         <div className="flex flex-col items-center mb-8">
-          <div className="bg-white/10 p-4 rounded-3xl backdrop-blur-md mb-4 shadow-xl border border-white/10">
-            <img src="/logo.png" alt="DIGISPIRE Academy" className="h-20 w-auto object-contain drop-shadow-lg" />
+          <div className="bg-white p-4 rounded-3xl mb-4 shadow-xl border border-slate-100/50">
+            <img src="/logo.png" alt="DIGISPIRE Academy" className="h-20 w-auto object-contain" />
           </div>
           <h1 className="text-3xl font-bold text-white tracking-tight">DIGISPIRE</h1>
           <p className="text-blue-300 text-sm font-medium tracking-widest uppercase mt-1 opacity-80">Academy Portal</p>

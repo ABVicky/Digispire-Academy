@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy, limit, doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useAuth } from '../../context/AuthContext';
 import { 
@@ -142,8 +142,20 @@ export default function StudentAttendancePage() {
         type: data.type || 'academic',
         date: today,
         timestamp: serverTimestamp(),
-        sessionId: data.sessionId
+        sessionId: data.sessionId,
+        coveredCourse: data.coveredCourse || '',
+        coveredModule: data.coveredModule || '',
+        coveredTopics: data.coveredTopics || []
       });
+
+      // 4. Update Course/Topic Completion
+      if (data.coveredTopics && data.coveredTopics.length > 0) {
+        await Promise.all(data.coveredTopics.map(topicId => {
+          return updateDoc(doc(db, 'topics', topicId), {
+            completedStudents: arrayUnion(userProfile.uid)
+          }).catch(err => console.error("Failed to mark topic complete:", err));
+        }));
+      }
 
       setStatus('success');
       setMessage(`Successfully marked present for ${data.type || 'academic'} session!`);
