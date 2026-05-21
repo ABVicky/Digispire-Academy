@@ -17,6 +17,7 @@ import ContentPage from './pages/admin/ContentPage';
 import AnalyticsPage from './pages/admin/AnalyticsPage';
 import AttendanceReportPage from './pages/admin/AttendanceReportPage';
 import AdminToolsPage from './pages/admin/AdminToolsPage';
+import RevisionAppealsPage from './pages/admin/RevisionAppealsPage';
 
 // Student pages
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -68,6 +69,7 @@ function App() {
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="reports" element={<AttendanceReportPage />} />
               <Route path="tools" element={<AdminToolsPage />} />
+              <Route path="revisions" element={<RevisionAppealsPage />} />
               <Route path="community" element={<CommunityPortfolioPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>

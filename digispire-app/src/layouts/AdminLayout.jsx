@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Users, CalendarCheck, BookOpen, FileText,
   LogOut, Menu, X, GraduationCap, User, ChevronRight, BarChart3,
-  FileSpreadsheet, Zap, Globe
+  FileSpreadsheet, Zap, Globe, History
 } from 'lucide-react';
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
   { path: 'students', label: 'Students', icon: Users },
   { path: 'attendance', label: 'Attendance', icon: CalendarCheck },
   { path: 'courses', label: 'Courses', icon: GraduationCap },
+  { path: 'revisions', label: 'Revision Appeals', icon: History },
   { path: 'content', label: 'Resources', icon: FileText },
   { path: 'analytics', label: 'Analytics', icon: BarChart3 },
   { path: 'reports', label: 'Reports', icon: FileSpreadsheet },
