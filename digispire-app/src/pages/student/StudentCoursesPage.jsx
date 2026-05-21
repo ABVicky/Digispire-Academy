@@ -120,7 +120,7 @@ export default function StudentCoursesPage() {
       </div>
 
       {courses.length === 0 ? (
-        <div className="text-center py-16 text-slate-400 bg-white rounded-[2rem] border border-dashed border-slate-200">
+        <div className="text-center py-16 text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200">
           <BookOpen size={48} className="mx-auto mb-3 opacity-20" />
           <p className="font-bold">No courses available yet.</p>
         </div>
@@ -132,7 +132,7 @@ export default function StudentCoursesPage() {
             const isExpanded = expandedCourse === course.id;
 
             return (
-              <div key={course.id} className={`bg-white rounded-[2.5rem] shadow-sm border transition-all duration-300 ${isExpanded ? 'border-[#255A84]/30 ring-4 ring-[#255A84]/5' : 'border-slate-100'}`}>
+              <div key={course.id} className={`bg-white rounded-2xl shadow-sm border transition-all duration-300 ${isExpanded ? 'border-[#255A84]/30 ring-4 ring-[#255A84]/5' : 'border-slate-100'}`}>
                 <button
                   className="w-full flex items-center gap-4 p-5 text-left outline-none"
                   onClick={() => setExpandedCourse(isExpanded ? null : course.id)}
@@ -160,7 +160,7 @@ export default function StudentCoursesPage() {
                 {isExpanded && (
                   <div className="px-6 pb-6 pt-2 space-y-3 animate-in slide-in-from-top-2 duration-300">
                     {courseModules.length === 0 ? (
-                      <div className="text-center py-8 bg-slate-50 rounded-3xl">
+                      <div className="text-center py-8 bg-slate-50 rounded-xl">
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No modules added yet</p>
                       </div>
                     ) : (
@@ -171,7 +171,7 @@ export default function StudentCoursesPage() {
                         const isModComplete = modTopics.length > 0 && completedCount === modTopics.length;
 
                         return (
-                          <div key={mod.id} className="bg-slate-50/50 rounded-3xl border border-slate-100 overflow-hidden">
+                          <div key={mod.id} className="bg-slate-50/50 rounded-xl border border-slate-100 overflow-hidden">
                             <div
                               className="w-full flex items-center gap-3 p-4 cursor-pointer hover:bg-slate-100/50 transition-colors"
                               onClick={() => setExpandedModule(isModExpanded ? null : mod.id)}
@@ -292,7 +292,7 @@ export default function StudentCoursesPage() {
       {/* Revision Request Modal */}
       {revisionModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-[2rem] shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200 animate-out duration-150">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200 animate-out duration-150">
             <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div>
                 <h3 className="font-bold text-slate-800 text-sm">Request Revision</h3>

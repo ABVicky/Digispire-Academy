@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, BookOpen, QrCode, User, 
   LogOut, Menu, X, ChevronRight, Bell,
-  Zap, Briefcase, Globe, FileText
+  Zap, Briefcase, Globe, FileText, ExternalLink, GraduationCap
 } from 'lucide-react';
 
 const navItems = [
@@ -15,6 +15,7 @@ const navItems = [
   { path: 'portfolio', label: 'Portfolio', icon: Briefcase },
   { path: 'community', label: 'Wall of Fame', icon: Globe },
   { path: 'attendance', label: 'Check-in', icon: QrCode },
+  { path: 'https://marketing.abvicky.in', label: 'Study Portal', icon: GraduationCap, isExternal: true },
   { path: 'profile', label: 'Account', icon: User },
 ];
 
@@ -74,7 +75,7 @@ export default function StudentLayout() {
           <NavLink
             to="/student/profile"
             onClick={() => setIsSidebarOpen(false)}
-            className="mb-8 p-4 bg-slate-50 rounded-3xl border border-slate-100 flex items-center gap-3 hover:bg-slate-100 transition group active:scale-95 duration-200"
+            className="mb-8 p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-3 hover:bg-slate-100 transition group active:scale-95 duration-200"
           >
             <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-[#255A84] font-bold shadow-sm border border-slate-100 uppercase overflow-hidden">
               {userProfile?.photoURL ? (
@@ -91,17 +92,35 @@ export default function StudentLayout() {
           </NavLink>
 
           <nav className="flex-1 space-y-1 overflow-y-auto no-scrollbar">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onClick={() => setIsSidebarOpen(false)}
-                className={({ isActive }) => `flex items-center gap-3 px-4 py-4 rounded-2xl text-sm font-bold transition-all duration-300 ${isActive ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'}`}
-              >
-                <item.icon size={20} />
-                {item.label}
-              </NavLink>
-            ))}
+            {navItems.map((item) => {
+              if (item.isExternal) {
+                return (
+                  <a
+                    key={item.path}
+                    href={item.path}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="flex items-center gap-3 px-4 py-4 rounded-2xl text-sm font-bold transition-all duration-300 text-slate-500 hover:bg-[#F48B1F]/10 hover:text-[#F48B1F] border border-dashed border-transparent hover:border-[#F48B1F]/30"
+                  >
+                    <item.icon size={20} />
+                    <span>{item.label}</span>
+                    <ExternalLink size={12} className="ml-auto opacity-60 shrink-0" />
+                  </a>
+                );
+              }
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setIsSidebarOpen(false)}
+                  className={({ isActive }) => `flex items-center gap-3 px-4 py-4 rounded-2xl text-sm font-bold transition-all duration-300 ${isActive ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'}`}
+                >
+                  <item.icon size={20} />
+                  {item.label}
+                </NavLink>
+              );
+            })}
           </nav>
 
           <div className="pt-6 mt-6 border-t border-slate-100">

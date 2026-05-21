@@ -107,11 +107,11 @@ export default function StudentDashboard() {
   return (
     <div className="space-y-6 pb-24">
       {/* Welcome Card */}
-      <div className="relative bg-gradient-to-br from-[#255A84] to-[#1a4261] rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 text-white overflow-hidden shadow-lg border border-white/10">
+      <div className="relative bg-gradient-to-br from-[#255A84] to-[#1a4261] rounded-2xl p-6 sm:p-8 text-white overflow-hidden shadow-lg border border-white/10">
         <div className="relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6">
-            <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl sm:rounded-3xl bg-white/20 backdrop-blur-md p-1 border border-white/20 shadow-xl overflow-hidden flex-shrink-0">
-              <div className="h-full w-full rounded-xl sm:rounded-2xl bg-white/10 flex items-center justify-center text-white font-bold text-xl sm:text-2xl overflow-hidden">
+            <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl bg-white/20 backdrop-blur-md p-1 border border-white/20 shadow-xl overflow-hidden flex-shrink-0">
+              <div className="h-full w-full rounded-lg bg-white/10 flex items-center justify-center text-white font-bold text-xl sm:text-2xl overflow-hidden">
                 {userProfile?.photoURL ? (
                   <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover" />
                 ) : (
@@ -149,8 +149,8 @@ export default function StudentDashboard() {
           { icon: Award, label: 'Completion', value: `${courseProgress}%`, color: 'text-[#F48B1F]', bg: 'bg-orange-50' },
           { icon: Sparkles, label: 'Academy ID', value: userProfile?.studentId?.substring(2) || '---', color: 'text-emerald-600', bg: 'bg-emerald-50' },
         ].map(({ icon: Icon, label, value, color, bg }) => (
-          <div key={label} className="bg-white rounded-[1.5rem] sm:rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-50 hover:shadow-md transition-all duration-300 group active:scale-95">
-            <div className={`h-10 w-10 sm:h-11 sm:w-11 rounded-xl sm:rounded-2xl ${bg} flex items-center justify-center mb-3 sm:mb-4 transition-transform group-hover:scale-110`}>
+          <div key={label} className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-50 hover:shadow-md transition-all duration-300 group active:scale-95">
+            <div className={`h-10 w-10 sm:h-11 sm:w-11 rounded-xl ${bg} flex items-center justify-center mb-3 sm:mb-4 transition-transform group-hover:scale-110`}>
               <Icon size={20} className={color} />
             </div>
             <p className={`text-xl sm:text-2xl font-bold tracking-tight ${color}`}>{value}</p>
@@ -159,10 +159,38 @@ export default function StudentDashboard() {
         ))}
       </div>
 
+      {/* Promotional study portal banner */}
+      <a 
+        href="https://marketing.abvicky.in" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="group relative block overflow-hidden bg-gradient-to-r from-[#F48B1F] to-[#e07b12] rounded-2xl p-6 sm:p-8 text-white shadow-md border border-white/10 hover:shadow-lg transition-all duration-300 active:scale-[0.99]"
+      >
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-1.5">
+            <span className="bg-white/20 backdrop-blur-md text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-white/10 inline-block">
+              Study Hub Promotion
+            </span>
+            <h3 className="text-lg sm:text-xl font-black tracking-tight mt-1.5 flex items-center gap-2 group-hover:underline">
+              Visit our Digital Marketing Study Portal <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            </h3>
+            <p className="text-xs text-orange-50/95 font-medium max-w-2xl leading-relaxed">
+              Access comprehensive learning guides, case studies, and advanced resources curated by Vicky Vicky Prasad Mahato to accelerate your digital marketing journey.
+            </p>
+          </div>
+          <div className="bg-white text-[#F48B1F] text-xs font-black px-6 py-3.5 rounded-xl shrink-0 shadow-md group-hover:bg-orange-50 transition-colors">
+            Start Learning Now
+          </div>
+        </div>
+        <div className="absolute right-0 top-0 translate-x-1/4 -translate-y-1/4 opacity-10 pointer-events-none text-white">
+          <Globe size={180} />
+        </div>
+      </a>
+
       {/* Quick Access Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
         {/* Certification Card */}
-        <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 shadow-sm border border-slate-50 relative overflow-hidden">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-50 relative overflow-hidden">
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-6 sm:mb-8">
               <h2 className="font-bold text-slate-800 text-[10px] sm:text-xs uppercase tracking-[0.15em] flex items-center gap-2">
@@ -191,7 +219,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* Recent Resources Card */}
-        <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 shadow-sm border border-slate-50 flex flex-col">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-50 flex flex-col">
           <div className="flex items-center justify-between mb-6 sm:mb-8">
             <h2 className="font-bold text-slate-800 text-[10px] sm:text-xs uppercase tracking-[0.15em] flex items-center gap-2">
               <FileText size={18} className="text-[#255A84]" /> Resources
@@ -213,7 +241,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* Marketing Tools Card */}
-        <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 shadow-sm border border-slate-50">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-50">
           <div className="flex items-center justify-between mb-6 sm:mb-8">
             <h2 className="font-bold text-slate-800 text-[10px] sm:text-xs uppercase tracking-[0.15em] flex items-center gap-2">
               <Zap size={18} className="text-[#255A84]" /> Tools
@@ -226,7 +254,7 @@ export default function StudentDashboard() {
                { name: 'Analytics', icon: TrendingUp, color: 'text-emerald-500' },
                { name: 'Keyword Hub', icon: Search, color: 'text-blue-500' }
              ].map((t, idx) => (
-               <Link key={idx} to="/student/tools" className="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors active:scale-95">
+               <Link key={idx} to="/student/tools" className="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors active:scale-95">
                   <div className="flex items-center gap-3">
                     <t.icon size={14} className={t.color} />
                     <span className="text-xs font-bold text-slate-600">{t.name}</span>
@@ -238,7 +266,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* Industry Trends Card */}
-        <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 shadow-sm border border-slate-100">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100">
            <div className="flex items-center justify-between mb-6 sm:mb-8">
             <h2 className="font-bold text-slate-800 text-[10px] sm:text-xs uppercase tracking-[0.15em] flex items-center gap-2">
               <Newspaper size={18} className="text-emerald-600" /> Market Trends
@@ -264,9 +292,9 @@ export default function StudentDashboard() {
       </div>
 
       {/* Date & Check-in Bar */}
-      <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-4 sm:p-5 shadow-sm border border-slate-50 flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
+      <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-50 flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
         <div className="flex items-center gap-4 w-full sm:w-auto p-2">
-          <div className="h-14 w-14 rounded-2xl bg-[#255A84] flex flex-col items-center justify-center text-white flex-shrink-0 shadow-lg shadow-[#255A84]/20">
+          <div className="h-14 w-14 rounded-xl bg-[#255A84] flex flex-col items-center justify-center text-white flex-shrink-0 shadow-lg shadow-[#255A84]/20">
             <span className="text-[9px] sm:text-[10px] font-bold uppercase leading-none opacity-80">{new Date().toLocaleString('en-IN', { month: 'short' })}</span>
             <span className="text-2xl font-bold leading-tight">{new Date().getDate()}</span>
           </div>
@@ -278,7 +306,7 @@ export default function StudentDashboard() {
         <div className="w-full sm:ml-auto sm:w-auto pb-2 sm:pb-0">
           <Link
             to="/student/attendance"
-            className="flex items-center justify-center gap-3 w-full sm:w-auto px-10 py-4.5 bg-[#F48B1F] hover:bg-[#cc7214] text-white text-[11px] font-bold rounded-2xl transition-all shadow-lg shadow-[#F48B1F]/20 uppercase tracking-widest active:scale-95"
+            className="flex items-center justify-center gap-3 w-full sm:w-auto px-10 py-4.5 bg-[#F48B1F] hover:bg-[#cc7214] text-white text-[11px] font-bold rounded-xl transition-all shadow-lg shadow-[#F48B1F]/20 uppercase tracking-widest active:scale-95"
           >
             <QrCode size={18} /> Daily Check-in
           </Link>

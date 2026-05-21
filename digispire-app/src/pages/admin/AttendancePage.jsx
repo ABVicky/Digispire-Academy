@@ -64,7 +64,8 @@ export default function AttendancePage() {
   }, []);
 
   const generateQR = async () => {
-    const sessionId = Math.random().toString(36).substring(7);
+    // Generate exactly 6 uppercase characters
+    const sessionId = Math.random().toString(36).substring(2, 8).toUpperCase();
     const expiresAt = Date.now() + (5 * 60 * 1000); // 5 mins
 
     const newQr = {
@@ -79,7 +80,13 @@ export default function AttendancePage() {
     };
 
     try {
-      const url = await QRCode.toDataURL(JSON.stringify(newQr), {
+      // Compress the QR code payload so it is simple and scans instantly
+      const compressedPayload = {
+        s: sessionId,
+        b: activeTab
+      };
+      
+      const url = await QRCode.toDataURL(JSON.stringify(compressedPayload), {
         width: 300,
         margin: 2,
         color: {
@@ -193,6 +200,23 @@ export default function AttendancePage() {
               </div>
             )}
           </div>
+
+          {qrData && (
+            <div className="w-full mt-6 p-4 bg-[#255A84]/5 rounded-2xl border border-[#255A84]/10 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Manual Session Code</p>
+              <div className="flex items-center justify-center gap-1.5 font-mono">
+                {qrData.sessionId.split('').map((char, index) => (
+                  <span 
+                    key={index} 
+                    className="w-8 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-base font-extrabold text-[#255A84] shadow-sm select-all"
+                  >
+                    {char}
+                  </span>
+                ))}
+              </div>
+              <p className="text-[9px] text-slate-400 mt-2 font-medium">Students can enter this code manually if scanning fails</p>
+            </div>
+          )}
 
           {/* Topic Selection */}
           {!qrData && (

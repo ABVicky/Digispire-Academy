@@ -127,6 +127,34 @@ export default function AdminDashboard() {
         <StatCard icon={BookOpen} label="Courses" value={data.courses} color="bg-purple-500" />
       </div>
 
+      {/* Promotional study portal banner */}
+      <a 
+        href="https://marketing.abvicky.in" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="group relative block overflow-hidden bg-gradient-to-r from-[#F48B1F] to-[#e07b12] rounded-[2rem] p-6 text-white shadow-md border border-white/10 hover:shadow-lg transition-all duration-300 active:scale-[0.99]"
+      >
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-1.5">
+            <span className="bg-white/20 backdrop-blur-md text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-white/10 inline-block">
+              Teaching & Study Hub
+            </span>
+            <h3 className="text-lg sm:text-xl font-black tracking-tight mt-1.5 flex items-center gap-2 group-hover:underline">
+              Access Vicky's Study Portal <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            </h3>
+            <p className="text-xs text-orange-50/95 font-medium max-w-2xl leading-relaxed">
+              Utilize Vicky Prasad Mahato's digital marketing hub to discover teaching aids, presentation materials, and curriculum support documents.
+            </p>
+          </div>
+          <div className="bg-white text-[#F48B1F] text-xs font-black px-6 py-3.5 rounded-2xl shrink-0 shadow-md group-hover:bg-orange-50 transition-colors">
+            Open Portal
+          </div>
+        </div>
+        <div className="absolute right-0 top-0 translate-x-1/4 -translate-y-1/4 opacity-10 pointer-events-none text-white">
+          <Globe size={180} />
+        </div>
+      </a>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Batch Overview */}
         <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col">

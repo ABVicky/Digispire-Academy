@@ -57,7 +57,7 @@ export default function MarketingToolsPage() {
             placeholder="Search for tools, strategies, or platforms..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-14 pr-6 py-5 bg-white rounded-[2rem] border border-slate-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#255A84]/20 transition-all text-sm font-medium"
+            className="w-full pl-14 pr-6 py-5 bg-white rounded-2xl border border-slate-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#255A84]/20 transition-all text-sm font-medium"
           />
         </div>
       </div>
@@ -88,7 +88,7 @@ export default function MarketingToolsPage() {
           {filteredTools.map(tool => {
             const cat = CATEGORIES.find(c => c.id === tool.categoryId) || CATEGORIES[0];
             return (
-              <div key={tool.id} className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow group">
+              <div key={tool.id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow group">
                 <div className="flex items-start justify-between mb-6">
                   <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-[#255A84] group-hover:scale-110 transition-transform duration-300">
                     <cat.icon size={24} />

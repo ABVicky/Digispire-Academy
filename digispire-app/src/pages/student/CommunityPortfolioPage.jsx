@@ -80,7 +80,7 @@ export default function CommunityPortfolioPage() {
           {filtered.map(p => {
             const typeInfo = PROJECT_TYPES.find(t => t.id === p.type) || PROJECT_TYPES[0];
             return (
-              <div key={p.id} className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-all group">
+              <div key={p.id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-all group">
                 <div className="flex items-start justify-between mb-6">
                   <div className={`h-12 w-12 rounded-2xl ${typeInfo.color} bg-opacity-10 flex items-center justify-center`}>
                     <typeInfo.icon size={24} />

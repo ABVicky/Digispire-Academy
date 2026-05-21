@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Users, CalendarCheck, BookOpen, FileText,
   LogOut, Menu, X, GraduationCap, User, ChevronRight, BarChart3,
-  FileSpreadsheet, Zap, Globe, History
+  FileSpreadsheet, Zap, Globe, History, ExternalLink
 } from 'lucide-react';
 
 const navItems = [
@@ -13,6 +13,7 @@ const navItems = [
   { path: 'attendance', label: 'Attendance', icon: CalendarCheck },
   { path: 'courses', label: 'Courses', icon: GraduationCap },
   { path: 'revisions', label: 'Revision Appeals', icon: History },
+  { path: 'https://marketing.abvicky.in', label: 'Study Portal', icon: BookOpen, isExternal: true },
   { path: 'content', label: 'Resources', icon: FileText },
   { path: 'analytics', label: 'Analytics', icon: BarChart3 },
   { path: 'reports', label: 'Reports', icon: FileSpreadsheet },
@@ -93,17 +94,35 @@ export default function AdminLayout() {
 
           {/* Navigation */}
           <nav className="flex-1 space-y-1 overflow-y-auto no-scrollbar">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onClick={closeSidebar}
-                className={({ isActive }) => `flex items-center gap-3 px-4 py-4 rounded-2xl text-xs font-bold transition-all duration-300 ${isActive ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'}`}
-              >
-                <item.icon size={20} />
-                {item.label}
-              </NavLink>
-            ))}
+            {navItems.map((item) => {
+              if (item.isExternal) {
+                return (
+                  <a
+                    key={item.path}
+                    href={item.path}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={closeSidebar}
+                    className="flex items-center gap-3 px-4 py-4 rounded-2xl text-xs font-bold transition-all duration-300 text-slate-500 hover:bg-[#F48B1F]/10 hover:text-[#F48B1F] border border-dashed border-transparent hover:border-[#F48B1F]/30"
+                  >
+                    <item.icon size={20} />
+                    <span>{item.label}</span>
+                    <ExternalLink size={12} className="ml-auto opacity-60 shrink-0" />
+                  </a>
+                );
+              }
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={closeSidebar}
+                  className={({ isActive }) => `flex items-center gap-3 px-4 py-4 rounded-2xl text-xs font-bold transition-all duration-300 ${isActive ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'}`}
+                >
+                  <item.icon size={20} />
+                  {item.label}
+                </NavLink>
+              );
+            })}
           </nav>
 
           {/* Logout */}

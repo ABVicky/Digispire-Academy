@@ -66,7 +66,7 @@ export default function InstallPrompt() {
 
   return (
     <div className="fixed bottom-24 left-4 right-4 z-[100] animate-in slide-in-from-bottom-10 duration-500">
-      <div className="bg-white rounded-[2rem] shadow-2xl border border-slate-100 p-6 flex items-center gap-4 relative overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 p-6 flex items-center gap-4 relative overflow-hidden">
         {/* Background Accent */}
         <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full -mr-12 -mt-12 opacity-50" />
         

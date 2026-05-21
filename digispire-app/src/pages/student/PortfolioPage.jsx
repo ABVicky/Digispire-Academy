@@ -79,8 +79,8 @@ export default function PortfolioPage() {
       {loading ? (
         <div className="py-20 flex justify-center"><Loader2 className="animate-spin text-slate-300" size={32} /></div>
       ) : projects.length === 0 && !showAdd ? (
-        <div className="mx-2 bg-white rounded-[2.5rem] p-12 text-center border border-dashed border-slate-200">
-          <div className="h-20 w-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-slate-300">
+        <div className="mx-2 bg-white rounded-2xl p-12 text-center border border-dashed border-slate-200">
+          <div className="h-20 w-20 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-slate-300">
             <Briefcase size={40} />
           </div>
           <h3 className="text-lg font-bold text-slate-800">No Projects Yet</h3>
@@ -97,7 +97,7 @@ export default function PortfolioPage() {
           {projects.map(p => {
             const typeInfo = PROJECT_TYPES.find(t => t.id === p.type) || PROJECT_TYPES[0];
             return (
-              <div key={p.id} className="bg-white rounded-[2rem] p-5 shadow-sm border border-slate-100 group">
+              <div key={p.id} className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 group">
                 <div className="flex items-start justify-between">
                   <div className={`h-10 w-10 rounded-xl ${typeInfo.color} bg-opacity-10 flex items-center justify-center`}>
                     <typeInfo.icon size={20} />
@@ -135,7 +135,7 @@ export default function PortfolioPage() {
       {/* Add Project Modal */}
       {showAdd && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
-          <div className="bg-white rounded-t-[3rem] sm:rounded-[3rem] w-full max-w-lg shadow-2xl p-8 animate-in slide-in-from-bottom duration-300">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-lg shadow-2xl p-8 animate-in slide-in-from-bottom duration-300">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Add Campaign Link</h2>
               <button onClick={() => setShowAdd(false)} className="text-slate-300 hover:text-slate-600 transition-colors"><XCircle size={28} /></button>
@@ -188,7 +188,7 @@ export default function PortfolioPage() {
 
               <button 
                 type="submit" disabled={saving}
-                className="w-full py-5 bg-[#255A84] text-white rounded-[2rem] font-bold text-sm uppercase tracking-widest shadow-xl shadow-[#255A84]/20 active:scale-95 transition-all flex items-center justify-center gap-3"
+                className="w-full py-5 bg-[#255A84] text-white rounded-2xl font-bold text-sm uppercase tracking-widest shadow-xl shadow-[#255A84]/20 active:scale-95 transition-all flex items-center justify-center gap-3"
               >
                 {saving ? <Loader2 className="animate-spin" size={20} /> : <Share2 size={20} />}
                 {saving ? 'Publishing...' : 'Publish to Portfolio'}
