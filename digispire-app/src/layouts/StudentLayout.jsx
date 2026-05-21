@@ -4,12 +4,13 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, BookOpen, QrCode, User, 
   LogOut, Menu, X, ChevronRight, Bell,
-  Zap, Briefcase, Globe
+  Zap, Briefcase, Globe, FileText
 } from 'lucide-react';
 
 const navItems = [
   { path: 'dashboard', label: 'Home', icon: LayoutDashboard },
   { path: 'courses', label: 'Academy', icon: BookOpen },
+  { path: 'content', label: 'Resources', icon: FileText },
   { path: 'tools', label: 'Tools', icon: Zap },
   { path: 'portfolio', label: 'Portfolio', icon: Briefcase },
   { path: 'community', label: 'Wall of Fame', icon: Globe },

@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Phone, Mail, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
-  const { loginAdmin, loginStudent } = useAuth();
+  const { userProfile, loading: authLoading, loginAdmin, loginStudent } = useAuth();
   const navigate = useNavigate();
 
   const [tab, setTab] = useState('admin'); // 'admin' | 'student'
@@ -16,6 +16,16 @@ export default function LoginPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!authLoading && userProfile) {
+      if (userProfile.role === 'admin') {
+        navigate('/admin/dashboard', { replace: true });
+      } else {
+        navigate('/student/dashboard', { replace: true });
+      }
+    }
+  }, [userProfile, authLoading, navigate]);
 
   const handleAdminLogin = async (e) => {
     e.preventDefault();
@@ -66,6 +76,14 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#255A84] via-[#1a4261] to-[#0f2d45] flex items-center justify-center p-4">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-white border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#255A84] via-[#1a4261] to-[#0f2d45] flex items-center justify-center p-4">

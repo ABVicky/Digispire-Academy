@@ -25,16 +25,18 @@ function ResourceMiniCard({ item }) {
       href={item.fileUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-100 hover:border-[#255A84]/30 hover:shadow-sm transition group"
+      className="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors active:scale-95 group"
     >
-      <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">
-        {type === 'pdf' ? <FileText size={14} className="text-red-500" /> : <Globe size={14} className="text-blue-500" />}
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0 shadow-sm border border-slate-100">
+          {type === 'pdf' ? <FileText size={14} className="text-red-500" /> : <Globe size={14} className="text-blue-500" />}
+        </div>
+        <div className="min-w-0">
+          <p className="text-xs font-bold text-slate-700 truncate group-hover:text-[#255A84] transition-colors">{item.title}</p>
+          <p className="text-[9px] font-medium text-slate-400 truncate mt-0.5">{item.subject || 'Resource'}</p>
+        </div>
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-semibold text-slate-700 truncate group-hover:text-[#255A84] transition-colors">{item.title}</p>
-        <p className="text-[10px] text-slate-400 truncate">{item.subject || 'Resource'}</p>
-      </div>
-      <ArrowRight size={12} className="text-slate-300 group-hover:text-[#255A84] transition-colors" />
+      <ArrowRight size={12} className="text-slate-300 group-hover:text-[#255A84] transition-colors flex-shrink-0" />
     </a>
   );
 }
@@ -158,7 +160,7 @@ export default function StudentDashboard() {
       </div>
 
       {/* Quick Access Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
         {/* Certification Card */}
         <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 shadow-sm border border-slate-50 relative overflow-hidden">
           <div className="relative z-10">
@@ -185,6 +187,28 @@ export default function StudentDashboard() {
           </div>
           <div className="absolute -right-4 -top-4 opacity-[0.03] pointer-events-none">
              <Award size={120} />
+          </div>
+        </div>
+
+        {/* Recent Resources Card */}
+        <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 shadow-sm border border-slate-50 flex flex-col">
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <h2 className="font-bold text-slate-800 text-[10px] sm:text-xs uppercase tracking-[0.15em] flex items-center gap-2">
+              <FileText size={18} className="text-[#255A84]" /> Resources
+            </h2>
+            <Link to="/student/content" className="text-[9px] sm:text-[10px] font-bold text-[#255A84] hover:underline uppercase tracking-widest">View All</Link>
+          </div>
+          <div className="space-y-3 flex-1">
+             {data.recentResources.length === 0 ? (
+               <div className="h-full flex flex-col items-center justify-center text-center p-4">
+                 <FileText size={20} className="text-slate-300 mb-1" />
+                 <p className="text-[10px] text-slate-400 font-medium">No resources shared yet.</p>
+               </div>
+             ) : (
+               data.recentResources.slice(0, 3).map((item) => (
+                 <ResourceMiniCard key={item.id} item={item} />
+               ))
+             )}
           </div>
         </div>
 
