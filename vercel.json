@@ -1,0 +1,9 @@
+{
+  "installCommand": "cd digispire-app && npm install",
+  "buildCommand": "cd digispire-app && npm run build",
+  "outputDirectory": "digispire-app/dist",
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
