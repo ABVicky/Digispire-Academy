@@ -291,57 +291,59 @@ export default function StudentCoursesPage() {
 
       {/* Revision Request Modal */}
       {revisionModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200 animate-out duration-150">
-            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div className="modal-backdrop-premium" onClick={() => setRevisionModal(null)}>
+          <div className="modal-container-premium max-w-md animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+            <div className="modal-header-premium">
               <div>
                 <h3 className="font-bold text-slate-800 text-sm">Request Revision</h3>
-                <p className="text-[10px] font-bold text-[#255A84] uppercase tracking-wider mt-0.5">
+                <p className="text-[10px] font-bold text-[#255A84] uppercase tracking-wider mt-0.5 font-sans">
                   {revisionModal.type === 'module' ? 'Module Revision' : 'Topic Revision'}
                 </p>
               </div>
               <button
                 onClick={() => setRevisionModal(null)}
-                className="h-8 w-8 rounded-full bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors active:scale-95"
+                className="p-2 text-slate-400 hover:text-slate-600 transition"
               >
-                <X size={16} />
+                <X size={20} />
               </button>
             </div>
 
-            <form onSubmit={submitRevisionRequest} className="p-6 space-y-4">
-              <div className="bg-[#255A84]/5 rounded-2xl p-4 border border-[#255A84]/10 space-y-1.5 text-xs text-slate-600">
-                <p><span className="font-bold text-slate-800">Course:</span> {revisionModal.courseName}</p>
-                <p><span className="font-bold text-slate-800">Module:</span> {revisionModal.moduleTitle}</p>
-                {revisionModal.type === 'topic' && (
-                  <p><span className="font-bold text-slate-800">Topic:</span> {revisionModal.topicTitle}</p>
-                )}
+            <form onSubmit={submitRevisionRequest} className="flex flex-col h-full overflow-hidden">
+              <div className="modal-body-premium space-y-4">
+                <div className="bg-[#255A84]/5 rounded-2xl p-4 border border-[#255A84]/10 space-y-1.5 text-xs text-slate-600">
+                  <p><span className="font-bold text-slate-800">Course:</span> {revisionModal.courseName}</p>
+                  <p><span className="font-bold text-slate-800">Module:</span> {revisionModal.moduleTitle}</p>
+                  {revisionModal.type === 'topic' && (
+                    <p><span className="font-bold text-slate-800">Topic:</span> {revisionModal.topicTitle}</p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">
+                    Revision Notes / What would you like to revise?
+                  </label>
+                  <textarea
+                    value={revisionModal.notes}
+                    onChange={e => setRevisionModal(m => ({ ...m, notes: e.target.value }))}
+                    className="textarea-premium"
+                    rows={4}
+                    placeholder="Explain your doubts or what topics you want to go over..."
+                  />
+                </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Revision Notes / What would you like to revise?
-                </label>
-                <textarea
-                  value={revisionModal.notes}
-                  onChange={e => setRevisionModal(m => ({ ...m, notes: e.target.value }))}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-[#255A84] focus:border-transparent resize-none bg-slate-50/50"
-                  rows={4}
-                  placeholder="Explain your doubts or what topics you want to go over..."
-                />
-              </div>
-
-              <div className="flex gap-3 pt-2">
+              <div className="modal-footer-premium">
                 <button
                   type="button"
                   onClick={() => setRevisionModal(null)}
-                  className="flex-1 py-3 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-xl text-xs font-bold transition active:scale-95"
+                  className="btn-outline-premium flex-1 py-3"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingAppeal}
-                  className="flex-1 py-3 bg-[#255A84] hover:bg-[#1a4261] text-white rounded-xl text-xs font-bold transition active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+                  className="btn-primary-premium flex-1 py-3"
                 >
                   {submittingAppeal ? (
                     <>

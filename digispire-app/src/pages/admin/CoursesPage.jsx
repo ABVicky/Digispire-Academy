@@ -87,7 +87,7 @@ export default function CoursesPage() {
           <h1 className="text-2xl font-bold text-slate-800">Courses</h1>
           <p className="text-sm text-slate-500">Manage courses, modules, and topics</p>
         </div>
-        <button onClick={() => openModal('course')} className="flex items-center gap-2 bg-[#255A84] hover:bg-[#1a4261] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition">
+        <button onClick={() => openModal('course')} className="btn-primary-premium px-4 py-2.5">
           <Plus size={16} /> New Course
         </button>
       </div>
@@ -161,37 +161,41 @@ export default function CoursesPage() {
 
       {/* Modal */}
       {modal && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-              <h2 className="font-bold text-slate-800 capitalize">{modal.editId ? 'Edit' : 'Add'} {modal.type}</h2>
-              <button onClick={() => setModal(null)} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
+        <div className="modal-backdrop-premium" onClick={() => setModal(null)}>
+          <div className="modal-container-premium max-w-sm" onClick={e => e.stopPropagation()}>
+            <div className="modal-header-premium">
+              <h2 className="text-xl font-bold text-slate-800 capitalize">{modal.editId ? 'Edit' : 'Add'} {modal.type}</h2>
+              <button onClick={() => setModal(null)} className="p-2 text-slate-400 hover:text-slate-600 transition"><X size={20} /></button>
             </div>
-            <form onSubmit={handleSave} className="p-5 space-y-4">
-              {modal.type === 'course' ? (
-                <>
+            
+            <form onSubmit={handleSave} className="flex flex-col h-full overflow-hidden">
+              <div className="modal-body-premium space-y-4">
+                {modal.type === 'course' ? (
+                  <>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Course Name *</label>
+                      <input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                        className="input-premium" placeholder="e.g. Web Development" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Description</label>
+                      <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                        className="textarea-premium" rows={3} placeholder="Course description..." />
+                    </div>
+                  </>
+                ) : (
                   <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Course Name *</label>
-                    <input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                      className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#255A84]" placeholder="e.g. Web Development" />
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">{modal.type === 'module' ? 'Module' : 'Topic'} Title *</label>
+                    <input required value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                      className="input-premium"
+                      placeholder={modal.type === 'module' ? 'e.g. HTML Basics' : 'e.g. What is HTML?'} />
                   </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Description</label>
-                    <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                      className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#255A84] resize-none" rows={3} placeholder="Course description..." />
-                  </div>
-                </>
-              ) : (
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{modal.type === 'module' ? 'Module' : 'Topic'} Title *</label>
-                  <input required value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#255A84]"
-                    placeholder={modal.type === 'module' ? 'e.g. HTML Basics' : 'e.g. What is HTML?'} />
-                </div>
-              )}
-              <div className="flex gap-3">
-                <button type="button" onClick={() => setModal(null)} className="flex-1 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">Cancel</button>
-                <button type="submit" disabled={saving} className="flex-1 py-2.5 bg-[#255A84] hover:bg-[#1a4261] text-white rounded-xl text-sm font-semibold transition disabled:opacity-60">
+                )}
+              </div>
+              
+              <div className="modal-footer-premium">
+                <button type="button" onClick={() => setModal(null)} className="btn-outline-premium flex-1 py-2.5">Cancel</button>
+                <button type="submit" disabled={saving} className="btn-primary-premium flex-1 py-2.5">
                   {saving ? 'Saving...' : modal.editId ? 'Update' : 'Add'}
                 </button>
               </div>

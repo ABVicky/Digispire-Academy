@@ -51,7 +51,6 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      // Clean phone number (ensure it matches what was saved)
       const cleanPhone = phone.trim();
       const { profile } = await loginStudent(cleanPhone, studentPassword);
       if (profile) {
@@ -79,46 +78,53 @@ export default function LoginPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#255A84] via-[#1a4261] to-[#0f2d45] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Glow Spots */}
+        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full ambient-glow-1 pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full ambient-glow-2 pointer-events-none" />
         <div className="animate-spin rounded-full h-10 w-10 border-4 border-white border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#255A84] via-[#1a4261] to-[#0f2d45] flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden font-sans">
+      {/* Glow Spots */}
+      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full ambient-glow-1 pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full ambient-glow-2 pointer-events-none" />
+
+      <div className="w-full max-w-md relative z-10 page-transition">
         {/* Logo & Brand */}
         <div className="flex flex-col items-center mb-8">
-          <div className="bg-white p-4 rounded-3xl mb-4 shadow-xl border border-slate-100/50">
-            <img src="/logo.png" alt="DIGISPIRE Academy" className="h-20 w-auto object-contain" />
+          <div className="bg-white/10 backdrop-blur-md p-4.5 rounded-[2rem] mb-4 border border-white/15 shadow-2xl">
+            <img src="/logo.png" alt="DIGISPIRE Academy" className="h-16 w-auto object-contain" />
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">DIGISPIRE</h1>
-          <p className="text-blue-300 text-sm font-medium tracking-widest uppercase mt-1 opacity-80">Academy Portal</p>
+          <h1 className="text-3xl font-heading font-black text-white tracking-tight">DIGISPIRE</h1>
+          <p className="text-blue-300 text-[10px] font-bold tracking-[0.2em] uppercase mt-1 opacity-80 font-sans">Academy Portal</p>
         </div>
 
-        {/* Card */}
-        <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-white/20">
+        {/* Glassmorphic Login Box */}
+        <div className="bg-white/95 backdrop-blur-lg rounded-[2.5rem] shadow-[0_24px_64px_rgba(0,0,0,0.4)] overflow-hidden border border-white/20">
           {/* Tab Switcher */}
-          <div className="flex p-2 bg-slate-50 border-b border-slate-100">
+          <div className="flex p-2 bg-slate-50/50 border-b border-slate-100/60">
             <button
               onClick={() => { setTab('admin'); setError(''); }}
-              className={`flex-1 py-3.5 text-xs font-bold uppercase tracking-widest rounded-2xl transition-all duration-300 ${tab === 'admin' ? 'bg-[#255A84] text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`flex-1 py-3.5 text-xs font-bold uppercase tracking-widest rounded-[1.25rem] transition-all duration-300 ${tab === 'admin' ? 'bg-[#255A84] text-white shadow-md shadow-[#255A84]/20 font-extrabold' : 'text-slate-400 hover:text-slate-600'}`}
             >
-              Admin
+              Faculty Portal
             </button>
             <button
               onClick={() => { setTab('student'); setError(''); }}
-              className={`flex-1 py-3.5 text-xs font-bold uppercase tracking-widest rounded-2xl transition-all duration-300 ${tab === 'student' ? 'bg-[#F48B1F] text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`flex-1 py-3.5 text-xs font-bold uppercase tracking-widest rounded-[1.25rem] transition-all duration-300 ${tab === 'student' ? 'bg-[#F48B1F] text-white shadow-md shadow-[#F48B1F]/20 font-extrabold' : 'text-slate-400 hover:text-slate-600'}`}
             >
-              Student
+              Student Portal
             </button>
           </div>
 
           <div className="p-8">
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-xs font-bold flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
-                <div className="h-5 w-5 bg-red-500 text-white rounded-full flex items-center justify-center flex-shrink-0">!</div>
+              <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 text-xs font-bold flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+                <div className="h-5 w-5 bg-rose-500 text-white rounded-full flex items-center justify-center flex-shrink-0 font-extrabold text-[10px]">!</div>
                 {error}
               </div>
             )}
@@ -127,46 +133,46 @@ export default function LoginPage() {
             {tab === 'admin' && (
               <form onSubmit={handleAdminLogin} className="space-y-5">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Email Address</label>
+                  <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Email Address</label>
                   <div className="relative">
-                    <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+                    <Mail size={16} className="absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
                     <input
                       required
                       type="email"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       placeholder="admin@digispire.in"
-                      className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-transparent rounded-2xl text-sm focus:bg-white focus:border-[#255A84] focus:ring-4 focus:ring-[#255A84]/10 transition-all outline-none"
+                      className="input-premium pl-12"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Password</label>
+                  <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Password</label>
                   <div className="relative">
-                    <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+                    <Lock size={16} className="absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
                     <input
                       required
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full pl-12 pr-12 py-4 bg-slate-50 border border-transparent rounded-2xl text-sm focus:bg-white focus:border-[#255A84] focus:ring-4 focus:ring-[#255A84]/10 transition-all outline-none"
+                      className="input-premium pl-12 pr-12"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 transition"
+                      className="absolute right-4.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors z-10"
                     >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
                 </div>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 bg-[#255A84] hover:bg-[#1a4261] text-white font-bold rounded-2xl transition-all duration-300 text-sm shadow-xl shadow-[#255A84]/20 active:scale-95 disabled:opacity-50"
+                  className="w-full py-4 btn-primary-premium mt-2"
                 >
-                  {loading ? 'Authenticating...' : 'Sign In as Admin'}
+                  {loading ? 'Authenticating...' : 'Sign In to Faculty Portal'}
                 </button>
               </form>
             )}
@@ -175,49 +181,49 @@ export default function LoginPage() {
             {tab === 'student' && (
               <form onSubmit={handleStudentLogin} className="space-y-5">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Phone Number</label>
+                  <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Phone Number</label>
                   <div className="relative">
-                    <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+                    <Phone size={16} className="absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
                     <input
                       required
                       type="tel"
                       value={phone}
                       onChange={e => setPhone(e.target.value)}
                       placeholder="+91 98765 43210"
-                      className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-transparent rounded-2xl text-sm focus:bg-white focus:border-[#F48B1F] focus:ring-4 focus:ring-[#F48B1F]/10 transition-all outline-none"
+                      className="input-premium pl-12"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Password</label>
+                  <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Password</label>
                   <div className="relative">
-                    <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+                    <Lock size={16} className="absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
                     <input
                       required
                       type={showPassword ? "text" : "password"}
                       value={studentPassword}
                       onChange={e => setStudentPassword(e.target.value)}
                       placeholder="Enter your password"
-                      className="w-full pl-12 pr-12 py-4 bg-slate-50 border border-transparent rounded-2xl text-sm focus:bg-white focus:border-[#F48B1F] focus:ring-4 focus:ring-[#F48B1F]/10 transition-all outline-none"
+                      className="input-premium pl-12 pr-12"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 transition"
+                      className="absolute right-4.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors z-10"
                     >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
                 </div>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 bg-[#F48B1F] hover:bg-[#cc7214] text-white font-bold rounded-2xl transition-all duration-300 text-sm shadow-xl shadow-[#F48B1F]/20 active:scale-95 disabled:opacity-50"
+                  className="w-full py-4 btn-secondary-premium mt-2"
                 >
-                  {loading ? 'Logging in...' : 'Sign In as Student'}
+                  {loading ? 'Authenticating...' : 'Sign In to Student Portal'}
                 </button>
-                <p className="text-center text-[10px] text-slate-400 font-medium px-4">
-                  Default password is provided by your educator. Change it after your first login.
+                <p className="text-center text-[10px] text-slate-400 font-medium px-4 leading-normal">
+                  Default credentials are provided by your educator. Please reset password after first enrollment access.
                 </p>
               </form>
             )}
@@ -225,8 +231,8 @@ export default function LoginPage() {
         </div>
 
         <div className="text-center mt-8">
-          <p className="text-blue-300/60 text-[10px] font-bold uppercase tracking-widest">
-            © 2024 DIGISPIRE Academy · digispire.in
+          <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">
+            © 2026 DIGISPIRE Academy · digispire.in
           </p>
         </div>
       </div>

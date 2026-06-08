@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
 import {
-  BarChart3, TrendingUp, Users, BookOpen,
-  PieChart, FileText, Globe, Calendar, Briefcase
+  BarChart3, TrendingUp, Users,
+  PieChart, Calendar, Briefcase
 } from 'lucide-react';
 
 export default function AnalyticsPage() {
@@ -60,7 +60,7 @@ export default function AnalyticsPage() {
 
   const morningStudents = data.students.filter(s => s.batchId === 'morning').length;
   const eveningStudents = data.students.filter(s => s.batchId === 'evening').length;
-  const interns = data.students.filter(s => s.batchId === 'internship').length;
+  const interns = data.students.filter(s => s.isIntern).length;
 
   return (
     <div className="space-y-6">
@@ -107,6 +107,9 @@ export default function AnalyticsPage() {
                 </div>
               </div>
             ))}
+            {topResources.length === 0 && (
+              <p className="text-center text-slate-400 py-6 text-xs">No resources recorded</p>
+            )}
           </div>
         </div>
 
@@ -162,7 +165,7 @@ function BatchBar({ label, count, total, color }) {
 
 function InsightCard({ icon: Icon, label, value, color }) {
   return (
-    <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-slate-100 flex items-center gap-5 group hover:shadow-lg hover:border-[#255A84]/20 transition-all duration-300">
+    <div className="card-premium p-6 flex items-center gap-5 group">
       <div className={`h-14 w-14 rounded-3xl flex items-center justify-center ${color} text-white shadow-lg transition-transform group-hover:scale-110`}>
         <Icon size={24} />
       </div>

@@ -105,7 +105,8 @@ export default function StudentDashboard() {
   );
 
   return (
-    <div className="space-y-6 pb-24">
+    <div className="space-y-6 pb-24 font-sans">
+
       {/* Welcome Card */}
       <div className="relative bg-gradient-to-br from-[#255A84] to-[#1a4261] rounded-2xl p-6 sm:p-8 text-white overflow-hidden shadow-lg border border-white/10">
         <div className="relative z-10">
@@ -124,7 +125,7 @@ export default function StudentDashboard() {
               <h1 className="text-2xl sm:text-3xl font-bold mt-1 tracking-tight truncate max-w-[200px] sm:max-w-none">{userProfile?.name || 'Marketer'}</h1>
               <div className="flex items-center gap-2 sm:gap-3 mt-3 sm:mt-4">
                 <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-lg sm:rounded-xl border border-white/10 shrink-0">
-                  <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">
+                  <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider font-sans">
                     {userProfile?.batchId === 'morning' ? '🌅 Morning' : '🌆 Evening'}
                   </span>
                 </div>

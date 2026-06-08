@@ -60,7 +60,7 @@ export default function AdminDashboard() {
           getDocs(collection(db, 'users')),
           getDocs(collection(db, 'attendance')),
           getDocs(collection(db, 'courses')),
-          getDocs(query(collection(db, 'content'), orderBy('createdAt', 'desc'), limit(4))),
+          getDocs(query(collection(db, 'content'), orderBy('createdAt', 'desc'), limit(4)))
         ]);
 
         const allUsers = usersSnap.docs.map(d => ({ id: d.id, ...d.data() }));

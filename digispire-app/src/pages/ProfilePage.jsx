@@ -5,7 +5,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import {
   User, Phone, Mail, GraduationCap, Lock, Key,
   CheckCircle2, AlertCircle, Camera, LogOut, ChevronRight, Loader2,
-  ShieldCheck, Settings
+  ShieldCheck
 } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -198,7 +198,7 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Batch Assignment</p>
-                      <p className="text-sm font-semibold mt-1 capitalize">
+                      <p className="text-sm font-semibold mt-1">
                         {userProfile?.batchId} {userProfile?.isIntern ? ' (Intern)' : ''}
                       </p>
                     </div>

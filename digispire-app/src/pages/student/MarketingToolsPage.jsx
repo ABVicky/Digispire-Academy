@@ -51,13 +51,13 @@ export default function MarketingToolsPage() {
       {/* Search Bar */}
       <div className="px-2">
         <div className="relative group">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#255A84] transition-colors" size={20} />
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 z-10" size={20} />
           <input 
             type="text"
             placeholder="Search for tools, strategies, or platforms..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-14 pr-6 py-5 bg-white rounded-2xl border border-slate-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#255A84]/20 transition-all text-sm font-medium"
+            className="input-premium pl-14 py-4 bg-white border-slate-100"
           />
         </div>
       </div>

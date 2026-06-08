@@ -1,12 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   collection, addDoc, getDocs, query, where, orderBy, limit, serverTimestamp,
   doc, setDoc, deleteDoc, onSnapshot
 } from 'firebase/firestore';
 import { db } from '../../firebase';
 import {
-  QrCode, RefreshCw, Clock, Calendar, Users, ChevronRight,
-  TrendingUp, CheckCircle2, History, Trash2, ArrowRight, Briefcase, X
+  QrCode, RefreshCw, Clock, History, Trash2, X, Users
 } from 'lucide-react';
 import QRCode from 'qrcode';
 
@@ -64,7 +63,6 @@ export default function AttendancePage() {
   }, []);
 
   const generateQR = async () => {
-    // Generate exactly 6 uppercase characters
     const sessionId = Math.random().toString(36).substring(2, 8).toUpperCase();
     const expiresAt = Date.now() + (5 * 60 * 1000); // 5 mins
 
@@ -80,7 +78,6 @@ export default function AttendancePage() {
     };
 
     try {
-      // Compress the QR code payload so it is simple and scans instantly
       const compressedPayload = {
         s: sessionId,
         b: activeTab
@@ -97,7 +94,6 @@ export default function AttendancePage() {
       setQrImageUrl(url);
       await setDoc(doc(db, 'qr_sessions', activeTab), newQr);
       
-      // Log session permanently (wrapped in try-catch to not block UI if rules fail)
       try {
         await addDoc(collection(db, 'class_sessions'), {
           type: newQr.type,
@@ -149,161 +145,154 @@ export default function AttendancePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Attendance Center</h1>
-          <p className="text-xs text-slate-500 font-medium">Manage check-ins for academic and internship tracks</p>
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Live Class Console</h1>
+          <p className="text-xs text-slate-500 font-medium">Broadcast secure QR codes and capture real-time student check-ins</p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="bg-emerald-50 text-emerald-600 px-4 py-3 rounded-xl text-xs font-bold border border-emerald-100 flex items-center gap-2 w-full sm:w-auto justify-center">
-            <TrendingUp size={14} /> {stats.today} Check-ins Today
-          </div>
+        
+        {/* Tab switcher */}
+        <div className="flex bg-slate-100 p-1 rounded-xl">
+          {['morning', 'evening', 'internship'].map(tab => (
+            <button
+              key={tab}
+              onClick={() => { setActiveTab(tab); discardQR(); }}
+              className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer ${
+                activeTab === tab ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* QR Generator Card */}
-        <div className="lg:col-span-1 bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-sm border border-slate-100 p-6 sm:p-8 flex flex-col items-center text-center">
-          <h2 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-6">QR Generator</h2>
+        {/* Left Control Card */}
+        <div className="lg:col-span-1 card-premium p-6 sm:p-8 flex flex-col justify-between">
+          <div>
+            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2 mb-6">
+              <QrCode size={18} className="text-[#255A84]" /> Broadcaster
+            </h2>
 
-          {/* Tab Switcher */}
-          <div className="flex bg-slate-50 p-1.5 rounded-2xl mb-8 w-full overflow-x-auto no-scrollbar">
-            {['morning', 'evening', 'internship'].map(t => (
-              <button
-                key={t}
-                onClick={() => { setActiveTab(t); setQrData(null); setQrImageUrl(''); }}
-                className={`flex-1 py-3 px-3 text-[9px] font-bold uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === t ? 'bg-white text-[#255A84] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
-              >
-                {t === 'internship' ? <Briefcase size={14} /> : null}
-                {t}
-              </button>
-            ))}
-          </div>
-
-          <div className="relative group w-full flex justify-center">
-            <div className={`p-4 sm:p-6 bg-slate-50 rounded-[2.5rem] border-2 border-dashed transition-all duration-500 w-full max-w-[240px] aspect-square flex items-center justify-center ${qrData ? 'border-[#255A84]/20' : 'border-slate-100'}`}>
-              {qrImageUrl ? (
-                <div className="animate-in fade-in zoom-in duration-300 w-full h-full">
-                  <img src={qrImageUrl} alt="QR Code" className="w-full h-full rounded-xl object-contain" />
+            {qrData ? (
+              <div className="space-y-6 text-center">
+                <div className="p-4 bg-slate-50 border border-slate-100 rounded-3xl inline-block shadow-sm">
+                  {qrImageUrl && <img src={qrImageUrl} alt="QR Code" className="h-56 w-56 mx-auto object-contain rounded-2xl" />}
                 </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center text-slate-300 gap-3">
-                  <QrCode size={64} strokeWidth={1} />
-                  <p className="text-[10px] font-bold uppercase tracking-widest">Select Mode</p>
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Access Token</p>
+                  <p className="text-3xl font-black text-slate-800 tracking-widest mt-1 font-mono">{qrData.sessionId}</p>
                 </div>
-              )}
-            </div>
+                <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center gap-3">
+                  <Clock size={16} className="text-[#255A84]" />
+                  <span className="text-xs font-bold text-slate-700">Code Expires: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</span>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="p-4 bg-blue-50/50 border border-blue-100/60 rounded-2xl text-blue-600 text-xs font-medium leading-relaxed">
+                  Generate a temporary verification check-in. Students must scan this using the portal check-in screen to check in automatically.
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Enrolled Course *</label>
+                  <select
+                    value={selectedCourse}
+                    onChange={e => { setSelectedCourse(e.target.value); setSelectedModule(''); setSelectedTopics([]); }}
+                    className="select-premium cursor-pointer"
+                  >
+                    <option value="">Select Course...</option>
+                    {courses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Academic Module *</label>
+                  <select 
+                    value={selectedModule} 
+                    onChange={e => { setSelectedModule(e.target.value); setSelectedTopics([]); }}
+                    disabled={!selectedCourse}
+                    className="select-premium disabled:opacity-50"
+                  >
+                    <option value="">Select Module...</option>
+                    {modules.filter(m => m.courseId === selectedCourse).map(m => (
+                      <option key={m.id} value={m.id}>{m.title}</option>
+                    ))}
+                  </select>
+                </div>
 
-            {qrData && (
-              <div className="absolute -top-2 -right-2 h-11 w-11 bg-[#255A84] text-white rounded-2xl flex items-center justify-center text-xs font-bold shadow-lg shadow-[#255A84]/20">
-                {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
+                {selectedModule && (
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Topics Credit Synced</label>
+                    <div className="mt-1 max-h-32 overflow-y-auto no-scrollbar border border-slate-100 rounded-2xl p-2 bg-slate-50/50">
+                      {topics.filter(t => t.moduleId === selectedModule).length === 0 ? (
+                        <p className="text-xs text-slate-400 p-2 text-center">No topics found.</p>
+                      ) : (
+                        topics.filter(t => t.moduleId === selectedModule).map(topic => (
+                          <label key={topic.id} className="flex items-start gap-2.5 px-2.5 py-2 hover:bg-white rounded-xl cursor-pointer transition-colors border border-transparent hover:border-slate-100">
+                            <input 
+                              type="checkbox" 
+                              className="mt-0.5 rounded text-[#255A84] focus:ring-[#255A84] border-slate-300 flex-shrink-0"
+                              checked={selectedTopics.includes(topic.id)}
+                              onChange={(e) => {
+                                if (e.target.checked) setSelectedTopics(prev => [...prev, topic.id]);
+                                else setSelectedTopics(prev => prev.filter(id => id !== topic.id));
+                              }}
+                            />
+                            <span className="text-xs font-semibold text-slate-700 leading-snug">{topic.title}</span>
+                          </label>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
 
-          {qrData && (
-            <div className="w-full mt-6 p-4 bg-[#255A84]/5 rounded-2xl border border-[#255A84]/10 animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Manual Session Code</p>
-              <div className="flex items-center justify-center gap-1.5 font-mono">
-                {qrData.sessionId.split('').map((char, index) => (
-                  <span 
-                    key={index} 
-                    className="w-8 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-base font-extrabold text-[#255A84] shadow-sm select-all"
-                  >
-                    {char}
-                  </span>
-                ))}
-              </div>
-              <p className="text-[9px] text-slate-400 mt-2 font-medium">Students can enter this code manually if scanning fails</p>
-            </div>
-          )}
-
-          {/* Topic Selection */}
-          {!qrData && (
-            <div className="w-full text-left mt-6 space-y-3">
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Curriculum Covered (Optional)</label>
-              
-              <select 
-                value={selectedCourse} 
-                onChange={e => { setSelectedCourse(e.target.value); setSelectedModule(''); setSelectedTopics([]); }}
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#255A84] bg-slate-50"
+          <div>
+            {qrData ? (
+              <button
+                onClick={discardQR}
+                className="w-full mt-8 py-4 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-2xl font-bold text-xs uppercase tracking-widest transition active:scale-95 flex items-center justify-center gap-2 border border-rose-100 cursor-pointer"
               >
-                <option value="">Select Course...</option>
-                {courses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-
-              <select 
-                value={selectedModule} 
-                onChange={e => { setSelectedModule(e.target.value); setSelectedTopics([]); }}
-                disabled={!selectedCourse}
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#255A84] bg-slate-50 disabled:opacity-50"
+                <X size={14} /> Discard Session
+              </button>
+            ) : (
+              <button
+                onClick={generateQR}
+                className={`w-full mt-8 py-4 text-white rounded-2xl font-bold text-xs uppercase tracking-widest transition flex items-center justify-center gap-2 active:scale-95 cursor-pointer ${
+                  activeTab === 'internship' ? 'btn-secondary-premium bg-gradient-to-r from-emerald-500 to-emerald-600 border-none shadow-emerald-500/20' : 'btn-primary-premium'
+                }`}
               >
-                <option value="">Select Module...</option>
-                {modules.filter(m => m.courseId === selectedCourse).map(m => (
-                  <option key={m.id} value={m.id}>{m.title}</option>
-                ))}
-              </select>
-
-              {selectedModule && (
-                <div className="mt-2 max-h-32 overflow-y-auto no-scrollbar border border-slate-100 rounded-xl p-2 bg-slate-50/50">
-                  {topics.filter(t => t.moduleId === selectedModule).length === 0 ? (
-                    <p className="text-xs text-slate-400 p-2 text-center">No topics found in this module.</p>
-                  ) : (
-                    topics.filter(t => t.moduleId === selectedModule).map(topic => (
-                      <label key={topic.id} className="flex items-start gap-2 px-2 py-2 hover:bg-white rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-100">
-                        <input 
-                          type="checkbox" 
-                          className="mt-0.5 rounded text-[#255A84] focus:ring-[#255A84] border-slate-300 flex-shrink-0"
-                          checked={selectedTopics.includes(topic.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) setSelectedTopics(prev => [...prev, topic.id]);
-                            else setSelectedTopics(prev => prev.filter(id => id !== topic.id));
-                          }}
-                        />
-                        <span className="text-xs font-medium text-slate-700 leading-tight">{topic.title}</span>
-                      </label>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {qrData ? (
-            <button
-              onClick={discardQR}
-              className="w-full mt-8 py-4.5 bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 rounded-2xl font-bold text-sm transition flex items-center justify-center gap-3 active:scale-95"
-            >
-              <X size={18} /> Discard Session
-            </button>
-          ) : (
-            <button
-              onClick={generateQR}
-              className={`w-full mt-8 py-4.5 text-white rounded-2xl font-bold text-sm transition shadow-xl flex items-center justify-center gap-3 active:scale-95 ${activeTab === 'internship' ? 'bg-emerald-600 shadow-emerald-500/20' : 'bg-[#255A84] shadow-[#255A84]/20'}`}
-            >
-              <RefreshCw size={18} />
-              Start {activeTab} Session
-            </button>
-          )}
-          <p className="mt-5 text-[9px] sm:text-[10px] text-slate-400 font-medium italic leading-relaxed">
-            {activeTab === 'internship' ? '* Only enrolled interns can scan this.' : '* Only students in this batch can scan.'}
-          </p>
+                <RefreshCw size={14} />
+                Start {activeTab} Session
+              </button>
+            )}
+            <p className="mt-5 text-[9px] text-slate-400 font-medium italic leading-relaxed text-center">
+              {activeTab === 'internship' ? '* Only enrolled interns can scan this.' : '* Only students in this batch can scan.'}
+            </p>
+          </div>
         </div>
 
         {/* Live Feed Card */}
-        <div className="lg:col-span-2 bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+        <div className="lg:col-span-2 card-premium overflow-hidden">
           <div className="p-6 border-b border-slate-50 flex items-center justify-between">
-            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
+            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2 font-sans">
               <History size={18} className="text-[#255A84]" /> Live Feed
             </h2>
-            <button onClick={fetchCurriculum} className="p-3 text-slate-400 hover:text-[#255A84] transition active:rotate-180 duration-500" title="Refresh Curriculum">
-              <RefreshCw size={18} />
+            <button onClick={fetchCurriculum} className="p-2 btn-outline-premium rounded-xl text-slate-400 hover:text-[#255A84]" title="Refresh Curriculum">
+              <RefreshCw size={14} />
             </button>
           </div>
 
           <div className="overflow-y-auto max-h-[60vh] sm:max-h-[500px]">
             {loading && records.length === 0 ? (
               <div className="py-20 flex justify-center"><div className="animate-spin h-6 w-6 border-2 border-[#255A84] border-t-transparent rounded-full" /></div>
+            ) : records.length === 0 ? (
+              <div className="py-20 text-center text-slate-400">
+                <Users size={40} className="mx-auto mb-3 opacity-20" />
+                <p className="text-sm font-bold">No attendance logs yet</p>
+              </div>
             ) : (
               <table className="w-full text-sm responsive-table">
                 <thead className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-widest text-slate-400 sticky top-0 z-10">
@@ -320,7 +309,7 @@ export default function AttendancePage() {
                     <tr key={record.id} className="group hover:bg-slate-50/50 transition-colors">
                       <td className="px-8 py-4" data-label="Student">
                         <p className="font-bold text-slate-800">{record.name}</p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{record.studentId}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">{record.studentId}</p>
                       </td>
                       <td className="px-4 py-4" data-label="Track">
                         <span className={`px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${
@@ -336,7 +325,7 @@ export default function AttendancePage() {
                             <p className="text-xs font-bold text-slate-700">
                               {courses.find(c => c.id === record.coveredCourse)?.name || 'Unknown Course'}
                             </p>
-                            <p className="text-[10px] text-slate-500">
+                            <p className="text-[10px] text-slate-500 mt-0.5">
                               {modules.find(m => m.id === record.coveredModule)?.title || 'Unknown Module'}
                               {record.coveredTopics?.length > 0 && ` • ${record.coveredTopics.length} Topics`}
                             </p>
@@ -348,12 +337,12 @@ export default function AttendancePage() {
                       <td className="px-4 py-4 text-slate-500 font-medium" data-label="Time">
                         <div className="flex items-center gap-2">
                           <Clock size={14} className="text-slate-300" />
-                          <span className="text-xs">{record.timestamp?.toDate ? record.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}</span>
+                          <span className="text-xs font-semibold font-mono">{record.timestamp?.toDate ? record.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}</span>
                         </div>
                       </td>
                       <td className="px-8 py-4 text-right" data-label="Actions">
-                        <button onClick={() => deleteRecord(record.id)} className="p-3 text-slate-300 hover:text-red-500 transition-colors sm:opacity-0 sm:group-hover:opacity-100 active:scale-90">
-                          <Trash2 size={18} />
+                        <button onClick={() => deleteRecord(record.id)} className="p-2.5 btn-outline-premium text-slate-400 hover:text-red-500 hover:bg-slate-50 rounded-xl transition active:scale-95 border border-slate-100 sm:border-transparent hover:border-slate-100 shadow-sm sm:shadow-none sm:opacity-0 sm:group-hover:opacity-100">
+                          <Trash2 size={16} />
                         </button>
                       </td>
                     </tr>
