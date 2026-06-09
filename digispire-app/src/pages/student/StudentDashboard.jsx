@@ -1,318 +1,220 @@
 import { useEffect, useState } from 'react';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useAuth } from '../../context/AuthContext';
 import {
-  CalendarCheck, BookOpen, TrendingUp, Award,
-  Clock, ArrowRight, Star, FileText, Globe, CheckCircle2,
-  Zap, Briefcase, Sparkles, Megaphone, Newspaper, QrCode, Search
+  Calendar, Clock, Layers, ChevronRight, Award, QrCode
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-function detectType(url) {
-  if (!url) return 'link';
-  const lower = url.toLowerCase();
-  if (lower.includes('drive.google.com') || lower.includes('docs.google.com')) return 'gdrive';
-  if (lower.includes('.pdf') || lower.includes('pdf')) return 'pdf';
-  if (lower.includes('youtube.com') || lower.includes('youtu.be')) return 'video';
-  return 'link';
-}
-
-function ResourceMiniCard({ item }) {
-  const type = detectType(item.fileUrl);
-  return (
-    <a
-      href={item.fileUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors active:scale-95 group"
-    >
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0 shadow-sm border border-slate-100">
-          {type === 'pdf' ? <FileText size={14} className="text-red-500" /> : <Globe size={14} className="text-blue-500" />}
-        </div>
-        <div className="min-w-0">
-          <p className="text-xs font-bold text-slate-700 truncate group-hover:text-[#255A84] transition-colors">{item.title}</p>
-          <p className="text-[9px] font-medium text-slate-400 truncate mt-0.5">{item.subject || 'Resource'}</p>
-        </div>
-      </div>
-      <ArrowRight size={12} className="text-slate-300 group-hover:text-[#255A84] transition-colors flex-shrink-0" />
-    </a>
-  );
-}
+import { calculateAttendance } from '../../utils/attendanceEngine';
 
 export default function StudentDashboard() {
   const { userProfile } = useAuth();
   const [data, setData] = useState({
-    attendance: 0,
-    totalClasses: 0,
-    courses: 0,
-    topicsDone: 0,
-    totalTopics: 0,
-    recentResources: [],
-    portfolioCount: 0
+    attendancePct: 0,
+    enrolledBatches: [],
+    upcomingClasses: []
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!userProfile?.uid) return;
+    if (!userProfile?.uid || !userProfile?.studentId) return;
 
-    const fetchStudentData = async () => {
+    const fetchStudentDashboardData = async () => {
       try {
-        const [attSnap, coursesSnap, topicsSnap, resSnap, portSnap] = await Promise.all([
+        const studentBatchIds = userProfile.batchIds || (userProfile.batchId ? [userProfile.batchId] : ['morning']);
+        const [attSnap, batchesSnap, holidaysSnap, cancellationsSnap] = await Promise.all([
           getDocs(collection(db, 'attendance')),
-          getDocs(collection(db, 'courses')),
-          getDocs(collection(db, 'topics')),
-          getDocs(query(collection(db, 'content'), orderBy('createdAt', 'desc'), limit(3))),
-          getDocs(collection(db, 'portfolios'))
+          getDocs(collection(db, 'batches')),
+          getDocs(collection(db, 'holidays')),
+          getDocs(collection(db, 'cancelled_classes'))
         ]);
+        const myAtt = attSnap.docs.map(d => d.data()).filter(d => d.studentId === userProfile.studentId);
+        const allBatches = batchesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const holidays = holidaysSnap.docs.map(d => d.data());
+        const cancellations = cancellationsSnap.docs.map(d => d.data());
+        const enrolledBatches = allBatches.filter(b => studentBatchIds.includes(b.id));
 
-        const myAtt = attSnap.docs.filter(d => d.data().studentId === userProfile.studentId);
-        const myTopics = topicsSnap.docs.filter(d => d.data().completedStudents?.includes(userProfile.uid));
-        const myPortfolio = portSnap.docs.filter(d => d.data().uid === userProfile.uid);
-
-        const batchDates = new Set(attSnap.docs
-          .filter(d => d.data().batchId === userProfile.batchId)
-          .map(d => d.data().date)
-        );
-
-        setData({
-          attendance: myAtt.length,
-          totalClasses: Math.max(batchDates.size, myAtt.length, 1),
-          courses: coursesSnap.size,
-          topicsDone: myTopics.length,
-          totalTopics: topicsSnap.size,
-          recentResources: resSnap.docs.map(d => ({ id: d.id, ...d.data() })),
-          portfolioCount: myPortfolio.length
+        let totalPct = 0, countedBatches = 0;
+        enrolledBatches.forEach(bSchedule => {
+          const stats = calculateAttendance({
+            student: userProfile,
+            attendanceLogs: myAtt,
+            batchSchedule: bSchedule,
+            holidays,
+            cancelledClasses: cancellations
+          });
+          totalPct += stats.attendancePercentage;
+          countedBatches++;
         });
+        const attendancePct = countedBatches > 0 ? Math.round(totalPct / countedBatches) : 100;
+
+        const dayOfWeek = new Date().getDay();
+        const tomorrowDayOfWeek = (dayOfWeek + 1) % 7;
+        const getWeeklyDays = (b) => {
+          if (b.weeklyDays && Array.isArray(b.weeklyDays)) return b.weeklyDays;
+          if (b.schedule && Array.isArray(b.schedule)) {
+            const dayMap = { sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6 };
+            return b.schedule.map(d => dayMap[d.toLowerCase()]).filter(d => d !== undefined);
+          }
+          return [];
+        };
+
+        const upcomingClasses = [];
+        enrolledBatches.forEach(b => {
+          const days = getWeeklyDays(b);
+          if (days.includes(dayOfWeek)) {
+            upcomingClasses.push({ id: `${b.id}-today`, name: b.name || b.id, time: `${b.startTime || '09:00'} – ${b.endTime || '11:00'}`, day: 'Today', educator: b.educator || 'Faculty' });
+          }
+          if (days.includes(tomorrowDayOfWeek)) {
+            upcomingClasses.push({ id: `${b.id}-tomorrow`, name: b.name || b.id, time: `${b.startTime || '09:00'} – ${b.endTime || '11:00'}`, day: 'Tomorrow', educator: b.educator || 'Faculty' });
+          }
+        });
+        setData({ attendancePct, enrolledBatches, upcomingClasses });
       } catch (err) {
         console.error('Error fetching student stats:', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchStudentData();
+    fetchStudentDashboardData();
   }, [userProfile]);
-
-  const attendancePct = Math.max(0, Math.round((data.attendance / (data.totalClasses || 1)) * 100));
-  const courseProgress = data.totalTopics > 0 ? Math.round((data.topicsDone / data.totalTopics) * 100) : 0;
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-48 gap-3">
       <div className="animate-spin rounded-full h-8 w-8 border-4 border-[#255A84] border-t-transparent" />
-      <p className="text-xs text-slate-400 font-medium">Syncing your marketing hub...</p>
+      <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Loading...</p>
     </div>
   );
 
+  const pctColor = data.attendancePct >= 75 ? 'text-emerald-500' : data.attendancePct >= 50 ? 'text-amber-500' : 'text-rose-500';
+  const pctBg = data.attendancePct >= 75 ? 'bg-emerald-50' : data.attendancePct >= 50 ? 'bg-amber-50' : 'bg-rose-50';
+  const pctBar = data.attendancePct >= 75 ? 'bg-emerald-500' : data.attendancePct >= 50 ? 'bg-amber-500' : 'bg-rose-500';
+
   return (
-    <div className="space-y-6 pb-24 font-sans">
-
-      {/* Welcome Card */}
-      <div className="relative bg-gradient-to-br from-[#255A84] to-[#1a4261] rounded-2xl p-6 sm:p-8 text-white overflow-hidden shadow-lg border border-white/10">
-        <div className="relative z-10">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6">
-            <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl bg-white/20 backdrop-blur-md p-1 border border-white/20 shadow-xl overflow-hidden flex-shrink-0">
-              <div className="h-full w-full rounded-lg bg-white/10 flex items-center justify-center text-white font-bold text-xl sm:text-2xl overflow-hidden">
-                {userProfile?.photoURL ? (
-                  <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover" />
-                ) : (
-                  userProfile?.name?.charAt(0)
-                )}
-              </div>
-            </div>
-            <div>
-              <p className="text-blue-100 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em]">Academy Member</p>
-              <h1 className="text-2xl sm:text-3xl font-bold mt-1 tracking-tight truncate max-w-[200px] sm:max-w-none">{userProfile?.name || 'Marketer'}</h1>
-              <div className="flex items-center gap-2 sm:gap-3 mt-3 sm:mt-4">
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-lg sm:rounded-xl border border-white/10 shrink-0">
-                  <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider font-sans">
-                    {userProfile?.batchId === 'morning' ? '🌅 Morning' : '🌆 Evening'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-lg sm:rounded-xl border border-white/10 shrink-0">
-                  <span className="text-[9px] sm:text-[10px] font-mono font-bold tracking-widest">
-                    {userProfile?.studentId}
-                  </span>
-                </div>
-              </div>
-            </div>
+    <div className="space-y-4 pb-4 font-sans">
+      {/* ─── Hero Welcome Card ─── */}
+      <div className="relative bg-gradient-to-br from-[#255A84] to-[#1a4261] rounded-2xl p-5 text-white overflow-hidden shadow-lg border border-white/10">
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="h-14 w-14 rounded-xl bg-white/20 backdrop-blur-md border border-white/20 shadow-xl overflow-hidden flex-shrink-0 flex items-center justify-center">
+            {userProfile?.photoURL ? (
+              <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover" />
+            ) : (
+              <span className="text-white font-bold text-xl">{userProfile?.name?.charAt(0)}</span>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-blue-200 text-[10px] font-bold uppercase tracking-[0.2em]">Student Portal</p>
+            <h1 className="text-lg font-bold mt-0.5 tracking-tight truncate">{userProfile?.name || 'Student'}</h1>
+            <p className="text-[11px] font-mono font-bold text-blue-300 mt-0.5">ID: {userProfile?.studentId}</p>
           </div>
         </div>
-        <div className="absolute -right-6 -bottom-6 w-40 h-40 bg-[#F48B1F]/20 rounded-full blur-3xl" />
-        <div className="absolute right-10 top-10 w-20 h-20 bg-blue-400/10 rounded-full blur-2xl animate-pulse" />
+        <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-[#F48B1F]/20 rounded-full blur-2xl" />
+        <div className="absolute -left-4 -top-4 w-24 h-24 bg-white/5 rounded-full blur-xl" />
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {[
-          { icon: Zap, label: 'Attendance', value: `${attendancePct}%`, color: 'text-[#255A84]', bg: 'bg-blue-50' },
-          { icon: Briefcase, label: 'Portfolio', value: data.portfolioCount, color: 'text-purple-600', bg: 'bg-purple-50' },
-          { icon: Award, label: 'Completion', value: `${courseProgress}%`, color: 'text-[#F48B1F]', bg: 'bg-orange-50' },
-          { icon: Sparkles, label: 'Academy ID', value: userProfile?.studentId?.substring(2) || '---', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-        ].map(({ icon: Icon, label, value, color, bg }) => (
-          <div key={label} className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-50 hover:shadow-md transition-all duration-300 group active:scale-95">
-            <div className={`h-10 w-10 sm:h-11 sm:w-11 rounded-xl ${bg} flex items-center justify-center mb-3 sm:mb-4 transition-transform group-hover:scale-110`}>
-              <Icon size={20} className={color} />
-            </div>
-            <p className={`text-xl sm:text-2xl font-bold tracking-tight ${color}`}>{value}</p>
-            <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Promotional study portal banner */}
-      <a 
-        href="https://marketing.abvicky.in" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="group relative block overflow-hidden bg-gradient-to-r from-[#F48B1F] to-[#e07b12] rounded-2xl p-6 sm:p-8 text-white shadow-md border border-white/10 hover:shadow-lg transition-all duration-300 active:scale-[0.99]"
-      >
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-1.5">
-            <span className="bg-white/20 backdrop-blur-md text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-white/10 inline-block">
-              Study Hub Promotion
-            </span>
-            <h3 className="text-lg sm:text-xl font-black tracking-tight mt-1.5 flex items-center gap-2 group-hover:underline">
-              Visit our Digital Marketing Study Portal <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-            </h3>
-            <p className="text-xs text-orange-50/95 font-medium max-w-2xl leading-relaxed">
-              Access comprehensive learning guides, case studies, and advanced resources curated by Vicky Vicky Prasad Mahato to accelerate your digital marketing journey.
-            </p>
-          </div>
-          <div className="bg-white text-[#F48B1F] text-xs font-black px-6 py-3.5 rounded-xl shrink-0 shadow-md group-hover:bg-orange-50 transition-colors">
-            Start Learning Now
-          </div>
-        </div>
-        <div className="absolute right-0 top-0 translate-x-1/4 -translate-y-1/4 opacity-10 pointer-events-none text-white">
-          <Globe size={180} />
-        </div>
-      </a>
-
-      {/* Quick Access Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-        {/* Certification Card */}
-        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-50 relative overflow-hidden">
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-6 sm:mb-8">
-              <h2 className="font-bold text-slate-800 text-[10px] sm:text-xs uppercase tracking-[0.15em] flex items-center gap-2">
-                <Award size={18} className="text-[#F48B1F]" /> Certification
-              </h2>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-end justify-between">
-                <span className="text-2xl sm:text-3xl font-bold text-slate-800">{courseProgress}%</span>
-                <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest pb-1.5">Mastery Level</span>
-              </div>
-              <div className="h-3 bg-slate-50 rounded-full overflow-hidden border border-slate-100 p-0.5">
-                <div 
-                  className="h-full bg-gradient-to-r from-[#F48B1F] to-[#f7a552] rounded-full transition-all duration-1000"
-                  style={{ width: `${courseProgress}%` }}
-                />
-              </div>
-              <p className="text-[9px] sm:text-[10px] font-medium text-slate-400 leading-relaxed">
-                Complete {Math.max(0, 100 - courseProgress)}% more of the curriculum to unlock your final Digital Marketing Master certification.
-              </p>
-            </div>
-          </div>
-          <div className="absolute -right-4 -top-4 opacity-[0.03] pointer-events-none">
-             <Award size={120} />
-          </div>
-        </div>
-
-        {/* Recent Resources Card */}
-        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-50 flex flex-col">
-          <div className="flex items-center justify-between mb-6 sm:mb-8">
-            <h2 className="font-bold text-slate-800 text-[10px] sm:text-xs uppercase tracking-[0.15em] flex items-center gap-2">
-              <FileText size={18} className="text-[#255A84]" /> Resources
-            </h2>
-            <Link to="/student/content" className="text-[9px] sm:text-[10px] font-bold text-[#255A84] hover:underline uppercase tracking-widest">View All</Link>
-          </div>
-          <div className="space-y-3 flex-1">
-             {data.recentResources.length === 0 ? (
-               <div className="h-full flex flex-col items-center justify-center text-center p-4">
-                 <FileText size={20} className="text-slate-300 mb-1" />
-                 <p className="text-[10px] text-slate-400 font-medium">No resources shared yet.</p>
-               </div>
-             ) : (
-               data.recentResources.slice(0, 3).map((item) => (
-                 <ResourceMiniCard key={item.id} item={item} />
-               ))
-             )}
-          </div>
-        </div>
-
-        {/* Marketing Tools Card */}
-        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-50">
-          <div className="flex items-center justify-between mb-6 sm:mb-8">
-            <h2 className="font-bold text-slate-800 text-[10px] sm:text-xs uppercase tracking-[0.15em] flex items-center gap-2">
-              <Zap size={18} className="text-[#255A84]" /> Tools
-            </h2>
-            <Link to="/student/tools" className="text-[9px] sm:text-[10px] font-bold text-[#255A84] hover:underline uppercase tracking-widest">Explore</Link>
-          </div>
-          <div className="space-y-3">
-             {[
-               { name: 'Ads Library', icon: Megaphone, color: 'text-purple-500' },
-               { name: 'Analytics', icon: TrendingUp, color: 'text-emerald-500' },
-               { name: 'Keyword Hub', icon: Search, color: 'text-blue-500' }
-             ].map((t, idx) => (
-               <Link key={idx} to="/student/tools" className="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors active:scale-95">
-                  <div className="flex items-center gap-3">
-                    <t.icon size={14} className={t.color} />
-                    <span className="text-xs font-bold text-slate-600">{t.name}</span>
-                  </div>
-                  <ArrowRight size={12} className="text-slate-300" />
-               </Link>
-             ))}
-          </div>
-        </div>
-
-        {/* Industry Trends Card */}
-        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100">
-           <div className="flex items-center justify-between mb-6 sm:mb-8">
-            <h2 className="font-bold text-slate-800 text-[10px] sm:text-xs uppercase tracking-[0.15em] flex items-center gap-2">
-              <Newspaper size={18} className="text-emerald-600" /> Market Trends
-            </h2>
-          </div>
-          <div className="space-y-4">
-             {[
-               { title: 'AI in Meta Ads', desc: 'How Advantage+ campaigns are changing the game...', icon: Star, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-               { title: 'Google SGE Update', desc: 'Search Generative Experience and its impact on SEO...', icon: Globe, color: 'text-blue-600', bg: 'bg-blue-50' }
-             ].map((trend, idx) => (
-               <div key={idx} className="flex gap-4 p-1">
-                  <div className={`flex-shrink-0 h-11 w-11 ${trend.bg} rounded-xl flex items-center justify-center ${trend.color} shadow-sm`}>
-                    <trend.icon size={18} />
-                  </div>
-                  <div className="min-w-0">
-                     <h4 className="text-xs font-bold text-slate-700 truncate">{trend.title}</h4>
-                     <p className="text-[9px] sm:text-[10px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">{trend.desc}</p>
-                  </div>
-               </div>
-             ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Date & Check-in Bar */}
-      <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-50 flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
-        <div className="flex items-center gap-4 w-full sm:w-auto p-2">
-          <div className="h-14 w-14 rounded-xl bg-[#255A84] flex flex-col items-center justify-center text-white flex-shrink-0 shadow-lg shadow-[#255A84]/20">
-            <span className="text-[9px] sm:text-[10px] font-bold uppercase leading-none opacity-80">{new Date().toLocaleString('en-IN', { month: 'short' })}</span>
-            <span className="text-2xl font-bold leading-tight">{new Date().getDate()}</span>
+      {/* ─── Attendance + Quick Check-in Row ─── */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Attendance % */}
+        <div className={`${pctBg} rounded-2xl p-4 border border-slate-100 flex flex-col justify-between min-h-[110px]`}>
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Attendance</p>
+            <Award size={16} className={pctColor} />
           </div>
           <div>
-            <p className="text-base font-bold text-slate-800 leading-tight">{new Date().toLocaleDateString('en-IN', { weekday: 'long' })}</p>
-            <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">{new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            <p className={`text-3xl font-black ${pctColor} leading-none`}>{data.attendancePct}%</p>
+            <p className="text-[10px] text-slate-400 font-medium mt-1">Goal: 75%+</p>
+            {/* Mini progress bar */}
+            <div className="mt-2 h-1 bg-slate-200/60 rounded-full overflow-hidden">
+              <div className={`h-full ${pctBar} rounded-full transition-all`} style={{ width: `${Math.min(data.attendancePct, 100)}%` }} />
+            </div>
           </div>
         </div>
-        <div className="w-full sm:ml-auto sm:w-auto pb-2 sm:pb-0">
-          <Link
-            to="/student/attendance"
-            className="flex items-center justify-center gap-3 w-full sm:w-auto px-10 py-4.5 bg-[#F48B1F] hover:bg-[#cc7214] text-white text-[11px] font-bold rounded-xl transition-all shadow-lg shadow-[#F48B1F]/20 uppercase tracking-widest active:scale-95"
-          >
-            <QrCode size={18} /> Daily Check-in
-          </Link>
-        </div>
+
+        {/* Quick Check-in CTA */}
+        <Link
+          to="/student/attendance"
+          className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col justify-between min-h-[110px] active:scale-[0.98] transition hover:shadow-md"
+        >
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Check-In</p>
+            <QrCode size={16} className="text-[#255A84]" />
+          </div>
+          <div>
+            <p className="font-bold text-slate-800 text-sm leading-tight">Scan QR Code</p>
+            <p className="text-[10px] text-slate-400 font-medium mt-0.5">Mark attendance</p>
+            <div className="flex items-center gap-1 mt-2">
+              <span className="text-[10px] font-bold text-[#255A84]">Open terminal</span>
+              <ChevronRight size={11} className="text-[#255A84]" />
+            </div>
+          </div>
+        </Link>
       </div>
+
+      {/* ─── Enrolled Batches ─── */}
+      <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-3">
+        <h2 className="text-[11px] font-black text-slate-600 uppercase tracking-widest flex items-center gap-2">
+          <Layers size={14} className="text-[#255A84]" /> Enrolled Batches
+        </h2>
+        {data.enrolledBatches.length === 0 ? (
+          <p className="text-xs text-slate-400 py-3 italic">Not enrolled in any active batch.</p>
+        ) : (
+          <div className="grid grid-cols-1 gap-2">
+            {data.enrolledBatches.map(b => (
+              <div key={b.id} className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-bold text-slate-800 text-sm truncate">{b.name || b.id}</p>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                    {b.startTime} – {b.endTime}
+                  </p>
+                </div>
+                <span className="badge-premium-blue shrink-0">Enrolled</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ─── Upcoming Classes ─── */}
+      <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-3">
+        <h2 className="text-[11px] font-black text-slate-600 uppercase tracking-widest flex items-center gap-2">
+          <Clock size={14} className="text-orange-500" /> Upcoming Classes
+        </h2>
+        {data.upcomingClasses.length === 0 ? (
+          <p className="text-xs text-slate-400 py-3 text-center italic">No classes today or tomorrow.</p>
+        ) : (
+          data.upcomingClasses.map(cls => (
+            <div key={cls.id} className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-bold text-slate-800 text-sm truncate">{cls.name}</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{cls.time} · {cls.educator}</p>
+              </div>
+              <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border shrink-0 ${
+                cls.day === 'Today' ? 'bg-orange-50 text-orange-600 border-orange-100' : 'bg-slate-100 text-slate-500 border-slate-200'
+              }`}>
+                {cls.day}
+              </span>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* ─── Attendance History shortcut ─── */}
+      <Link
+        to="/student/attendance"
+        className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl active:scale-[0.99] transition hover:bg-slate-100"
+      >
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 bg-blue-50 text-[#255A84] rounded-xl flex items-center justify-center shrink-0">
+            <Calendar size={16} />
+          </div>
+          <div>
+            <p className="font-bold text-slate-800 text-xs">View Attendance Calendar</p>
+            <p className="text-[10px] text-slate-400 font-medium">Full history & check-in logs</p>
+          </div>
+        </div>
+        <ChevronRight size={16} className="text-slate-400 shrink-0" />
+      </Link>
     </div>
   );
 }

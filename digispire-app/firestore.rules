@@ -83,6 +83,18 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Holidays
+    match /holidays/{id} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+
+    // Cancelled Classes
+    match /cancelled_classes/{id} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+
     // Revision Appeals
     match /revision_appeals/{id} {
       allow read: if isAuth();

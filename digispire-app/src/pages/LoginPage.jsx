@@ -88,42 +88,42 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden font-sans">
+    <div className="min-h-screen-ios bg-slate-950 flex items-center justify-center p-4 py-8 relative overflow-auto font-sans">
       {/* Glow Spots */}
       <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full ambient-glow-1 pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full ambient-glow-2 pointer-events-none" />
 
-      <div className="w-full max-w-md relative z-10 page-transition">
+      <div className="w-full max-w-md relative z-10 page-transition my-auto">
         {/* Logo & Brand */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="bg-white/10 backdrop-blur-md p-4.5 rounded-[2rem] mb-4 border border-white/15 shadow-2xl">
-            <img src="/logo.png" alt="DIGISPIRE Academy" className="h-16 w-auto object-contain" />
+        <div className="flex flex-col items-center mb-6">
+          <div className="bg-white/10 backdrop-blur-md p-3.5 rounded-2xl mb-3 border border-white/15 shadow-2xl">
+            <img src="/logo.png" alt="DIGISPIRE Academy" className="h-12 w-auto object-contain" />
           </div>
-          <h1 className="text-3xl font-heading font-black text-white tracking-tight">DIGISPIRE</h1>
+          <h1 className="text-2xl font-heading font-black text-white tracking-tight">DIGISPIRE</h1>
           <p className="text-blue-300 text-[10px] font-bold tracking-[0.2em] uppercase mt-1 opacity-80 font-sans">Academy Portal</p>
         </div>
 
         {/* Glassmorphic Login Box */}
-        <div className="bg-white/95 backdrop-blur-lg rounded-[2.5rem] shadow-[0_24px_64px_rgba(0,0,0,0.4)] overflow-hidden border border-white/20">
+        <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-[0_24px_64px_rgba(0,0,0,0.4)] overflow-hidden border border-white/20">
           {/* Tab Switcher */}
           <div className="flex p-2 bg-slate-50/50 border-b border-slate-100/60">
             <button
               onClick={() => { setTab('admin'); setError(''); }}
-              className={`flex-1 py-3.5 text-xs font-bold uppercase tracking-widest rounded-[1.25rem] transition-all duration-300 ${tab === 'admin' ? 'bg-[#255A84] text-white shadow-md shadow-[#255A84]/20 font-extrabold' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`flex-1 py-3.5 text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300 ${tab === 'admin' ? 'bg-[#255A84] text-white shadow-md shadow-[#255A84]/20 font-extrabold' : 'text-slate-400 hover:text-slate-600'}`}
             >
               Faculty Portal
             </button>
             <button
               onClick={() => { setTab('student'); setError(''); }}
-              className={`flex-1 py-3.5 text-xs font-bold uppercase tracking-widest rounded-[1.25rem] transition-all duration-300 ${tab === 'student' ? 'bg-[#F48B1F] text-white shadow-md shadow-[#F48B1F]/20 font-extrabold' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`flex-1 py-3.5 text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300 ${tab === 'student' ? 'bg-[#F48B1F] text-white shadow-md shadow-[#F48B1F]/20 font-extrabold' : 'text-slate-400 hover:text-slate-600'}`}
             >
               Student Portal
             </button>
           </div>
 
-          <div className="p-8">
+          <div className="p-5 sm:p-8">
             {error && (
-              <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 text-xs font-bold flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+              <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-xs font-bold flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
                 <div className="h-5 w-5 bg-rose-500 text-white rounded-full flex items-center justify-center flex-shrink-0 font-extrabold text-[10px]">!</div>
                 {error}
               </div>
@@ -133,7 +133,7 @@ export default function LoginPage() {
             {tab === 'admin' && (
               <form onSubmit={handleAdminLogin} className="space-y-5">
                 <div>
-                  <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Email Address</label>
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Email Address</label>
                   <div className="relative">
                     <Mail size={16} className="absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
                     <input
@@ -147,7 +147,7 @@ export default function LoginPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Password</label>
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Password</label>
                   <div className="relative">
                     <Lock size={16} className="absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
                     <input
@@ -181,7 +181,7 @@ export default function LoginPage() {
             {tab === 'student' && (
               <form onSubmit={handleStudentLogin} className="space-y-5">
                 <div>
-                  <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Phone Number</label>
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Phone Number</label>
                   <div className="relative">
                     <Phone size={16} className="absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
                     <input
@@ -195,7 +195,7 @@ export default function LoginPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Password</label>
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Password</label>
                   <div className="relative">
                     <Lock size={16} className="absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
                     <input
@@ -222,7 +222,7 @@ export default function LoginPage() {
                 >
                   {loading ? 'Authenticating...' : 'Sign In to Student Portal'}
                 </button>
-                <p className="text-center text-[10px] text-slate-400 font-medium px-4 leading-normal">
+                <p className="text-center text-[11px] text-slate-400 font-medium px-4 leading-normal">
                   Default credentials are provided by your educator. Please reset password after first enrollment access.
                 </p>
               </form>
@@ -231,7 +231,7 @@ export default function LoginPage() {
         </div>
 
         <div className="text-center mt-8">
-          <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">
+          <p className="text-slate-500 text-[11px] font-bold uppercase tracking-widest">
             © 2026 DIGISPIRE Academy · digispire.in
           </p>
         </div>

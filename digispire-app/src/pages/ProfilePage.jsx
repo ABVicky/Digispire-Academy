@@ -4,7 +4,7 @@ import { storage } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import {
   User, Phone, Mail, GraduationCap, Lock, Key,
-  CheckCircle2, AlertCircle, Camera, LogOut, ChevronRight, Loader2,
+  CheckCircle2, AlertCircle, Camera, LogOut, Loader2,
   ShieldCheck
 } from 'lucide-react';
 
@@ -84,16 +84,16 @@ export default function ProfilePage() {
       </div>
 
       {/* Tab Switcher */}
-      <div className="flex bg-white/50 backdrop-blur-sm p-1.5 rounded-[2rem] border border-slate-100 shadow-sm mx-2">
+      <div className="flex bg-white/50 backdrop-blur-sm p-1.5 rounded-2xl border border-slate-100 shadow-sm mx-2">
         <button
           onClick={() => setActiveTab('general')}
-          className={`flex-1 py-3.5 rounded-[1.5rem] text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${activeTab === 'general' ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'text-slate-400 hover:text-slate-600'}`}
+          className={`flex-1 py-3.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${activeTab === 'general' ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'text-slate-400 hover:text-slate-600'}`}
         >
           <User size={14} /> My Profile
         </button>
         <button
           onClick={() => setActiveTab('security')}
-          className={`flex-1 py-3.5 rounded-[1.5rem] text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${activeTab === 'security' ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'text-slate-400 hover:text-slate-600'}`}
+          className={`flex-1 py-3.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${activeTab === 'security' ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'text-slate-400 hover:text-slate-600'}`}
         >
           <Lock size={14} /> Security
         </button>
@@ -102,13 +102,13 @@ export default function ProfilePage() {
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         {activeTab === 'general' ? (
           /* Profile Card */
-          <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="relative h-32 bg-gradient-to-r from-[#255A84] to-[#1a4261]">
               <div className="absolute -bottom-12 left-8">
-                <div className="h-24 w-24 rounded-3xl bg-white p-1.5 shadow-xl">
+                <div className="h-24 w-24 rounded-2xl bg-white p-1.5 shadow-xl">
                   <div 
                     onClick={handleImageClick}
-                    className="h-full w-full rounded-2xl bg-slate-100 flex items-center justify-center text-[#255A84] font-bold text-3xl border border-slate-50 relative group overflow-hidden cursor-pointer"
+                    className="h-full w-full rounded-xl bg-slate-100 flex items-center justify-center text-[#255A84] font-bold text-3xl border border-slate-50 relative group overflow-hidden cursor-pointer"
                   >
                     {userProfile?.photoURL ? (
                       <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover" />
@@ -140,11 +140,11 @@ export default function ProfilePage() {
                 <div>
                   <h2 className="text-2xl font-bold text-slate-800 tracking-tight">{userProfile?.name}</h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${userProfile?.role === 'admin' ? 'bg-[#255A84] text-white' : 'bg-orange-50 text-[#F48B1F]'}`}>
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${userProfile?.role === 'admin' ? 'bg-[#255A84] text-white' : 'bg-orange-50 text-[#F48B1F]'}`}>
                       {userProfile?.role}
                     </span>
                     {userProfile?.role === 'student' && (
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
                         ID: {userProfile?.studentId}
                       </span>
                     )}
@@ -165,7 +165,7 @@ export default function ProfilePage() {
                       <Phone size={18} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Phone Number</p>
+                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest leading-none">Phone Number</p>
                       <p className="text-sm font-semibold mt-1">{userProfile?.phone || 'Not provided'}</p>
                     </div>
                   </div>
@@ -174,7 +174,7 @@ export default function ProfilePage() {
                       <Mail size={18} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Email Address</p>
+                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest leading-none">Email Address</p>
                       <p className="text-sm font-semibold mt-1">{userProfile?.email || 'Not provided'}</p>
                     </div>
                   </div>
@@ -186,7 +186,7 @@ export default function ProfilePage() {
                       <GraduationCap size={18} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">
+                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest leading-none">
                         {userProfile?.role === 'admin' ? 'Position' : 'Enrolled Course'}
                       </p>
                       <p className="text-sm font-semibold mt-1">{userProfile?.course || (userProfile?.role === 'admin' ? 'Educator' : 'General')}</p>
@@ -197,7 +197,7 @@ export default function ProfilePage() {
                       <User size={18} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Batch Assignment</p>
+                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest leading-none">Batch Assignment</p>
                       <p className="text-sm font-semibold mt-1">
                         {userProfile?.batchId} {userProfile?.isIntern ? ' (Intern)' : ''}
                       </p>
@@ -209,9 +209,9 @@ export default function ProfilePage() {
           </div>
         ) : (
           /* Security Card */
-          <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
             <div className="flex items-center gap-4 mb-8">
-              <div className="h-12 w-12 rounded-2xl bg-blue-50 text-[#255A84] flex items-center justify-center">
+              <div className="h-12 w-12 rounded-xl bg-blue-50 text-[#255A84] flex items-center justify-center">
                 <ShieldCheck size={24} />
               </div>
               <div>
@@ -222,14 +222,14 @@ export default function ProfilePage() {
 
             <form onSubmit={handlePasswordChange} className="max-w-md space-y-5">
               {status && (
-                <div className={`p-4 rounded-2xl flex items-center gap-3 text-xs font-bold animate-in fade-in slide-in-from-top-2 ${status.type === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                <div className={`p-4 rounded-xl flex items-center gap-3 text-xs font-bold animate-in fade-in slide-in-from-top-2 ${status.type === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
                   {status.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
                   {status.message}
                 </div>
               )}
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">New Password</label>
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">New Password</label>
                 <div className="relative">
                   <Key size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
                   <input
@@ -238,13 +238,13 @@ export default function ProfilePage() {
                     value={newPassword}
                     onChange={e => setNewPassword(e.target.value)}
                     placeholder="At least 6 characters"
-                    className="w-full pl-11 pr-4 py-4 bg-slate-50 border-transparent rounded-2xl text-sm focus:bg-white focus:border-[#255A84] transition outline-none shadow-inner"
+                    className="w-full pl-11 pr-4 py-4 bg-slate-50 border-transparent rounded-xl text-sm focus:bg-white focus:border-[#255A84] transition outline-none shadow-inner"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Confirm New Password</label>
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Confirm New Password</label>
                 <div className="relative">
                   <Key size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
                   <input
@@ -253,7 +253,7 @@ export default function ProfilePage() {
                     value={confirmPassword}
                     onChange={e => setConfirmPassword(e.target.value)}
                     placeholder="Repeat new password"
-                    className="w-full pl-11 pr-4 py-4 bg-slate-50 border-transparent rounded-2xl text-sm focus:bg-white focus:border-[#255A84] transition outline-none shadow-inner"
+                    className="w-full pl-11 pr-4 py-4 bg-slate-50 border-transparent rounded-xl text-sm focus:bg-white focus:border-[#255A84] transition outline-none shadow-inner"
                   />
                 </div>
               </div>
@@ -262,7 +262,7 @@ export default function ProfilePage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="w-full py-4 bg-[#255A84] hover:bg-[#1a4261] text-white font-bold rounded-2xl transition shadow-xl shadow-[#255A84]/20 disabled:opacity-50 active:scale-95 flex items-center justify-center gap-3"
+                  className="w-full py-4 bg-[#255A84] hover:bg-[#1a4261] text-white font-bold rounded-xl transition shadow-xl shadow-[#255A84]/20 disabled:opacity-50 active:scale-95 flex items-center justify-center gap-3"
                 >
                   {saving ? (
                     <Loader2 size={20} className="animate-spin" />
@@ -274,8 +274,8 @@ export default function ProfilePage() {
               </div>
             </form>
 
-            <div className="mt-10 p-6 bg-slate-50 rounded-[1.5rem] border border-dashed border-slate-200">
-              <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Security Tip</h4>
+            <div className="mt-10 p-6 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+              <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Security Tip</h4>
               <p className="text-xs text-slate-400 leading-relaxed font-medium">
                 Use a combination of uppercase, lowercase, numbers, and symbols for a stronger password. Avoid using personal information like your birthdate or phone number.
               </p>

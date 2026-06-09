@@ -14,19 +14,13 @@ import StudentsPage from './pages/admin/StudentsPage';
 import AttendancePage from './pages/admin/AttendancePage';
 import CoursesPage from './pages/admin/CoursesPage';
 import ContentPage from './pages/admin/ContentPage';
-import AnalyticsPage from './pages/admin/AnalyticsPage';
 import AttendanceReportPage from './pages/admin/AttendanceReportPage';
-import AdminToolsPage from './pages/admin/AdminToolsPage';
-import RevisionAppealsPage from './pages/admin/RevisionAppealsPage';
 
 // Student pages
 import StudentDashboard from './pages/student/StudentDashboard';
 import StudentAttendancePage from './pages/student/StudentAttendancePage';
 import StudentCoursesPage from './pages/student/StudentCoursesPage';
 import StudentContentPage from './pages/student/StudentContentPage';
-import MarketingToolsPage from './pages/student/MarketingToolsPage';
-import PortfolioPage from './pages/student/PortfolioPage';
-import CommunityPortfolioPage from './pages/student/CommunityPortfolioPage';
 
 // Shared pages
 import ProfilePage from './pages/ProfilePage';
@@ -66,11 +60,7 @@ function App() {
               <Route path="attendance" element={<AttendancePage />} />
               <Route path="courses" element={<CoursesPage />} />
               <Route path="content" element={<ContentPage />} />
-              <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="reports" element={<AttendanceReportPage />} />
-              <Route path="tools" element={<AdminToolsPage />} />
-              <Route path="revisions" element={<RevisionAppealsPage />} />
-              <Route path="community" element={<CommunityPortfolioPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
           </Route>
@@ -83,9 +73,6 @@ function App() {
               <Route path="attendance" element={<StudentAttendancePage />} />
               <Route path="courses" element={<StudentCoursesPage />} />
               <Route path="content" element={<StudentContentPage />} />
-              <Route path="tools" element={<MarketingToolsPage />} />
-              <Route path="portfolio" element={<PortfolioPage />} />
-              <Route path="community" element={<CommunityPortfolioPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
           </Route>

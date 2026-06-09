@@ -3,7 +3,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { 
   Globe, ExternalLink, Search, Megaphone, MousePointer2, 
-  Layout, Briefcase, Sparkles, Loader2, Award, User
+  Layout, Loader2, Award, User
 } from 'lucide-react';
 
 const PROJECT_TYPES = [
@@ -36,7 +36,10 @@ export default function CommunityPortfolioPage() {
         setLoading(false); 
       }
     };
-    fetchAllPortfolios();
+    const timer = setTimeout(() => {
+      fetchAllPortfolios();
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const filtered = projects.filter(p => activeType === 'all' || p.type === activeType);
@@ -52,7 +55,7 @@ export default function CommunityPortfolioPage() {
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar px-2 py-2">
         <button
           onClick={() => setActiveType('all')}
-          className={`flex-shrink-0 px-6 py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest transition-all ${activeType === 'all' ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'bg-white text-slate-500 border border-slate-50 hover:bg-slate-50'}`}
+          className={`flex-shrink-0 px-6 py-3 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all ${activeType === 'all' ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'bg-white text-slate-500 border border-slate-50 hover:bg-slate-50'}`}
         >
           All Projects
         </button>
@@ -60,7 +63,7 @@ export default function CommunityPortfolioPage() {
           <button
             key={t.id}
             onClick={() => setActiveType(t.id)}
-            className={`flex-shrink-0 flex items-center gap-2 px-6 py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest transition-all ${activeType === t.id ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'bg-white text-slate-500 border border-slate-50 hover:bg-slate-50'}`}
+            className={`flex-shrink-0 flex items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all ${activeType === t.id ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'bg-white text-slate-500 border border-slate-50 hover:bg-slate-50'}`}
           >
             <t.icon size={14} />
             {t.label}
@@ -86,9 +89,9 @@ export default function CommunityPortfolioPage() {
                     <typeInfo.icon size={24} />
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{typeInfo.label}</span>
-                    <span className="text-[10px] font-bold text-[#255A84] mt-1 flex items-center gap-1">
-                      <User size={10} /> {p.studentName || 'Marketer'}
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{typeInfo.label}</span>
+                    <span className="text-[11px] font-bold text-[#255A84] mt-1 flex items-center gap-1">
+                      <User size={12} /> {p.studentName || 'Marketer'}
                     </span>
                   </div>
                 </div>
@@ -104,7 +107,7 @@ export default function CommunityPortfolioPage() {
                     <div className="h-8 w-8 bg-slate-50 text-slate-400 rounded-lg flex items-center justify-center group-hover/link:text-[#255A84] group-hover/link:bg-[#255A84]/5 transition-colors">
                       <Globe size={14} />
                     </div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate max-w-[120px]">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest truncate max-w-[120px]">
                       {(() => {
                         try { return new URL(p.url).hostname; }
                         catch { return 'View Live'; }
@@ -113,7 +116,7 @@ export default function CommunityPortfolioPage() {
                   </a>
                   <a 
                     href={p.url} target="_blank" rel="noopener noreferrer"
-                    className="h-10 px-4 bg-slate-50 text-slate-600 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-[#255A84] hover:text-white transition-all"
+                    className="h-10 px-4 bg-slate-50 text-slate-600 rounded-xl text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-[#255A84] hover:text-white transition-all"
                   >
                     Details <ExternalLink size={12} />
                   </a>

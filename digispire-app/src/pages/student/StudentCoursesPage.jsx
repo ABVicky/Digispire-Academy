@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { collection, getDocs, query, where, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useAuth } from '../../context/AuthContext';
@@ -16,7 +16,7 @@ export default function StudentCoursesPage() {
   const [revisionModal, setRevisionModal] = useState(null);
   const [submittingAppeal, setSubmittingAppeal] = useState(false);
 
-  const fetchAll = async () => {
+  const fetchAll = useCallback(async () => {
     try {
       const [cSnap, mSnap, tSnap] = await Promise.all([
         getDocs(collection(db, 'courses')),
@@ -35,11 +35,14 @@ export default function StudentCoursesPage() {
       }
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
-  };
+  }, [userProfile]);
 
   useEffect(() => {
-    fetchAll();
-  }, [userProfile?.uid]);
+    const timer = setTimeout(() => {
+      fetchAll();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchAll]);
 
   const openRevisionModal = (type, course, mod, topic = null) => {
     setRevisionModal({
@@ -149,7 +152,7 @@ export default function StudentCoursesPage() {
                           style={{ width: `${progress}%` }}
                         />
                       </div>
-                      <span className={`text-[10px] font-bold tracking-widest ${progress === 100 ? 'text-emerald-600' : 'text-slate-500'}`}>{progress}%</span>
+                      <span className={`text-[11px] font-bold tracking-widest ${progress === 100 ? 'text-emerald-600' : 'text-slate-500'}`}>{progress}%</span>
                     </div>
                   </div>
                   <div className="h-8 w-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-white">
@@ -161,7 +164,7 @@ export default function StudentCoursesPage() {
                   <div className="px-6 pb-6 pt-2 space-y-3 animate-in slide-in-from-top-2 duration-300">
                     {courseModules.length === 0 ? (
                       <div className="text-center py-8 bg-slate-50 rounded-xl">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No modules added yet</p>
+                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">No modules added yet</p>
                       </div>
                     ) : (
                       courseModules.map(mod => {
@@ -188,13 +191,13 @@ export default function StudentCoursesPage() {
                                       if (modAppeal) {
                                         if (modAppeal.status === 'pending') {
                                           return (
-                                            <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl flex items-center gap-1 shadow-sm border border-amber-100 animate-pulse">
+                                            <span className="text-[11px] font-semibold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl flex items-center gap-1 shadow-sm border border-amber-100 animate-pulse">
                                               <History size={10} /> Revision Pending
                                             </span>
                                           );
                                         }
                                         return (
-                                          <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-xl flex items-center gap-1 border border-slate-200" title={modAppeal.feedback}>
+                                          <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-xl flex items-center gap-1 border border-slate-200" title={modAppeal.feedback}>
                                             <Check size={10} /> Revision Done
                                           </span>
                                         );
@@ -205,7 +208,7 @@ export default function StudentCoursesPage() {
                                             e.stopPropagation();
                                             openRevisionModal('module', course, mod);
                                           }}
-                                          className="text-[10px] font-bold text-[#F48B1F] hover:text-white bg-[#F48B1F]/10 hover:bg-[#F48B1F] px-2.5 py-1 rounded-xl transition-all flex items-center gap-1 active:scale-95 border border-[#F48B1F]/20"
+                                          className="text-[11px] font-bold text-[#F48B1F] hover:text-white bg-[#F48B1F]/10 hover:bg-[#F48B1F] px-2.5 py-1 rounded-xl transition-all flex items-center gap-1 active:scale-95 border border-[#F48B1F]/20"
                                         >
                                           <History size={10} /> Request Revision
                                         </button>
@@ -213,7 +216,7 @@ export default function StudentCoursesPage() {
                                     })()}
                                   </>
                                 )}
-                                <span className="text-[10px] font-bold text-slate-400">{completedCount}/{modTopics.length}</span>
+                                <span className="text-[11px] font-bold text-slate-400">{completedCount}/{modTopics.length}</span>
                                 <div onClick={() => setExpandedModule(isModExpanded ? null : mod.id)} className="cursor-pointer p-1">
                                   {isModExpanded ? <ChevronDown size={14} className="text-slate-300" /> : <ChevronRight size={14} className="text-slate-300" />}
                                 </div>
@@ -223,7 +226,7 @@ export default function StudentCoursesPage() {
                             {isModExpanded && (
                               <div className="p-2 space-y-1">
                                 {modTopics.length === 0 ? (
-                                  <p className="text-[10px] text-slate-400 text-center py-2 font-bold uppercase tracking-widest">No topics yet</p>
+                                  <p className="text-[11px] text-slate-400 text-center py-2 font-bold uppercase tracking-widest">No topics yet</p>
                                 ) : modTopics.map(topic => {
                                   const isCompleted = topic.completedStudents?.includes(userProfile?.uid);
                                   return (
@@ -239,24 +242,24 @@ export default function StudentCoursesPage() {
                                       </span>
                                       {isCompleted && (
                                         <div className="ml-auto flex items-center gap-2 shrink-0">
-                                          <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest hidden sm:inline-block">Completed</span>
+                                          <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest hidden sm:inline-block">Completed</span>
                                           {(() => {
                                             const topicAppeal = appeals.find(a => a.type === 'topic' && a.topicId === topic.id);
                                             if (topicAppeal) {
                                               if (topicAppeal.status === 'pending') {
                                                 return (
-                                                  <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl flex items-center gap-1 shadow-sm border border-amber-100">
+                                                  <span className="text-[11px] font-semibold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl flex items-center gap-1 shadow-sm border border-amber-100">
                                                     <History size={10} /> Revision Pending
                                                   </span>
                                                 );
                                               }
                                               return (
                                                 <div className="flex flex-col items-end">
-                                                  <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-xl flex items-center gap-1 border border-slate-200" title={topicAppeal.feedback ? `Feedback: ${topicAppeal.feedback}` : undefined}>
+                                                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-xl flex items-center gap-1 border border-slate-200" title={topicAppeal.feedback ? `Feedback: ${topicAppeal.feedback}` : undefined}>
                                                     <Check size={10} /> Revision Done
                                                   </span>
                                                   {topicAppeal.feedback && (
-                                                    <span className="text-[8px] text-slate-400 mt-0.5 max-w-[100px] truncate">{topicAppeal.feedback}</span>
+                                                    <span className="text-[11px] text-slate-400 mt-0.5 max-w-[100px] truncate">{topicAppeal.feedback}</span>
                                                   )}
                                                 </div>
                                               );
@@ -264,7 +267,7 @@ export default function StudentCoursesPage() {
                                             return (
                                               <button
                                                 onClick={() => openRevisionModal('topic', course, mod, topic)}
-                                                className="text-[10px] font-bold text-[#255A84] hover:text-white bg-[#255A84]/5 hover:bg-[#255A84] px-2.5 py-1 rounded-xl transition-all flex items-center gap-1 active:scale-95 border border-[#255A84]/10"
+                                                className="text-[11px] font-bold text-[#255A84] hover:text-white bg-[#255A84]/5 hover:bg-[#255A84] px-2.5 py-1 rounded-xl transition-all flex items-center gap-1 active:scale-95 border border-[#255A84]/10"
                                               >
                                                 <History size={10} /> Request Revision
                                               </button>
@@ -296,7 +299,7 @@ export default function StudentCoursesPage() {
             <div className="modal-header-premium">
               <div>
                 <h3 className="font-bold text-slate-800 text-sm">Request Revision</h3>
-                <p className="text-[10px] font-bold text-[#255A84] uppercase tracking-wider mt-0.5 font-sans">
+                <p className="text-[11px] font-bold text-[#255A84] uppercase tracking-wider mt-0.5 font-sans">
                   {revisionModal.type === 'module' ? 'Module Revision' : 'Topic Revision'}
                 </p>
               </div>
@@ -319,7 +322,7 @@ export default function StudentCoursesPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">
                     Revision Notes / What would you like to revise?
                   </label>
                   <textarea

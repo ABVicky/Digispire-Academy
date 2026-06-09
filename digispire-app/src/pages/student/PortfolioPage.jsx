@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { collection, addDoc, getDocs, query, where, serverTimestamp, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useAuth } from '../../context/AuthContext';
 import { 
   Plus, Globe, ExternalLink, Trash2, 
   Layout, MousePointer2, Megaphone, Search,
-  Briefcase, CheckCircle2, AlertCircle, Loader2,
-  Share2, Award, Zap, Sparkles, Newspaper, QrCode
+  Briefcase, Loader2,
+  Share2
 } from 'lucide-react';
 
 const PROJECT_TYPES = [
@@ -24,7 +24,7 @@ export default function PortfolioPage() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ title: '', url: '', type: 'seo', description: '' });
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     if (!userProfile?.uid) return;
     try {
       const q = query(collection(db, 'portfolios'), where('uid', '==', userProfile.uid));
@@ -32,9 +32,14 @@ export default function PortfolioPage() {
       setProjects(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
-  };
+  }, [userProfile]);
 
-  useEffect(() => { fetchProjects(); }, [userProfile]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchProjects();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchProjects]);
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -117,7 +122,7 @@ export default function PortfolioPage() {
                 >
                   <div className="flex items-center gap-2 text-slate-400 min-w-0">
                     <Globe size={14} />
-                    <span className="text-[10px] font-bold truncate uppercase tracking-wider">
+                    <span className="text-[11px] font-bold truncate uppercase tracking-wider">
                       {(() => {
                         try { return new URL(p.url).hostname; }
                         catch { return 'View Project'; }
@@ -143,24 +148,24 @@ export default function PortfolioPage() {
 
             <form onSubmit={handleAdd} className="space-y-6">
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Project Category</label>
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Project Category</label>
                 <div className="grid grid-cols-2 gap-2">
                   {PROJECT_TYPES.map(t => (
                     <button
                       key={t.id}
                       type="button"
                       onClick={() => setForm({ ...form, type: t.id })}
-                      className={`flex items-center gap-2 p-3 rounded-2xl border transition-all ${form.type === t.id ? 'bg-[#255A84] text-white border-transparent shadow-lg' : 'bg-slate-50 text-slate-500 border-transparent hover:bg-slate-100'}`}
+                      className={`flex items-center gap-2 p-3 rounded-xl border transition-all ${form.type === t.id ? 'bg-[#255A84] text-white border-transparent shadow-lg' : 'bg-slate-50 text-slate-500 border-transparent hover:bg-slate-100'}`}
                     >
                       <t.icon size={16} />
-                      <span className="text-[10px] font-bold uppercase tracking-wider">{t.label}</span>
+                      <span className="text-[11px] font-bold uppercase tracking-wider">{t.label}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Project Title</label>
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Project Title</label>
                 <input 
                   required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
                   placeholder="e.g. My Website SEO Audit"
@@ -169,7 +174,7 @@ export default function PortfolioPage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Live URL (Drive/Website)</label>
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Live URL (Drive/Website)</label>
                 <input 
                   required type="url" value={form.url} onChange={e => setForm({ ...form, url: e.target.value })}
                   placeholder="https://docs.google.com/..."
@@ -178,7 +183,7 @@ export default function PortfolioPage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Brief Description (Optional)</label>
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Brief Description (Optional)</label>
                 <textarea 
                   value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
                   rows="3" placeholder="Key highlights of your campaign..."

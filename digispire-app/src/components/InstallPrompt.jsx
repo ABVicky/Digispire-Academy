@@ -4,7 +4,7 @@ import { Download, X, Share } from 'lucide-react';
 export default function InstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [isIOS, setIsIOS] = useState(false);
+  const [isIOS] = useState(() => typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
 
   useEffect(() => {
     // Check if already installed
@@ -15,11 +15,7 @@ export default function InstallPrompt() {
     const pwaStatus = localStorage.getItem('pwa-install-status');
     if (pwaStatus === 'dismissed' || pwaStatus === 'installed') return;
 
-    // Detect iOS
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    setIsIOS(isIOSDevice);
-
-    if (isIOSDevice) {
+    if (isIOS) {
       // Show iOS instructions after 5 seconds
       const timer = setTimeout(() => {
         setShowPrompt(true);
@@ -39,7 +35,7 @@ export default function InstallPrompt() {
       window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     }
-  }, []);
+  }, [isIOS]);
 
   const handleInstall = async () => {
     if (isIOS) {
@@ -76,7 +72,7 @@ export default function InstallPrompt() {
 
         <div className="flex-1 relative z-10">
           <h3 className="font-bold text-slate-800 text-sm">Install DIGISPIRE</h3>
-          <p className="text-[10px] font-medium text-slate-500 leading-relaxed mt-0.5">
+          <p className="text-[11px] font-medium text-slate-500 leading-relaxed mt-0.5">
             {isIOS 
               ? 'Tap Share then "Add to Home Screen"' 
               : 'Add to your home screen for a better experience'}
@@ -86,7 +82,7 @@ export default function InstallPrompt() {
         <div className="flex items-center gap-2 relative z-10">
           <button 
             onClick={handleInstall}
-            className="bg-[#255A84] text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-md flex items-center gap-2"
+            className="bg-[#255A84] text-white px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest shadow-md flex items-center gap-2"
           >
             {isIOS ? <Share size={14} /> : <Download size={14} />}
             {isIOS ? 'How?' : 'Install'}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
-  collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, serverTimestamp, orderBy
+  collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp
 } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Plus, ChevronDown, ChevronRight, Trash2, Pencil, X, Check } from 'lucide-react';
@@ -29,7 +29,12 @@ export default function CoursesPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchAll();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const openModal = (type, parentId = null, editItem = null) => {
     setForm(editItem ? { title: editItem.title || '', name: editItem.name || '', description: editItem.description || '' } : { title: '', name: '', description: '' });
@@ -173,19 +178,19 @@ export default function CoursesPage() {
                 {modal.type === 'course' ? (
                   <>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Course Name *</label>
+                      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Course Name *</label>
                       <input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                         className="input-premium" placeholder="e.g. Web Development" />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Description</label>
+                      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Description</label>
                       <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                         className="textarea-premium" rows={3} placeholder="Course description..." />
                     </div>
                   </>
                 ) : (
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">{modal.type === 'module' ? 'Module' : 'Topic'} Title *</label>
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">{modal.type === 'module' ? 'Module' : 'Topic'} Title *</label>
                     <input required value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                       className="input-premium"
                       placeholder={modal.type === 'module' ? 'e.g. HTML Basics' : 'e.g. What is HTML?'} />

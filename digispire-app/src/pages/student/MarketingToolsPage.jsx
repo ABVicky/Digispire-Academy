@@ -3,7 +3,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { 
   Search, Globe, MousePointer2, Megaphone, BarChart3, 
-  Mail, ExternalLink, Sparkles, Zap, Smartphone, Layout,
+  Mail, ExternalLink, Sparkles, Zap,
   Loader2
 } from 'lucide-react';
 
@@ -68,7 +68,7 @@ export default function MarketingToolsPage() {
           <button
             key={cat.id}
             onClick={() => setActiveTab(cat.id)}
-            className={`flex-shrink-0 flex items-center gap-2 px-6 py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === cat.id ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'bg-white text-slate-500 border border-slate-50 hover:bg-slate-50'}`}
+            className={`flex-shrink-0 flex items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all ${activeTab === cat.id ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'bg-white text-slate-500 border border-slate-50 hover:bg-slate-50'}`}
           >
             <cat.icon size={14} />
             {cat.label}
@@ -93,7 +93,7 @@ export default function MarketingToolsPage() {
                   <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-[#255A84] group-hover:scale-110 transition-transform duration-300">
                     <cat.icon size={24} />
                   </div>
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] bg-slate-50 px-3 py-1.5 rounded-full">{cat.label}</span>
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] bg-slate-50 px-3 py-1.5 rounded-full">{cat.label}</span>
                 </div>
                 <h3 className="text-lg font-bold text-slate-800 leading-tight">{tool.name}</h3>
                 <p className="text-xs text-slate-500 mt-3 leading-relaxed flex-1">{tool.description}</p>
@@ -105,9 +105,9 @@ export default function MarketingToolsPage() {
                     className="flex items-center justify-between group/btn"
                   >
                     <div className="flex items-center gap-2">
-                       <span className="text-[10px] font-bold text-[#255A84] uppercase tracking-widest">Open Tool</span>
+                       <span className="text-[11px] font-bold text-[#255A84] uppercase tracking-widest">Open Tool</span>
                        <div className="h-1 w-1 rounded-full bg-[#255A84]/30" />
-                       <span className="text-[9px] font-medium text-slate-400 truncate max-w-[120px]">{new URL(tool.url).hostname}</span>
+                       <span className="text-[11px] font-medium text-slate-400 truncate max-w-[120px]">{new URL(tool.url).hostname}</span>
                     </div>
                     <div className="h-10 w-10 bg-[#255A84]/5 text-[#255A84] rounded-xl flex items-center justify-center group-hover/btn:bg-[#255A84] group-hover/btn:text-white transition-all duration-300">
                        <ExternalLink size={16} />

@@ -5,7 +5,7 @@ import {
 import { db } from '../../firebase';
 import {
   Plus, Link2, FileText, Globe, Trash2, Pencil, X,
-  ExternalLink, Search, Filter, BookOpen
+  ExternalLink, Search, BookOpen
 } from 'lucide-react';
 
 // Detect link type from URL
@@ -76,7 +76,12 @@ export default function ContentPage() {
     }
   };
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchAll();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const openAdd = () => {
     setForm(emptyForm);
