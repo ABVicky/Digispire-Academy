@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Users, CalendarCheck, FileText,
   LogOut, Menu, X, GraduationCap, ChevronRight,
-  FileSpreadsheet, UserCog
+  FileSpreadsheet, UserCog, History
 } from 'lucide-react';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
 
 const navItems = [
   { path: 'dashboard', label: 'Dashboard', shortLabel: 'Home', icon: LayoutDashboard, category: 'Operations & Registry' },
@@ -15,6 +17,7 @@ const navItems = [
   { path: 'courses', label: 'Course Curriculum', shortLabel: 'Courses', icon: GraduationCap, category: 'Curriculum & Learning' },
   { path: 'content', label: 'Resources Library', shortLabel: 'Library', icon: FileText, category: 'Curriculum & Learning' },
   { path: 'reports', label: 'Attendance Ledgers', shortLabel: 'Reports', icon: FileSpreadsheet, category: 'Evaluation & Audits' },
+  { path: 'revisions', label: 'Revision Appeals', shortLabel: 'Revisions', icon: History, category: 'Evaluation & Audits' },
 ];
 
 // Bottom nav shows only the 5 most critical items for one-handed thumb reach
@@ -31,6 +34,20 @@ export default function AdminLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const [pendingRevisionsCount, setPendingRevisionsCount] = useState(0);
+
+  useEffect(() => {
+    const q = query(
+      collection(db, 'revision_appeals'),
+      where('status', '==', 'pending')
+    );
+    const unsubscribe = onSnapshot(q, (snap) => {
+      setPendingRevisionsCount(snap.size);
+    }, (err) => {
+      console.error('Error listening to pending revision appeals:', err);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -140,6 +157,11 @@ export default function AdminLayout() {
                         <>
                           <item.icon size={15} className={`shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                           <span>{item.label}</span>
+                          {item.path === 'revisions' && pendingRevisionsCount > 0 && (
+                            <span className="ml-auto bg-amber-500 text-white font-bold text-[9px] px-2 py-0.5 rounded-full shadow-sm">
+                              {pendingRevisionsCount}
+                            </span>
+                          )}
                         </>
                       )}
                     </NavLink>

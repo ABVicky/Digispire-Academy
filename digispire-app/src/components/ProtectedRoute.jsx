@@ -12,23 +12,23 @@ function Spinner() {
   );
 }
 
-// Wraps routes that require a specific role.
-// Usage: <Route element={<ProtectedRoute role="admin" />}> ... </Route>
-function ProtectedRoute({ role }) {
+// Wraps routes that require specific roles.
+// Usage: <Route element={<ProtectedRoute allowedRoles={['admin']} />}> ... </Route>
+function ProtectedRoute({ allowedRoles }) {
   const { user, userProfile, loading } = useAuth();
   if (loading) return <Spinner />;
   if (!user) return <Navigate to="/login" replace />;
-  if (role && userProfile?.role !== role) return <Navigate to="/login" replace />;
+  if (allowedRoles && !allowedRoles.includes(userProfile?.role)) return <Navigate to="/login" replace />;
   return <Outlet />;
 }
 
 // Named convenience exports used in App.jsx
 export function AdminRoute() {
-  return <ProtectedRoute role="admin" />;
+  return <ProtectedRoute allowedRoles={['admin', 'educator']} />;
 }
 
 export function StudentRoute() {
-  return <ProtectedRoute role="student" />;
+  return <ProtectedRoute allowedRoles={['student']} />;
 }
 
 export default ProtectedRoute;

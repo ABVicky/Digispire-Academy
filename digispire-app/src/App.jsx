@@ -16,6 +16,7 @@ import CoursesPage from './pages/admin/CoursesPage';
 import ContentPage from './pages/admin/ContentPage';
 import AttendanceReportPage from './pages/admin/AttendanceReportPage';
 import StaffPage from './pages/admin/StaffPage';
+import RevisionAppealsPage from './pages/admin/RevisionAppealsPage';
 
 // Student pages
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -63,6 +64,7 @@ function App() {
               <Route path="courses" element={<CoursesPage />} />
               <Route path="content" element={<ContentPage />} />
               <Route path="reports" element={<AttendanceReportPage />} />
+              <Route path="revisions" element={<RevisionAppealsPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
           </Route>
