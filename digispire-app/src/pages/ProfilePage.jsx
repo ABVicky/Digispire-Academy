@@ -44,6 +44,39 @@ export default function ProfilePage() {
     }
   };
 
+  const compressImage = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 150;
+          let width = img.width;
+          let height = img.height;
+          if (width > height) {
+            if (width > maxDim) {
+              height *= maxDim / width;
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width *= maxDim / height;
+              height = maxDim;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.8));
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
@@ -52,19 +85,26 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      setStatus({ type: 'error', message: 'Image must be less than 2MB.' });
+    if (file.size > 5 * 1024 * 1024) {
+      setStatus({ type: 'error', message: 'Image must be less than 5MB.' });
       return;
     }
 
     setUploading(true);
     setStatus(null);
     try {
-      const storageRef = ref(storage, `profiles/${userProfile.uid}`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-      await updateProfile({ photoURL: url });
-      setStatus({ type: 'success', message: 'Profile picture updated!' });
+      const compressedDataUrl = await compressImage(file);
+      try {
+        const storageRef = ref(storage, `profiles/${userProfile.uid}`);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        await updateProfile({ photoURL: url });
+        setStatus({ type: 'success', message: 'Profile picture updated!' });
+      } catch (storageErr) {
+        console.warn('Firebase Storage failed, saving compressed base64 to Firestore:', storageErr);
+        await updateProfile({ photoURL: compressedDataUrl });
+        setStatus({ type: 'success', message: 'Profile picture updated successfully!' });
+      }
     } catch (err) {
       console.error(err);
       setStatus({ type: 'error', message: 'Failed to upload image.' });

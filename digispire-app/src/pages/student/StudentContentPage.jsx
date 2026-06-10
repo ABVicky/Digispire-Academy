@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { collection, getDocs, updateDoc, doc, increment, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { FileText, Link2, Globe, ExternalLink, Search, BookOpen, Star } from 'lucide-react';
+import { FileText, Link2, Globe, ExternalLink, Search, BookOpen, Star, Video, Eye } from 'lucide-react';
 
 function detectType(url) {
   if (!url) return 'link';
@@ -13,25 +13,25 @@ function detectType(url) {
 }
 
 function typeLabel(type) {
-  const map = { pdf: 'PDF', gdrive: 'Google Drive', video: 'Video', link: 'Link' };
-  return map[type] || 'Link';
+  const map = { pdf: 'PDF Document', gdrive: 'Google Drive', video: 'Video Session', link: 'Resource Link' };
+  return map[type] || 'Resource';
 }
 
 function typeBadge(type) {
   const map = {
-    pdf: 'bg-red-50 text-red-600',
-    gdrive: 'bg-blue-50 text-blue-600',
-    video: 'bg-purple-50 text-purple-700',
-    link: 'bg-slate-100 text-slate-600',
+    pdf: 'bg-rose-50 border-rose-100 text-rose-600',
+    gdrive: 'bg-blue-50 border-blue-100 text-blue-600',
+    video: 'bg-purple-50 border-purple-100 text-purple-600',
+    link: 'bg-slate-50 border-slate-100 text-slate-600',
   };
   return map[type] || map.link;
 }
 
 function TypeIcon({ type }) {
-  if (type === 'pdf') return <FileText size={18} className="text-red-500" />;
-  if (type === 'gdrive') return <Globe size={18} className="text-blue-500" />;
-  if (type === 'video') return <Globe size={18} className="text-purple-500" />;
-  return <Link2 size={18} className="text-blue-500" />;
+  if (type === 'pdf') return <FileText size={20} className="text-rose-500" />;
+  if (type === 'gdrive') return <Globe size={20} className="text-blue-500" />;
+  if (type === 'video') return <Video size={20} className="text-purple-500" />;
+  return <Link2 size={20} className="text-slate-500" />;
 }
 
 export default function StudentContentPage() {
@@ -100,44 +100,45 @@ export default function StudentContentPage() {
   const useGroups = filterCourse === 'all' && !search && !showBookmarksOnly;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
+      {/* Title */}
       <div>
-        <h1 className="text-xl font-bold text-slate-800">Resources</h1>
-        <p className="text-sm text-slate-500">Study materials & links shared by your instructors</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Resources Library</h1>
+        <p className="text-xs text-slate-400 font-medium mt-0.5">Study materials, downloads, & links shared by your instructors</p>
       </div>
 
-      {/* Search + Filters */}
-      <div className="space-y-2">
+      {/* Search + Filters Controls */}
+      <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100/80 space-y-3">
         <div className="relative">
           <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Search by title, subject…"
-            className="input-premium pl-10"
+            placeholder="Search resources by title, subject, description..."
+            className="input-premium pl-10 text-xs"
           />
         </div>
 
-        {/* Filter pills */}
-        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+        {/* Filter pills scroll row */}
+        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar select-none">
           <button
             onClick={() => { setFilterCourse('all'); setShowBookmarksOnly(false); }}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${filterCourse === 'all' && !showBookmarksOnly ? 'bg-[#255A84] text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+            className={`flex-shrink-0 px-3.5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition cursor-pointer ${filterCourse === 'all' && !showBookmarksOnly ? 'bg-[#255A84] text-white shadow-sm' : 'bg-slate-50 text-slate-500 border border-slate-100 hover:bg-slate-100'}`}
           >
-            All
+            All Resources
           </button>
           <button
             onClick={() => { setShowBookmarksOnly(!showBookmarksOnly); setFilterCourse('all'); }}
-            className={`flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition ${showBookmarksOnly ? 'bg-[#F48B1F] text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+            className={`flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition cursor-pointer ${showBookmarksOnly ? 'bg-[#F48B1F] text-white shadow-sm' : 'bg-slate-50 text-slate-500 border border-slate-100 hover:bg-slate-100'}`}
           >
-            <Star size={11} /> Bookmarks
+            <Star size={11} fill={showBookmarksOnly ? 'currentColor' : 'none'} /> Bookmarks
           </button>
           {courses.map(c => (
             <button
               key={c.id}
               onClick={() => { setFilterCourse(c.id); setShowBookmarksOnly(false); }}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${filterCourse === c.id ? 'bg-[#255A84] text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+              className={`flex-shrink-0 px-3.5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition cursor-pointer ${filterCourse === c.id ? 'bg-[#255A84] text-white shadow-sm' : 'bg-slate-50 text-slate-500 border border-slate-100 hover:bg-slate-100'}`}
             >
               {c.name}
             </button>
@@ -146,83 +147,172 @@ export default function StudentContentPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-40">
-          <div className="animate-spin rounded-full h-8 w-8 border-4 border-[#255A84] border-t-transparent" />
+        /* Premium Card Skeletons */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 animate-pulse">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} className="bg-white border border-slate-100 rounded-2xl p-5 space-y-4 shadow-sm">
+              <div className="flex justify-between items-center">
+                <div className="h-4 w-20 bg-slate-200 rounded" />
+                <div className="h-6 w-16 bg-slate-200 rounded-full" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-4 w-3/4 bg-slate-200 rounded" />
+                <div className="h-3.5 w-5/6 bg-slate-200 rounded" />
+              </div>
+              <div className="flex justify-between items-center pt-3 border-t border-slate-50">
+                <div className="h-4 w-12 bg-slate-200 rounded" />
+                <div className="flex gap-2">
+                  <div className="h-6 w-6 bg-slate-200 rounded-lg" />
+                  <div className="h-6 w-6 bg-slate-200 rounded-lg" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 text-slate-400">
-          <BookOpen size={48} className="mx-auto mb-3 opacity-30" />
-          <p className="font-medium">{showBookmarksOnly ? 'No bookmarked resources.' : search ? 'No resources match your search.' : 'No resources available yet.'}</p>
+        <div className="text-center py-20 text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200 shadow-sm">
+          <BookOpen size={48} className="mx-auto mb-3 opacity-20" />
+          <p className="font-bold text-sm">No resources found.</p>
+          <p className="text-xs text-slate-400 mt-1">
+            {showBookmarksOnly 
+              ? 'Bookmark study materials to save them here for quick access.' 
+              : 'Materials shared by your educators will appear here.'}
+          </p>
         </div>
       ) : useGroups ? (
-        // Grouped by course
-        <div className="space-y-6">
+        /* Grouped by Course Lists */
+        <div className="space-y-8">
           {Object.entries(courseGroups).map(([courseId, items]) => (
-            <div key={courseId}>
-              <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <BookOpen size={14} />
+            <div key={courseId} className="space-y-3">
+              <h2 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-2">
+                <BookOpen size={14} className="text-[#255A84]" />
                 {courseId === '__uncategorized__' ? 'General Resources' : getCourseName(courseId)}
-                <span className="font-normal normal-case text-slate-400">({items.length})</span>
+                <span className="font-medium text-slate-300">({items.length})</span>
               </h2>
-              <div className="space-y-2">
-                {items.map(item => <ResourceCard key={item.id} item={item} bookmarks={bookmarks} onBookmark={toggleBookmark} />)}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {items.map(item => (
+                  <ResourceCard
+                    key={item.id}
+                    item={item}
+                    bookmarks={bookmarks}
+                    onBookmark={toggleBookmark}
+                    onLogClick={logClick}
+                    courseName={getCourseName(item.courseId)}
+                  />
+                ))}
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="space-y-2">
-          {filtered.map(item => <ResourceCard key={item.id} item={item} bookmarks={bookmarks} onBookmark={toggleBookmark} onLogClick={logClick} />)}
+        /* Flat Grid View when Searching or Filtering */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filtered.map(item => (
+            <ResourceCard
+              key={item.id}
+              item={item}
+              bookmarks={bookmarks}
+              onBookmark={toggleBookmark}
+              onLogClick={logClick}
+              courseName={getCourseName(item.courseId)}
+            />
+          ))}
         </div>
       )}
     </div>
   );
 }
 
-function ResourceCard({ item, bookmarks, onBookmark, onLogClick }) {
+function ResourceCard({ item, bookmarks, onBookmark, onLogClick, courseName }) {
   const type = item.type || detectType(item.fileUrl);
   const isBookmarked = bookmarks.includes(item.id);
 
   return (
-    <a
-      href={item.fileUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center gap-3 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md hover:border-[#255A84]/30 transition-all group"
-      onClick={() => onLogClick(item.id)}
-    >
-      <div className="h-10 w-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center flex-shrink-0">
-        <TypeIcon type={type} />
-      </div>
+    <div className="bg-white rounded-2xl border border-slate-100/80 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-[#255A84]/20 hover:-translate-y-0.5 transition-all duration-300 group overflow-hidden">
+      {/* Upper Content */}
+      <div className="p-5 space-y-3">
+        {/* Course Name / Type Badge */}
+        <div className="flex items-center justify-between gap-2">
+          {courseName ? (
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#255A84] truncate max-w-[140px]" title={courseName}>
+              {courseName}
+            </span>
+          ) : (
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-300">
+              General
+            </span>
+          )}
 
-      <div className="flex-1 min-w-0">
-        <p className="font-semibold text-slate-800 text-sm leading-snug group-hover:text-[#255A84] transition-colors truncate">
-          {item.title}
-        </p>
-        {item.description && (
-          <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{item.description}</p>
-        )}
-        <div className="flex flex-wrap gap-1 mt-1">
-          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${typeBadge(type)}`}>
+          <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-lg border shrink-0 ${typeBadge(type)}`}>
             {typeLabel(type)}
           </span>
+        </div>
+
+        {/* Title and Description */}
+        <div className="space-y-1.5">
+          <a
+            href={item.fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => onLogClick && onLogClick(item.id)}
+            className="font-bold text-slate-800 text-sm leading-snug group-hover:text-[#255A84] transition-colors line-clamp-2 block hover:underline"
+          >
+            {item.title}
+          </a>
+          {item.description && (
+            <p className="text-xs text-slate-400 font-medium line-clamp-2 leading-relaxed">
+              {item.description}
+            </p>
+          )}
+        </div>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-1.5 pt-1">
           {item.subject && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-50 border border-slate-100 text-slate-500 uppercase tracking-wide">
               {item.subject}
             </span>
           )}
         </div>
       </div>
 
-      <div className="flex items-center gap-1 flex-shrink-0">
-        <button
-          onClick={e => { e.preventDefault(); e.stopPropagation(); onBookmark(item.id); }}
-          className={`p-1.5 rounded-lg transition ${isBookmarked ? 'text-[#F48B1F]' : 'text-slate-300 hover:text-[#F48B1F]'}`}
-        >
-          <Star size={15} fill={isBookmarked ? '#F48B1F' : 'none'} />
-        </button>
-        <ExternalLink size={14} className="text-slate-300 group-hover:text-[#255A84] transition-colors" />
+      {/* Footer Info & Actions */}
+      <div className="px-5 py-3.5 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-400">
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1" title="Access Counts">
+            <Eye size={12} className="text-slate-300 shrink-0" />
+            <span>{item.clicks || 0}</span>
+          </span>
+          {item.createdAt && (
+            <span className="text-slate-300 font-medium">
+              {new Date(item.createdAt.seconds * 1000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-1">
+          <button
+            onClick={e => { e.preventDefault(); e.stopPropagation(); onBookmark(item.id); }}
+            className={`p-1.5 rounded-lg transition-all active:scale-90 cursor-pointer ${
+              isBookmarked ? 'text-[#F48B1F] bg-[#F48B1F]/5' : 'text-slate-300 hover:text-[#F48B1F] hover:bg-slate-100/50'
+            }`}
+            title={isBookmarked ? 'Remove Bookmark' : 'Bookmark Resource'}
+          >
+            <Star size={14} fill={isBookmarked ? '#F48B1F' : 'none'} strokeWidth={isBookmarked ? 1.5 : 2} />
+          </button>
+          
+          <a
+            href={item.fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => onLogClick && onLogClick(item.id)}
+            className="p-1.5 rounded-lg text-slate-300 hover:text-[#255A84] hover:bg-slate-100/50 transition cursor-pointer"
+            title="Launch Resource"
+          >
+            <ExternalLink size={14} />
+          </a>
+        </div>
       </div>
-    </a>
+    </div>
   );
 }

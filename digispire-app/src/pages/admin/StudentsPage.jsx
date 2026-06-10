@@ -14,6 +14,14 @@ function generateStudentId() {
   return 'DS' + Math.floor(100000 + Math.random() * 900000);
 }
 
+function getBatchBadgeColor(bId, name = '') {
+  const label = (name || bId || '').toLowerCase();
+  if (label.includes('morning')) return 'badge-premium-orange';
+  if (label.includes('evening')) return 'badge-premium-blue';
+  if (label.includes('intern')) return 'badge-premium-green';
+  return 'badge-premium-grey';
+}
+
 const emptyForm = { 
   name: '', 
   email: '', 
@@ -234,17 +242,17 @@ export default function StudentsPage() {
         <StatChip label="Total Students" value={students.length} icon={Users} color="bg-[#255A84]" />
         {batches.length === 0 ? (
           <>
-            <StatChip label="Morning" value={students.filter(s => (s.batchIds || [s.batchId || 'morning']).includes('morning')).length} icon={Users} color="bg-[#255A84]" />
-            <StatChip label="Evening" value={students.filter(s => (s.batchIds || [s.batchId || 'morning']).includes('evening')).length} icon={Users} color="bg-orange-500" />
+            <StatChip label="Morning" value={students.filter(s => (s.batchIds || [s.batchId || 'morning']).includes('morning')).length} icon={Users} color="bg-orange-500" />
+            <StatChip label="Evening" value={students.filter(s => (s.batchIds || [s.batchId || 'morning']).includes('evening')).length} icon={Users} color="bg-[#255A84]" />
           </>
         ) : (
-          batches.filter(b => b.id !== 'internship').map((b, index) => (
+          batches.filter(b => b.id !== 'internship').map((b) => (
             <StatChip
               key={b.id}
               label={b.name || b.id}
               value={students.filter(s => (s.batchIds || [s.batchId || 'morning']).includes(b.id)).length}
               icon={Users}
-              color={index % 2 === 0 ? "bg-orange-500" : "bg-[#255A84]"}
+              color={b.id.toLowerCase().includes('morning') ? "bg-orange-500" : "bg-[#255A84]"}
             />
           ))
         )}
@@ -333,9 +341,12 @@ export default function StudentsPage() {
                         </td>
                         <td className="px-4 py-3.5">
                           <div className="flex flex-wrap gap-1">
-                            {(s.batchIds || [s.batchId || 'morning']).map(bId => (
-                              <span key={bId} className="badge-premium-blue">{batches.find(b => b.id === bId)?.name || bId}</span>
-                            ))}
+                            {(s.batchIds || [s.batchId || 'morning']).map(bId => {
+                              const bName = batches.find(b => b.id === bId)?.name || bId;
+                              return (
+                                <span key={bId} className={getBatchBadgeColor(bId, bName)}>{bName}</span>
+                              );
+                            })}
                             {s.isIntern && <span className="badge-premium-green">Intern</span>}
                           </div>
                           <p className="text-[10px] text-slate-400 font-medium mt-1">Joined: {s.joiningDate || '—'}</p>
@@ -397,9 +408,12 @@ export default function StudentsPage() {
 
                     {/* Batch badges */}
                     <div className="flex flex-wrap gap-1.5 items-center">
-                      {(s.batchIds || [s.batchId || 'morning']).map(bId => (
-                        <span key={bId} className="badge-premium-blue">{batches.find(b => b.id === bId)?.name || bId}</span>
-                      ))}
+                      {(s.batchIds || [s.batchId || 'morning']).map(bId => {
+                        const bName = batches.find(b => b.id === bId)?.name || bId;
+                        return (
+                          <span key={bId} className={getBatchBadgeColor(bId, bName)}>{bName}</span>
+                        );
+                      })}
                       {s.isIntern && <span className="badge-premium-green">Intern</span>}
                       <span className="text-[10px] text-slate-400 font-medium ml-auto">Joined {s.joiningDate || '—'}</span>
                     </div>

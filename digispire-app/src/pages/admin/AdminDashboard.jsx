@@ -7,7 +7,13 @@ import {
   ChevronRight, Calendar, AlertCircle, Sparkles, TrendingUp,
   Share2, X
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+function getBatchBadgeColor(bId, name = '') {
+  const label = (name || bId || '').toLowerCase();
+  if (label.includes('morning')) return 'badge-premium-orange';
+  if (label.includes('evening')) return 'badge-premium-blue';
+  if (label.includes('intern')) return 'badge-premium-green';
+  return 'badge-premium-grey';
+}
 
 function StatCard({ icon: Icon, label, value, color, colorBg, description }) {
   return (
@@ -42,7 +48,7 @@ function StudentCardMobile({ student, batches }) {
         {(student.batchIds || [student.batchId || 'morning']).map(bId => {
           const name = batches.find(b => b.id === bId)?.name || bId;
           return (
-            <span key={bId} className="badge-premium-blue">{name}</span>
+            <span key={bId} className={getBatchBadgeColor(bId, name)}>{name}</span>
           );
         })}
       </div>
@@ -531,7 +537,7 @@ export default function AdminDashboard() {
                         <td className="px-4 py-3">
                           {(student.batchIds || [student.batchId || 'morning']).map(bId => {
                             const name = data.batches.find(b => b.id === bId)?.name || bId;
-                            return <span key={bId} className="badge-premium-blue mr-1">{name}</span>;
+                            return <span key={bId} className={`${getBatchBadgeColor(bId, name)} mr-1`}>{name}</span>;
                           })}
                         </td>
                       </tr>

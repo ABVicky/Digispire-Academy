@@ -7,15 +7,6 @@
   --font-mono: "JetBrains Mono", monospace;
 }
 
-html {
-  font-size: 14.5px;
-}
-@media (min-width: 768px) {
-  html {
-    font-size: 14px;
-  }
-}
-
 :root {
   --primary: #255A84;
   --primary-glow: rgba(37, 90, 132, 0.15);
@@ -23,7 +14,7 @@ html {
   --secondary: #F48B1F;
   --secondary-glow: rgba(244, 139, 31, 0.15);
   --bg-main: #FAFBFD;
-  --bottom-nav-height: 60px;
+  --bottom-nav-height: 72px;
 }
 
 /* ========================
@@ -42,7 +33,6 @@ body {
   -webkit-tap-highlight-color: transparent;
   user-select: none;
   overflow-x: hidden;
-  font-size: 0.875rem;
   /* Support for iOS Safe Areas (notch/home indicator) */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
@@ -69,14 +59,14 @@ input, textarea, [contenteditable="true"] {
 
 /* ========================
    TOUCH TARGET STANDARDS
-   Min 40px touch targets for balanced layout
+   Min 44×44px per Apple HIG
 ======================== */
-button, a[role="button"] { min-height: 40px; }
-select { min-height: 40px; }
+button, a[role="button"] { min-height: 44px; }
+select { min-height: 44px; }
 
 /* Small touch target override for icon-only compact buttons */
-.touch-target-small { min-height: 32px; }
-.touch-target-xs { min-height: 24px; }
+.touch-target-small { min-height: 36px; }
+.touch-target-xs { min-height: 28px; }
 
 /* ========================
    BOTTOM NAV SAFE SPACING
@@ -217,7 +207,7 @@ select { min-height: 40px; }
 ======================== */
 .input-premium, .textarea-premium, .select-premium {
   width: 100%;
-  padding: 0.625rem 1rem;
+  padding: 0.875rem 1.25rem;
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 0.75rem;
@@ -226,7 +216,7 @@ select { min-height: 40px; }
   outline: none;
   font-weight: 500;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  min-height: 40px; /* adjusted comfortable touch target */
+  min-height: 48px; /* comfortable touch target */
 }
 .input-premium::placeholder, .textarea-premium::placeholder {
   color: #94a3b8;
@@ -240,7 +230,7 @@ select { min-height: 40px; }
 
 /* ========================
    BUTTONS
- ======================== */
+======================== */
 .btn-primary-premium {
   background: linear-gradient(135deg, #255A84 0%, #163650 100%);
   color: white;
@@ -256,8 +246,7 @@ select { min-height: 40px; }
   justify-content: center;
   gap: 0.5rem;
   cursor: pointer;
-  min-height: 40px;
-  padding: 0.625rem 1.25rem;
+  min-height: 44px;
 }
 .btn-primary-premium:hover { opacity: 0.92; box-shadow: 0 6px 20px rgba(37, 90, 132, 0.3); }
 .btn-primary-premium:active { transform: scale(0.97); }
@@ -284,8 +273,7 @@ select { min-height: 40px; }
   justify-content: center;
   gap: 0.5rem;
   cursor: pointer;
-  min-height: 40px;
-  padding: 0.625rem 1.25rem;
+  min-height: 44px;
 }
 .btn-secondary-premium:hover { opacity: 0.92; }
 .btn-secondary-premium:active { transform: scale(0.97); }
@@ -309,8 +297,7 @@ select { min-height: 40px; }
   justify-content: center;
   gap: 0.5rem;
   cursor: pointer;
-  min-height: 40px;
-  padding: 0.625rem 1.25rem;
+  min-height: 44px;
 }
 .btn-outline-premium:hover { background-color: #f8fafc; color: #334155; border-color: #cbd5e1; }
 .btn-outline-premium:active { transform: scale(0.97); }

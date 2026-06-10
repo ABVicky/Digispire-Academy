@@ -74,7 +74,7 @@ export default function StudentLayout() {
       )}
 
       {/* ── Sidebar ── */}
-      <aside className={`fixed inset-y-0 left-0 w-64 bg-white z-50 transform transition-transform duration-300 ease-out md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} border-r border-slate-100/60 shadow-xl shadow-slate-200/30 md:shadow-none`}>
+      <aside className={`fixed inset-y-0 left-0 w-72 bg-white z-50 transform transition-transform duration-300 ease-out md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} border-r border-slate-100/60 shadow-xl shadow-slate-200/30 md:shadow-none`}>
         <div className="flex flex-col h-full p-5">
           <div className="flex items-center justify-between md:block mb-6">
             <div className="flex items-center gap-3 px-1">
