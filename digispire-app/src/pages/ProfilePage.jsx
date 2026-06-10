@@ -1,22 +1,43 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { storage } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import {
   User, Phone, Mail, GraduationCap, Lock, Key,
   CheckCircle2, AlertCircle, Camera, LogOut, Loader2,
-  ShieldCheck
+  ShieldCheck, CreditCard
 } from 'lucide-react';
+import QRCode from 'qrcode';
 
 export default function ProfilePage() {
   const { userProfile, changePassword, logout, updateProfile } = useAuth();
-  const [activeTab, setActiveTab] = useState('general'); // general, security
+  const [activeTab, setActiveTab] = useState('general'); // general, idcard, security
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [status, setStatus] = useState(null); // { type, message }
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
+
+  useEffect(() => {
+    if (userProfile) {
+      const payload = {
+        uid: userProfile.uid,
+        name: userProfile.name,
+        role: userProfile.role,
+        studentId: userProfile.studentId || '',
+        phone: userProfile.phone || ''
+      };
+      QRCode.toDataURL(JSON.stringify(payload), {
+        margin: 1,
+        width: 256
+      })
+      .then(url => setQrCodeUrl(url))
+      .catch(err => console.error('Error generating QR code:', err));
+    }
+  }, [userProfile]);
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
@@ -126,16 +147,25 @@ export default function ProfilePage() {
       {/* Tab Switcher */}
       <div className="flex bg-white/50 backdrop-blur-sm p-1.5 rounded-2xl border border-slate-100 shadow-sm mx-2">
         <button
-          onClick={() => setActiveTab('general')}
-          className={`flex-1 py-3.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${activeTab === 'general' ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'text-slate-400 hover:text-slate-600'}`}
+          type="button"
+          onClick={() => { setActiveTab('general'); setIsFlipped(false); }}
+          className={`flex-1 py-3 px-1 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 ${activeTab === 'general' ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'text-slate-400 hover:text-slate-600'}`}
         >
-          <User size={14} /> My Profile
+          <User size={13} /> My Profile
         </button>
         <button
-          onClick={() => setActiveTab('security')}
-          className={`flex-1 py-3.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${activeTab === 'security' ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'text-slate-400 hover:text-slate-600'}`}
+          type="button"
+          onClick={() => { setActiveTab('idcard'); setIsFlipped(false); }}
+          className={`flex-1 py-3 px-1 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 ${activeTab === 'idcard' ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'text-slate-400 hover:text-slate-600'}`}
         >
-          <Lock size={14} /> Security
+          <CreditCard size={13} /> Digital ID
+        </button>
+        <button
+          type="button"
+          onClick={() => { setActiveTab('security'); setIsFlipped(false); }}
+          className={`flex-1 py-3 px-1 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 ${activeTab === 'security' ? 'bg-[#255A84] text-white shadow-lg shadow-[#255A84]/20' : 'text-slate-400 hover:text-slate-600'}`}
+        >
+          <Lock size={13} /> Security
         </button>
       </div>
 
@@ -245,6 +275,156 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        ) : activeTab === 'idcard' ? (
+          /* Digital ID Card */
+          <div className="flex flex-col items-center gap-6 py-4">
+            {/* Interactive Flipping ID Card Container */}
+            <div className="id-card-perspective w-80 h-[480px] cursor-pointer" onClick={() => setIsFlipped(!isFlipped)}>
+              <div className={`id-card-inner rounded-3xl shadow-2xl shadow-[#255A84]/10 border border-slate-100 ${isFlipped ? 'id-card-flipped' : ''}`}>
+                
+                {/* ── CARD FRONT ── */}
+                <div className="id-card-front bg-gradient-to-br from-[#1a3852] via-[#255A84] to-[#0c1a26] text-white flex flex-col justify-between p-6 relative overflow-hidden select-none">
+                  {/* Glowing background circles */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#F48B1F]/10 rounded-full blur-2xl pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#255A84]/40 rounded-full blur-2xl pointer-events-none" />
+                  
+                  {/* Header */}
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="h-7 w-7 bg-white rounded-lg flex items-center justify-center p-1 shadow-sm shrink-0">
+                        <img src="/logo.png" alt="DIGISPIRE Logo" className="h-full w-full object-contain" />
+                      </div>
+                      <div>
+                        <h4 className="font-heading font-black tracking-wider text-xs leading-none">DIGISPIRE</h4>
+                        <span className="text-[7px] text-[#F48B1F] tracking-[0.25em] font-extrabold uppercase mt-0.5 block">Academy Portal</span>
+                      </div>
+                    </div>
+                    <span className="text-[8px] font-bold uppercase tracking-widest text-slate-300 border border-white/15 px-2 py-0.5 rounded bg-white/5">
+                      ID Badge
+                    </span>
+                  </div>
+
+                  {/* Photo & Name */}
+                  <div className="text-center my-auto py-2 space-y-4">
+                    <div className="h-28 w-28 rounded-2xl bg-white/5 p-1 border border-white/20 shadow-2xl mx-auto overflow-hidden relative">
+                      {userProfile?.photoURL ? (
+                        <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover rounded-xl" />
+                      ) : (
+                        <div className="h-full w-full bg-[#255A84]/50 flex items-center justify-center text-white text-3xl font-bold font-heading rounded-xl">
+                          {userProfile?.name?.charAt(0)}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-heading font-extrabold text-white tracking-tight leading-snug">{userProfile?.name}</h3>
+                      <span className={`inline-block text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full mt-1.5 ${
+                        userProfile?.role === 'admin' 
+                          ? 'bg-[#F48B1F] text-white' 
+                          : userProfile?.role === 'educator' 
+                            ? 'bg-blue-500 text-white' 
+                            : 'bg-emerald-500 text-white'
+                      }`}>
+                        {userProfile?.role === 'admin' ? 'Administrator' : userProfile?.role === 'educator' ? 'Educator' : 'Student'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Footer details */}
+                  <div className="border-t border-white/10 pt-4 flex items-end justify-between">
+                    <div className="space-y-3 flex-1 min-w-0">
+                      <div>
+                        <p className="text-[7px] font-bold uppercase text-slate-400 tracking-wider">Identifier ID</p>
+                        <p className="text-xs font-mono font-bold text-white tracking-wide">{userProfile?.studentId || 'DS-FACULTY'}</p>
+                      </div>
+                      {userProfile?.role === 'student' ? (
+                        <div>
+                          <p className="text-[7px] font-bold uppercase text-slate-400 tracking-wider">Enrolled Course</p>
+                          <p className="text-[10px] font-semibold text-slate-200 truncate pr-4">{userProfile?.course || 'General Curriculum'}</p>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-[7px] font-bold uppercase text-slate-400 tracking-wider">Department</p>
+                          <p className="text-[10px] font-semibold text-slate-200 truncate pr-4">Academy Management</p>
+                        </div>
+                      )}
+                    </div>
+                    {/* Decorative Chip Accent */}
+                    <div className="h-7 w-9 rounded bg-gradient-to-br from-yellow-300 to-yellow-600 opacity-60 border border-yellow-200/50 shadow-inner flex flex-col gap-0.5 p-1 shrink-0">
+                      <div className="flex gap-1 h-full"><div className="w-1/2 border-r border-yellow-700/30"></div><div className="w-1/2"></div></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── CARD BACK ── */}
+                <div className="id-card-back bg-gradient-to-br from-[#1a3852] via-[#255A84] to-[#0c1a26] text-white flex flex-col justify-between p-6 relative overflow-hidden select-none">
+                  {/* Glowing background circles */}
+                  <div className="absolute top-0 left-0 w-32 h-32 bg-[#255A84]/40 rounded-full blur-2xl pointer-events-none" />
+                  <div className="absolute bottom-0 right-0 w-32 h-32 bg-[#F48B1F]/10 rounded-full blur-2xl pointer-events-none" />
+
+                  {/* Header */}
+                  <div className="text-center border-b border-white/10 pb-2.5">
+                    <h4 className="font-heading font-black tracking-wider text-xs leading-none">DIGISPIRE ACADEMY</h4>
+                    <span className="text-[6px] text-slate-400 uppercase tracking-widest mt-1 block">Verification & Access</span>
+                  </div>
+
+                  {/* QR Code Container */}
+                  <div className="my-auto text-center space-y-3">
+                    <div className="w-36 h-36 bg-white p-2.5 rounded-2xl shadow-2xl flex items-center justify-center mx-auto border border-white/10 relative group">
+                      {qrCodeUrl ? (
+                        <img src={qrCodeUrl} alt="Student QR Code" className="h-full w-full object-contain" />
+                      ) : (
+                        <div className="animate-pulse h-full w-full bg-slate-100 rounded-lg flex items-center justify-center text-slate-300 text-xs">
+                          Generating...
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-[8px] font-bold uppercase tracking-wider text-slate-400">Scan for Verification</p>
+                  </div>
+
+                  {/* Extra Details */}
+                  <div className="border-t border-white/10 pt-3.5 space-y-2">
+                    <div className="grid grid-cols-2 gap-2 text-[9px]">
+                      <div>
+                        <span className="text-slate-400 block text-[7px] uppercase tracking-wider font-medium">Contact Phone</span>
+                        <span className="font-semibold text-slate-200">{userProfile?.phone || 'Not provided'}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block text-[7px] uppercase tracking-wider font-medium">Enrolled Date</span>
+                        <span className="font-semibold text-slate-200">{userProfile?.joiningDate || '—'}</span>
+                      </div>
+                    </div>
+
+                    {/* Barcode & Notice */}
+                    <p className="text-[7px] text-slate-400 leading-tight font-medium text-center pt-1">
+                      This digital card certifies enrollment status. If found, please return to Admin Office.
+                    </p>
+
+                    {/* Decorative Barcode */}
+                    <div className="flex justify-center items-center gap-0.5 opacity-30 pt-1">
+                      {[1,3,2,1,4,2,1,3,2,1,4,1,2,3,1,2,4,1,2,3].map((w, i) => (
+                        <div key={i} className="bg-white h-5" style={{ width: `${w}px` }} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Interactive Control Options */}
+            <div className="flex flex-col items-center gap-2 mt-2 w-full max-w-xs px-4">
+              <button 
+                type="button"
+                onClick={() => setIsFlipped(!isFlipped)} 
+                className="w-full py-2.5 bg-white border border-slate-200/80 hover:bg-slate-50 text-slate-600 hover:text-slate-800 font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-95 cursor-pointer"
+              >
+                Flip Card
+              </button>
+              <p className="text-[10px] text-slate-400 font-medium text-center leading-normal">
+                💡 Tap the card directly or click "Flip Card" to flip between the photo ID badge and your secure verification QR Code.
+              </p>
             </div>
           </div>
         ) : (
