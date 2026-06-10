@@ -285,7 +285,7 @@ export default function ProfilePage() {
               <div className={`id-card-inner rounded-3xl shadow-2xl shadow-[#255A84]/10 border border-slate-100 ${isFlipped ? 'id-card-flipped' : ''}`}>
                 
                 {/* ── CARD FRONT ── */}
-                <div className="id-card-front bg-gradient-to-br from-[#1a3852] via-[#255A84] to-[#0c1a26] text-white flex flex-col justify-between p-6 relative overflow-hidden select-none">
+                <div className="id-card-front bg-gradient-to-br from-[#1a3852] via-[#255A84] to-[#0c1a26] text-white flex flex-col justify-between p-6 absolute inset-0 overflow-hidden select-none">
                   {/* Glowing background circles */}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-[#F48B1F]/10 rounded-full blur-2xl pointer-events-none" />
                   <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#255A84]/40 rounded-full blur-2xl pointer-events-none" />
@@ -358,7 +358,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* ── CARD BACK ── */}
-                <div className="id-card-back bg-gradient-to-br from-[#1a3852] via-[#255A84] to-[#0c1a26] text-white flex flex-col justify-between p-6 relative overflow-hidden select-none">
+                <div className="id-card-back bg-gradient-to-br from-[#1a3852] via-[#255A84] to-[#0c1a26] text-white flex flex-col justify-between p-6 absolute inset-0 overflow-hidden select-none">
                   {/* Glowing background circles */}
                   <div className="absolute top-0 left-0 w-32 h-32 bg-[#255A84]/40 rounded-full blur-2xl pointer-events-none" />
                   <div className="absolute bottom-0 right-0 w-32 h-32 bg-[#F48B1F]/10 rounded-full blur-2xl pointer-events-none" />
