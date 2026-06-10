@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, where, addDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useAuth } from '../../context/AuthContext';
 import {
   Users, CalendarCheck, Clock, UserPlus, Layers,
-  ChevronRight, Calendar, AlertCircle, Sparkles, TrendingUp
+  ChevronRight, Calendar, AlertCircle, Sparkles, TrendingUp,
+  Share2, X
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -59,6 +60,268 @@ export default function AdminDashboard() {
     todayAttendance: [], courses: 0, classSessionsToday: []
   });
   const [loading, setLoading] = useState(true);
+
+  // WhatsApp Share Modal States
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareDate, setShareDate] = useState(new Date().toISOString().split('T')[0]);
+  const [shareBatchId, setShareBatchId] = useState('');
+  const [courses, setCourses] = useState([]);
+  const [modules, setModules] = useState([]);
+  const [topics, setTopics] = useState([]);
+  const [currLoading, setCurrLoading] = useState(false);
+
+  const [shareSession, setShareSession] = useState(null);
+  const [shareAttendance, setShareAttendance] = useState([]);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+
+  const [selCourseId, setSelCourseId] = useState('');
+  const [selModuleId, setSelModuleId] = useState('');
+  const [selTopicIds, setSelTopicIds] = useState([]);
+
+  const [customMessage, setCustomMessage] = useState('');
+  const [isEditingMessage, setIsEditingMessage] = useState(false);
+
+  // Set default batch selection once loaded
+  useEffect(() => {
+    if (data.batches.length > 0 && !shareBatchId) {
+      setShareBatchId(data.batches[0].id);
+    }
+  }, [data.batches, shareBatchId]);
+
+  // Fetch courses, modules, and topics when modal is opened
+  useEffect(() => {
+    if (!showShareModal) return;
+    const fetchCurriculum = async () => {
+      setCurrLoading(true);
+      try {
+        const [cSnap, mSnap, tSnap] = await Promise.all([
+          getDocs(collection(db, 'courses')),
+          getDocs(collection(db, 'modules')),
+          getDocs(collection(db, 'topics'))
+        ]);
+        setCourses(cSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+        setModules(mSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+        setTopics(tSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      } catch (err) {
+        console.error('Error fetching curriculum:', err);
+      } finally {
+        setCurrLoading(false);
+      }
+    };
+    fetchCurriculum();
+  }, [showShareModal]);
+
+  // Fetch session curriculum and attendance logs for the selected date + batch
+  useEffect(() => {
+    if (!showShareModal || !shareDate || !shareBatchId) return;
+    const fetchDetails = async () => {
+      setDetailsLoading(true);
+      try {
+        const [sessionSnap, attSnap] = await Promise.all([
+          getDocs(query(
+            collection(db, 'class_sessions'),
+            where('date', '==', shareDate),
+            where('batchId', '==', shareBatchId)
+          )),
+          getDocs(query(
+            collection(db, 'attendance'),
+            where('date', '==', shareDate),
+            where('batchId', '==', shareBatchId)
+          ))
+        ]);
+
+        const attDocs = attSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        setShareAttendance(attDocs);
+
+        if (!sessionSnap.empty) {
+          const session = { id: sessionSnap.docs[0].id, ...sessionSnap.docs[0].data() };
+          setShareSession(session);
+          setSelCourseId(session.coveredCourse || '');
+          setSelModuleId(session.coveredModule || '');
+          setSelTopicIds(session.coveredTopics || []);
+        } else {
+          // Infer curriculum from attendance if class_session not found
+          const firstAttWithCurriculum = attDocs.find(a => a.coveredCourse);
+          if (firstAttWithCurriculum) {
+            setShareSession({
+              date: shareDate,
+              batchId: shareBatchId,
+              coveredCourse: firstAttWithCurriculum.coveredCourse,
+              coveredModule: firstAttWithCurriculum.coveredModule,
+              coveredTopics: firstAttWithCurriculum.coveredTopics || []
+            });
+            setSelCourseId(firstAttWithCurriculum.coveredCourse);
+            setSelModuleId(firstAttWithCurriculum.coveredModule);
+            setSelTopicIds(firstAttWithCurriculum.coveredTopics || []);
+          } else {
+            setShareSession(null);
+            setSelCourseId('');
+            setSelModuleId('');
+            setSelTopicIds([]);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching share details:', err);
+      } finally {
+        setDetailsLoading(false);
+      }
+    };
+    fetchDetails();
+  }, [showShareModal, shareDate, shareBatchId]);
+
+  // Generate formatting payload for WhatsApp
+  useEffect(() => {
+    if (!showShareModal) return;
+
+    let formattedDate = shareDate;
+    try {
+      formattedDate = new Date(shareDate).toLocaleDateString('en-IN', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+    } catch (e) {
+      console.error(e);
+    }
+
+    const batchName = data.batches.find(b => b.id === shareBatchId)?.name || shareBatchId;
+    const courseName = courses.find(c => c.id === selCourseId)?.name || 'N/A';
+    const moduleName = modules.find(m => m.id === selModuleId)?.title || 'N/A';
+    const topicNames = selTopicIds.map(tId => topics.find(t => t.id === tId)?.title).filter(Boolean);
+
+    const enrolledStudents = data.students.filter(s => 
+      (s.batchIds && s.batchIds.includes(shareBatchId)) || s.batchId === shareBatchId
+    );
+
+    const attendedList = [];
+    const absentList = [];
+    const leaveList = [];
+
+    const logsMap = new Map();
+    shareAttendance.forEach(log => {
+      logsMap.set(log.studentId, log.status || 'present');
+    });
+
+    enrolledStudents.forEach(student => {
+      const status = logsMap.get(student.studentId);
+      if (status === 'present' || status === 'makeup') {
+        attendedList.push(student.name);
+      } else if (status === 'leave') {
+        leaveList.push(student.name);
+      } else {
+        absentList.push(student.name);
+      }
+    });
+
+    // Capture guest attendees
+    shareAttendance.forEach(log => {
+      const isEnrolled = enrolledStudents.some(s => s.studentId === log.studentId);
+      if (!isEnrolled) {
+        const studName = log.name || data.students.find(s => s.studentId === log.studentId)?.name || log.studentId;
+        if (log.status === 'present' || log.status === 'makeup') {
+          attendedList.push(`${studName} (Makeup/Guest)`);
+        } else if (log.status === 'leave') {
+          leaveList.push(`${studName} (Guest - Leave)`);
+        }
+      }
+    });
+
+    let msg = `📅 *ACADEMY ATTENDANCE REPORT*\n`;
+    msg += `----------------------------------------\n`;
+    msg += `*Date:* ${formattedDate}\n`;
+    msg += `*Batch:* ${batchName}\n`;
+    msg += `*Course:* ${courseName}\n`;
+    msg += `*Module:* ${moduleName}\n`;
+    
+    if (topicNames.length > 0) {
+      msg += `*Topics Covered:*\n`;
+      topicNames.forEach(t => {
+        msg += `• ${t}\n`;
+      });
+    } else {
+      msg += `*Topics Covered:* N/A\n`;
+    }
+    
+    msg += `\n----------------------------------------\n`;
+    msg += `✅ *ATTENDED (${attendedList.length}):*\n`;
+    if (attendedList.length > 0) {
+      attendedList.sort().forEach((name, i) => {
+        msg += `${i + 1}. ${name}\n`;
+      });
+    } else {
+      msg += `No students marked present\n`;
+    }
+
+    msg += `\n❌ *ABSENT (${absentList.length}):*\n`;
+    if (absentList.length > 0) {
+      absentList.sort().forEach((name, i) => {
+        msg += `${i + 1}. ${name}\n`;
+      });
+    } else {
+      msg += `No students absent\n`;
+    }
+
+    if (leaveList.length > 0) {
+      msg += `\n⚠️ *ON LEAVE (${leaveList.length}):*\n`;
+      leaveList.sort().forEach((name, i) => {
+        msg += `${i + 1}. ${name}\n`;
+      });
+    }
+
+    if (!isEditingMessage) {
+      setCustomMessage(msg);
+    }
+  }, [
+    showShareModal, shareDate, shareBatchId, selCourseId, selModuleId, selTopicIds,
+    shareAttendance, courses, modules, topics, data.students, data.batches, isEditingMessage
+  ]);
+
+  const handleDateChange = (e) => {
+    setIsEditingMessage(false);
+    setShareDate(e.target.value);
+  };
+
+  const handleBatchChange = (e) => {
+    setIsEditingMessage(false);
+    setShareBatchId(e.target.value);
+  };
+
+  const handleSaveAndShare = async () => {
+    try {
+      if (selCourseId && selModuleId) {
+        const q = query(
+          collection(db, 'class_sessions'),
+          where('date', '==', shareDate),
+          where('batchId', '==', shareBatchId)
+        );
+        const snap = await getDocs(q);
+
+        const sessionPayload = {
+          date: shareDate,
+          batchId: shareBatchId,
+          coveredCourse: selCourseId,
+          coveredModule: selModuleId,
+          coveredTopics: selTopicIds,
+          type: shareBatchId === 'internship' ? 'internship' : 'academic',
+          timestamp: serverTimestamp()
+        };
+
+        if (!snap.empty) {
+          await updateDoc(doc(db, 'class_sessions', snap.docs[0].id), sessionPayload);
+        } else {
+          await addDoc(collection(db, 'class_sessions'), sessionPayload);
+        }
+      }
+
+      const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(customMessage)}`;
+      window.open(whatsappUrl, '_blank');
+      setShowShareModal(false);
+    } catch (err) {
+      console.error('Error saving session details:', err);
+      alert('Failed to save session curriculum: ' + err.message);
+    }
+  };
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -146,23 +409,33 @@ export default function AdminDashboard() {
           </p>
         </div>
 
-        {/* View switcher – admins only */}
-        {userProfile?.role === 'admin' && (
-          <div className="flex bg-slate-100 p-1 rounded-2xl self-start sm:self-auto shrink-0">
-            <button
-              onClick={() => setToggleMode('admin')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${viewMode === 'admin' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
-            >
-              Admin
-            </button>
-            <button
-              onClick={() => setToggleMode('educator')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${viewMode === 'educator' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
-            >
-              Educator
-            </button>
-          </div>
-        )}
+        <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+          {/* View switcher – admins only */}
+          {userProfile?.role === 'admin' && (
+            <div className="flex bg-slate-100 p-1 rounded-2xl shrink-0">
+              <button
+                onClick={() => setToggleMode('admin')}
+                className={`px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${viewMode === 'admin' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+              >
+                Admin
+              </button>
+              <button
+                onClick={() => setToggleMode('educator')}
+                className={`px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${viewMode === 'educator' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+              >
+                Educator
+              </button>
+            </div>
+          )}
+
+          <button
+            onClick={() => setShowShareModal(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+          >
+            <Share2 size={13} />
+            WhatsApp Report
+          </button>
+        </div>
       </div>
 
       {/* ============================================================
@@ -340,6 +613,167 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* WhatsApp Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto" onClick={() => setShowShareModal(false)}>
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-xl w-full max-w-2xl overflow-hidden flex flex-col my-8 animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b border-slate-50">
+              <div>
+                <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">WhatsApp Attendance Reporter</h2>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Select a date and batch to generate & share the summary</p>
+              </div>
+              <button onClick={() => setShowShareModal(false)} className="p-2 text-slate-400 hover:text-slate-600 transition">
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 overflow-y-auto space-y-4 max-h-[70vh]">
+              {/* Date & Batch Pickers */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Report Date</label>
+                  <input
+                    type="date"
+                    value={shareDate}
+                    onChange={handleDateChange}
+                    className="input-premium w-full text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Select Batch</label>
+                  <select
+                    value={shareBatchId}
+                    onChange={handleBatchChange}
+                    className="select-premium w-full text-xs font-semibold cursor-pointer"
+                  >
+                    {data.batches.map(b => (
+                      <option key={b.id} value={b.id}>{b.name || b.id}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Curriculum Selection / Logs */}
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-[#255A84]">Curriculum Covered</h4>
+                  {shareSession ? (
+                    <span className="badge-premium-blue text-[9px]">Logged Session</span>
+                  ) : (
+                    <span className="bg-amber-50 border border-amber-100 text-amber-600 text-[9px] font-bold px-2 py-0.5 rounded-lg">Unsaved Log</span>
+                  )}
+                </div>
+
+                {currLoading ? (
+                  <div className="py-2 text-center text-xs text-slate-400">Loading curriculum data...</div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Course</label>
+                      <select
+                        value={selCourseId}
+                        onChange={e => { setSelCourseId(e.target.value); setSelModuleId(''); setSelTopicIds([]); }}
+                        className="select-premium py-1 px-2 text-xs cursor-pointer bg-white"
+                      >
+                        <option value="">-- Select Course --</option>
+                        {courses.map(c => (
+                          <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Module</label>
+                      <select
+                        disabled={!selCourseId}
+                        value={selModuleId}
+                        onChange={e => { setSelModuleId(e.target.value); setSelTopicIds([]); }}
+                        className="select-premium py-1 px-2 text-xs cursor-pointer bg-white"
+                      >
+                        <option value="">-- Select Module --</option>
+                        {modules.filter(m => m.courseId === selCourseId).map(m => (
+                          <option key={m.id} value={m.id}>{m.title}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {selModuleId && (
+                      <div className="sm:col-span-2">
+                        <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Topics Completed</label>
+                        <div className="max-h-28 overflow-y-auto border border-slate-200/60 rounded-lg p-2.5 space-y-1.5 bg-white text-xs">
+                          {topics.filter(t => t.moduleId === selModuleId).length === 0 ? (
+                            <p className="text-[10px] text-slate-400 italic">No topics found in this module.</p>
+                          ) : (
+                            topics.filter(t => t.moduleId === selModuleId).map(topic => {
+                              const isChecked = selTopicIds.includes(topic.id);
+                              return (
+                                <label key={topic.id} className="flex items-center gap-2 cursor-pointer select-none">
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={() => {
+                                      setSelTopicIds(prev =>
+                                        isChecked ? prev.filter(id => id !== topic.id) : [...prev, topic.id]
+                                      );
+                                    }}
+                                    className="rounded border-slate-300 text-[#255A84] focus:ring-[#255A84]"
+                                  />
+                                  <span className="text-slate-600 font-medium text-[11px]">{topic.title}</span>
+                                </label>
+                              );
+                            })
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Message Live Preview */}
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">WhatsApp Message Preview (Editable)</label>
+                {detailsLoading ? (
+                  <div className="h-44 bg-slate-50 rounded-xl flex items-center justify-center border border-slate-100">
+                    <div className="flex flex-col items-center gap-2 text-slate-400 text-xs">
+                      <div className="animate-spin h-5 w-5 border-2 border-[#255A84] border-t-transparent rounded-full" />
+                      <span>Fetching details for report...</span>
+                    </div>
+                  </div>
+                ) : (
+                  <textarea
+                    rows={8}
+                    value={customMessage}
+                    onChange={e => { setIsEditingMessage(true); setCustomMessage(e.target.value); }}
+                    className="w-full text-xs font-mono p-4 border border-slate-200 rounded-xl focus:outline-none focus:border-[#255A84] focus:ring-0 bg-slate-50/50 leading-relaxed"
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50 border-t border-slate-100">
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="px-4 py-2 border border-slate-200 text-slate-500 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-100 active:scale-95 transition"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={detailsLoading || currLoading}
+                onClick={handleSaveAndShare}
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition active:scale-95 cursor-pointer"
+              >
+                <Share2 size={13} />
+                Save & Share
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
