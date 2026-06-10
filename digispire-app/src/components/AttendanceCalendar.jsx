@@ -283,7 +283,7 @@ export default function AttendanceCalendar({
               <span>{dayDetails.timing}</span>
             </div>
 
-            {dayDetails.status === 'present' && dayDetails.rawLog && (
+            {(dayDetails.status === 'present' || dayDetails.status === 'makeup') && dayDetails.rawLog && (
               <div className="flex items-center gap-2.5">
                 <CheckCircle2 size={15} className="text-emerald-500 shrink-0" />
                 <span>
@@ -358,12 +358,22 @@ export default function AttendanceCalendar({
                 <button
                   onClick={() => onUpdateStatus(dayDetails.date, 'present')}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition active:scale-95 cursor-pointer ${
-                    dayDetails.status === 'present' || dayDetails.status === 'makeup'
+                    dayDetails.status === 'present'
                       ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/20'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
                   Set Present
+                </button>
+                <button
+                  onClick={() => onUpdateStatus(dayDetails.date, 'makeup')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition active:scale-95 cursor-pointer ${
+                    dayDetails.status === 'makeup'
+                      ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  Set Makeup
                 </button>
                 <button
                   onClick={() => onUpdateStatus(dayDetails.date, 'leave')}

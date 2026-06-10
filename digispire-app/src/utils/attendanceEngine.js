@@ -93,37 +93,46 @@ export function calculateAttendance({
       const isMakeup = makeupMap.has(dateStr);
       const isHoliday = holidaysSet.has(dateStr);
       const isCancelled = cancelledSet.has(dateStr);
+      const hasLog = logsMap.has(dateStr);
 
       if (isHoliday) {
-        if (isRegularDay || isMakeup) {
+        if (isRegularDay || isMakeup || hasLog) {
           holidaysCount++;
           dailyStatus[dateStr] = 'holiday';
         } else {
           dailyStatus[dateStr] = 'no-class';
         }
       } else if (isCancelled) {
-        if (isRegularDay || isMakeup) {
+        if (isRegularDay || isMakeup || hasLog) {
           cancelledCount++;
           dailyStatus[dateStr] = 'cancelled';
         } else {
           dailyStatus[dateStr] = 'no-class';
         }
-      } else if (isRegularDay || isMakeup) {
+      } else if (isRegularDay || isMakeup || hasLog) {
         eligibleClasses++;
-        if (logsMap.has(dateStr)) {
+        if (hasLog) {
           const status = logsMap.get(dateStr);
           if (status === 'leave') {
             leaveClasses++;
             dailyStatus[dateStr] = 'leave';
           } else if (status === 'absent') {
             dailyStatus[dateStr] = 'absent';
+          } else if (status === 'makeup') {
+            presentClasses++;
+            dailyStatus[dateStr] = 'makeup';
           } else {
             presentClasses++;
             dailyStatus[dateStr] = isMakeup ? 'makeup' : 'present';
           }
         } else {
           // If educator does not mark present/leave: Absent = 1
-          dailyStatus[dateStr] = 'absent';
+          if (isRegularDay || isMakeup) {
+            dailyStatus[dateStr] = 'absent';
+          } else {
+            eligibleClasses--; // Revert eligible class increment as it is not a regular/makeup day
+            dailyStatus[dateStr] = 'no-class';
+          }
         }
       } else {
         dailyStatus[dateStr] = 'no-class';

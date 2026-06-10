@@ -473,7 +473,7 @@ export default function AttendancePage() {
           await addDoc(collection(db, 'attendance'), attendanceDoc);
         }
 
-        if (manualForm.status === 'present' && manualForm.topicIds && manualForm.topicIds.length > 0) {
+        if ((manualForm.status === 'present' || manualForm.status === 'makeup') && manualForm.topicIds && manualForm.topicIds.length > 0) {
           await Promise.all(manualForm.topicIds.map(topicId => {
             return updateDoc(doc(db, 'topics', topicId), {
               completedStudents: arrayUnion(student.uid || student.id)
@@ -1585,6 +1585,7 @@ export default function AttendancePage() {
                     className="select-premium cursor-pointer"
                   >
                     <option value="present">Present</option>
+                    <option value="makeup">Makeup</option>
                     <option value="leave">Leave</option>
                     <option value="absent">Absent</option>
                   </select>
