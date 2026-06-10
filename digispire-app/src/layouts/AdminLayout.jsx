@@ -4,12 +4,13 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Users, CalendarCheck, FileText,
   LogOut, Menu, X, GraduationCap, ChevronRight,
-  FileSpreadsheet
+  FileSpreadsheet, UserCog
 } from 'lucide-react';
 
 const navItems = [
   { path: 'dashboard', label: 'Dashboard', shortLabel: 'Home', icon: LayoutDashboard, category: 'Operations & Registry' },
   { path: 'students', label: 'Student Registry', shortLabel: 'Students', icon: Users, category: 'Operations & Registry' },
+  { path: 'staff', label: 'Staff Management', shortLabel: 'Staff', icon: UserCog, category: 'Operations & Registry' },
   { path: 'attendance', label: 'Live Class Console', shortLabel: 'Attendance', icon: CalendarCheck, category: 'Operations & Registry' },
   { path: 'courses', label: 'Course Curriculum', shortLabel: 'Courses', icon: GraduationCap, category: 'Curriculum & Learning' },
   { path: 'content', label: 'Resources Library', shortLabel: 'Library', icon: FileText, category: 'Curriculum & Learning' },
@@ -20,9 +21,9 @@ const navItems = [
 const bottomNavItems = [
   navItems.find(i => i.path === 'dashboard'),
   navItems.find(i => i.path === 'students'),
+  navItems.find(i => i.path === 'staff'),
   navItems.find(i => i.path === 'attendance'),
   navItems.find(i => i.path === 'courses'),
-  navItems.find(i => i.path === 'reports'),
 ];
 
 export default function AdminLayout() {

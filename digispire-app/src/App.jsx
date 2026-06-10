@@ -15,6 +15,7 @@ import AttendancePage from './pages/admin/AttendancePage';
 import CoursesPage from './pages/admin/CoursesPage';
 import ContentPage from './pages/admin/ContentPage';
 import AttendanceReportPage from './pages/admin/AttendanceReportPage';
+import StaffPage from './pages/admin/StaffPage';
 
 // Student pages
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -57,6 +58,7 @@ function App() {
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="students" element={<StudentsPage />} />
+              <Route path="staff" element={<StaffPage />} />
               <Route path="attendance" element={<AttendancePage />} />
               <Route path="courses" element={<CoursesPage />} />
               <Route path="content" element={<ContentPage />} />
