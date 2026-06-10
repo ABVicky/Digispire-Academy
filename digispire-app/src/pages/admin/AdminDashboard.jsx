@@ -5,8 +5,11 @@ import { useAuth } from '../../context/AuthContext';
 import {
   Users, CalendarCheck, Clock, UserPlus, Layers,
   ChevronRight, Calendar, AlertCircle, Sparkles, TrendingUp,
-  Share2, X
+  Share2, X, CreditCard
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import QRCode from 'qrcode';
+
 function getBatchBadgeColor(bId, name = '') {
   const label = (name || bId || '').toLowerCase();
   if (label.includes('morning')) return 'badge-premium-orange';
@@ -31,7 +34,7 @@ function StatCard({ icon: Icon, label, value, color, colorBg, description }) {
 }
 
 // Mobile-only card-style student row
-function StudentCardMobile({ student, batches }) {
+function StudentCardMobile({ student, batches, onOpenIdCard }) {
   return (
     <div className="student-card-mobile">
       <div className="flex items-center gap-3">
@@ -42,9 +45,16 @@ function StudentCardMobile({ student, batches }) {
           <p className="font-bold text-slate-800 text-sm truncate">{student.name}</p>
           <p className="text-[10px] font-mono font-bold text-slate-400 uppercase mt-0.5">{student.studentId}</p>
         </div>
-        <span className="text-[10px] text-slate-400 font-medium shrink-0">{student.joiningDate || '—'}</span>
+        <button 
+          type="button"
+          onClick={() => onOpenIdCard && onOpenIdCard(student)}
+          className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-[#255A84] transition active:scale-90 shrink-0 cursor-pointer"
+          title="Inspect ID Card"
+        >
+          <CreditCard size={14} />
+        </button>
       </div>
-      <div className="flex flex-wrap gap-1">
+      <div className="flex flex-wrap gap-1 mt-2">
         {(student.batchIds || [student.batchId || 'morning']).map(bId => {
           const name = batches.find(b => b.id === bId)?.name || bId;
           return (
@@ -88,6 +98,37 @@ export default function AdminDashboard() {
   const [isEditingMessage, setIsEditingMessage] = useState(false);
   const [copied, setCopied] = useState(false);
   const [activeShareTab, setActiveShareTab] = useState('present');
+
+  const [showIdCardModal, setShowIdCardModal] = useState(false);
+  const [selectedStudentForIdCard, setSelectedStudentForIdCard] = useState(null);
+  const [idCardQrCodeUrl, setIdCardQrCodeUrl] = useState('');
+  const [isIdCardFlipped, setIsIdCardFlipped] = useState(false);
+
+  useEffect(() => {
+    if (selectedStudentForIdCard) {
+      const payload = {
+        uid: selectedStudentForIdCard.uid || selectedStudentForIdCard.id,
+        name: selectedStudentForIdCard.name,
+        role: selectedStudentForIdCard.role || 'student',
+        studentId: selectedStudentForIdCard.studentId || '',
+        phone: selectedStudentForIdCard.phone || ''
+      };
+      QRCode.toDataURL(JSON.stringify(payload), {
+        margin: 1,
+        width: 256
+      })
+      .then(url => setIdCardQrCodeUrl(url))
+      .catch(err => console.error('Error generating QR code:', err));
+    } else {
+      setIdCardQrCodeUrl('');
+      setIsIdCardFlipped(false);
+    }
+  }, [selectedStudentForIdCard]);
+
+  const handleOpenIdCard = (student) => {
+    setSelectedStudentForIdCard(student);
+    setShowIdCardModal(true);
+  };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(customMessage);
@@ -531,7 +572,19 @@ export default function AdminDashboard() {
                   ) : (
                     recentAdmissions.map(student => (
                       <tr key={student.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-5 py-3 font-bold text-slate-800 text-sm">{student.name}</td>
+                        <td className="px-5 py-3 font-bold text-slate-800 text-sm">
+                          <div className="flex items-center gap-1.5">
+                            <span>{student.name}</span>
+                            <button 
+                              type="button"
+                              onClick={() => handleOpenIdCard(student)}
+                              className="p-1 text-slate-400 hover:text-[#255A84] rounded hover:bg-slate-100 transition duration-200 cursor-pointer"
+                              title="Inspect ID Card"
+                            >
+                              <CreditCard size={13} />
+                            </button>
+                          </div>
+                        </td>
                         <td className="px-4 py-3 font-mono text-xs text-slate-500">{student.studentId}</td>
                         <td className="px-4 py-3 text-xs text-slate-500">{student.joiningDate || 'N/A'}</td>
                         <td className="px-4 py-3">
@@ -554,7 +607,7 @@ export default function AdminDashboard() {
               ) : (
                 <div className="cards-list" style={{ display: 'flex' }}>
                   {recentAdmissions.map(student => (
-                    <StudentCardMobile key={student.id} student={student} batches={data.batches} />
+                    <StudentCardMobile key={student.id} student={student} batches={data.batches} onOpenIdCard={handleOpenIdCard} />
                   ))}
                 </div>
               )}
@@ -935,6 +988,143 @@ export default function AdminDashboard() {
                 Save & Share
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── DIGITAL ID CARD MODAL ── */}
+      {showIdCardModal && selectedStudentForIdCard && (
+        <div className="modal-backdrop-premium" onClick={() => setShowIdCardModal(false)}>
+          <div className="modal-container-premium max-w-sm sm:max-w-md bg-transparent border-transparent shadow-none" onClick={e => e.stopPropagation()}>
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-center px-4 py-2 bg-slate-900/80 backdrop-blur-md rounded-t-2xl border-b border-white/10">
+              <span className="text-xs font-black uppercase tracking-widest text-slate-300">Identity Verification</span>
+              <button onClick={() => setShowIdCardModal(false)} className="p-1 text-slate-400 hover:text-white transition rounded-lg hover:bg-white/10 cursor-pointer">
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="p-4 bg-slate-900/60 backdrop-blur-md rounded-b-2xl flex flex-col items-center gap-5">
+              {/* Flipping Card */}
+              <div className="id-card-perspective w-80 h-[480px] cursor-pointer" onClick={() => setIsIdCardFlipped(!isIdCardFlipped)}>
+                <div className={`id-card-inner rounded-3xl shadow-2xl ${isIdCardFlipped ? 'id-card-flipped' : ''}`}>
+                  
+                  {/* Card Front */}
+                  <div className="id-card-front bg-gradient-to-br from-[#1a3852] via-[#255A84] to-[#0c1a26] text-white flex flex-col justify-between p-6 absolute inset-0 overflow-hidden select-none">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#F48B1F]/10 rounded-full blur-2xl pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#255A84]/40 rounded-full blur-2xl pointer-events-none" />
+                    
+                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="h-7 w-7 bg-white rounded-lg flex items-center justify-center p-1 shadow-sm shrink-0">
+                          <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
+                        </div>
+                        <div>
+                          <h4 className="font-heading font-black tracking-wider text-xs leading-none">DIGISPIRE</h4>
+                          <span className="text-[7px] text-[#F48B1F] tracking-[0.25em] font-extrabold uppercase mt-0.5 block">Academy Portal</span>
+                        </div>
+                      </div>
+                      <span className="text-[8px] font-bold uppercase tracking-widest text-slate-300 border border-white/15 px-2 py-0.5 rounded bg-white/5">
+                        ID Badge
+                      </span>
+                    </div>
+
+                    <div className="text-center my-auto py-2 space-y-4">
+                      <div className="h-28 w-28 rounded-2xl bg-white/5 p-1 border border-white/20 shadow-2xl mx-auto overflow-hidden relative">
+                        {selectedStudentForIdCard.photoURL ? (
+                          <img src={selectedStudentForIdCard.photoURL} alt={selectedStudentForIdCard.name} className="h-full w-full object-cover rounded-xl" />
+                        ) : (
+                          <div className="h-full w-full bg-[#255A84]/50 flex items-center justify-center text-white text-3xl font-bold font-heading rounded-xl">
+                            {selectedStudentForIdCard.name?.charAt(0)}
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-heading font-extrabold text-white tracking-tight leading-snug">{selectedStudentForIdCard.name}</h3>
+                        <span className="inline-block text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full mt-1.5 bg-emerald-500 text-white">
+                          Student
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-white/10 pt-4 flex items-end justify-between">
+                      <div className="space-y-3 flex-1 min-w-0">
+                        <div>
+                          <p className="text-[7px] font-bold uppercase text-slate-400 tracking-wider">Identifier ID</p>
+                          <p className="text-xs font-mono font-bold text-white tracking-wide">{selectedStudentForIdCard.studentId || 'DS000000'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[7px] font-bold uppercase text-slate-400 tracking-wider">Enrolled Course</p>
+                          <p className="text-[10px] font-semibold text-slate-200 truncate pr-4">{selectedStudentForIdCard.course || 'General Curriculum'}</p>
+                        </div>
+                      </div>
+                      <div className="h-7 w-9 rounded bg-gradient-to-br from-yellow-300 to-yellow-600 opacity-60 border border-yellow-200/50 shadow-inner flex flex-col gap-0.5 p-1 shrink-0">
+                        <div className="flex gap-1 h-full"><div className="w-1/2 border-r border-yellow-700/30"></div><div className="w-1/2"></div></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Back */}
+                  <div className="id-card-back bg-gradient-to-br from-[#1a3852] via-[#255A84] to-[#0c1a26] text-white flex flex-col justify-between p-6 absolute inset-0 overflow-hidden select-none">
+                    <div className="absolute top-0 left-0 w-32 h-32 bg-[#255A84]/40 rounded-full blur-2xl pointer-events-none" />
+                    <div className="absolute bottom-0 right-0 w-32 h-32 bg-[#F48B1F]/10 rounded-full blur-2xl pointer-events-none" />
+
+                    <div className="text-center border-b border-white/10 pb-2.5">
+                      <h4 className="font-heading font-black tracking-wider text-xs leading-none">DIGISPIRE ACADEMY</h4>
+                      <span className="text-[6px] text-slate-400 uppercase tracking-widest mt-1 block">Verification & Access</span>
+                    </div>
+
+                    <div className="my-auto text-center space-y-3">
+                      <div className="w-36 h-36 bg-white p-2.5 rounded-2xl shadow-2xl flex items-center justify-center mx-auto border border-white/10 relative">
+                        {idCardQrCodeUrl ? (
+                          <img src={idCardQrCodeUrl} alt="QR Code" className="h-full w-full object-contain" />
+                        ) : (
+                          <div className="animate-pulse h-full w-full bg-slate-100 rounded-lg flex items-center justify-center text-slate-300 text-xs">
+                            Generating...
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-[8px] font-bold uppercase tracking-wider text-slate-400">Scan for Verification</p>
+                    </div>
+
+                    <div className="border-t border-white/10 pt-3.5 space-y-2">
+                      <div className="grid grid-cols-2 gap-2 text-[9px]">
+                        <div>
+                          <span className="text-slate-400 block text-[7px] uppercase tracking-wider font-medium">Contact Phone</span>
+                          <span className="font-semibold text-slate-200">{selectedStudentForIdCard.phone || '—'}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-400 block text-[7px] uppercase tracking-wider font-medium">Enrolled Date</span>
+                          <span className="font-semibold text-slate-200">{selectedStudentForIdCard.joiningDate || '—'}</span>
+                        </div>
+                      </div>
+
+                      <p className="text-[7px] text-slate-400 leading-tight font-medium text-center pt-1">
+                        This digital card certifies enrollment status. If found, please return to Admin Office.
+                      </p>
+
+                      <div className="flex justify-center items-center gap-0.5 opacity-30 pt-1">
+                        {[1,3,2,1,4,2,1,3,2,1,4,1,2,3,1,2,4,1,2,3].map((w, i) => (
+                          <div key={i} className="bg-white h-5" style={{ width: `${w}px` }} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Flip Button */}
+              <button 
+                type="button"
+                onClick={() => setIsIdCardFlipped(!isIdCardFlipped)} 
+                className="w-full py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-95 cursor-pointer"
+              >
+                Flip Card
+              </button>
+            </div>
+
           </div>
         </div>
       )}
