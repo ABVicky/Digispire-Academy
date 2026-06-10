@@ -80,6 +80,14 @@ export default function AdminDashboard() {
 
   const [customMessage, setCustomMessage] = useState('');
   const [isEditingMessage, setIsEditingMessage] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [activeShareTab, setActiveShareTab] = useState('present');
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(customMessage);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // Set default batch selection once loaded
   useEffect(() => {
@@ -396,6 +404,43 @@ export default function AdminDashboard() {
     educator: b.educator || 'Faculty'
   }));
 
+  // Group students for WhatsApp share verification
+  const enrolledStudentsForShare = data.students.filter(s => 
+    (s.batchIds && s.batchIds.includes(shareBatchId)) || s.batchId === shareBatchId
+  );
+
+  const attendedList = [];
+  const absentList = [];
+  const leaveList = [];
+
+  const shareLogsMap = new Map();
+  shareAttendance.forEach(log => {
+    shareLogsMap.set(log.studentId, log.status || 'present');
+  });
+
+  enrolledStudentsForShare.forEach(student => {
+    const status = shareLogsMap.get(student.studentId);
+    if (status === 'present' || status === 'makeup') {
+      attendedList.push(student.name);
+    } else if (status === 'leave') {
+      leaveList.push(student.name);
+    } else {
+      absentList.push(student.name);
+    }
+  });
+
+  shareAttendance.forEach(log => {
+    const isEnrolled = enrolledStudentsForShare.some(s => s.studentId === log.studentId);
+    if (!isEnrolled) {
+      const studName = log.name || data.students.find(s => s.studentId === log.studentId)?.name || log.studentId;
+      if (log.status === 'present' || log.status === 'makeup') {
+        attendedList.push(`${studName} (Makeup/Guest)`);
+      } else if (log.status === 'leave') {
+        leaveList.push(`${studName} (Guest - Leave)`);
+      }
+    }
+  });
+
   return (
     <div className="space-y-5 font-sans pb-4">
       {/* ─── Page Header ─── */}
@@ -619,12 +664,12 @@ export default function AdminDashboard() {
       {/* WhatsApp Share Modal */}
       {showShareModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto" onClick={() => setShowShareModal(false)}>
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-xl w-full max-w-2xl overflow-hidden flex flex-col my-8 animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-xl w-full max-w-4xl overflow-hidden flex flex-col my-8 animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
             {/* Header */}
             <div className="flex justify-between items-center px-6 py-4 border-b border-slate-50">
               <div>
                 <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">WhatsApp Attendance Reporter</h2>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Select a date and batch to generate & share the summary</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Generate and share structured attendance updates</p>
               </div>
               <button onClick={() => setShowShareModal(false)} className="p-2 text-slate-400 hover:text-slate-600 transition">
                 <X size={18} />
@@ -632,127 +677,238 @@ export default function AdminDashboard() {
             </div>
 
             {/* Body */}
-            <div className="p-6 overflow-y-auto space-y-4 max-h-[70vh]">
-              {/* Date & Batch Pickers */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Report Date</label>
-                  <input
-                    type="date"
-                    value={shareDate}
-                    onChange={handleDateChange}
-                    className="input-premium w-full text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Select Batch</label>
-                  <select
-                    value={shareBatchId}
-                    onChange={handleBatchChange}
-                    className="select-premium w-full text-xs font-semibold cursor-pointer"
-                  >
-                    {data.batches.map(b => (
-                      <option key={b.id} value={b.id}>{b.name || b.id}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Curriculum Selection / Logs */}
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-[#255A84]">Curriculum Covered</h4>
-                  {shareSession ? (
-                    <span className="badge-premium-blue text-[9px]">Logged Session</span>
-                  ) : (
-                    <span className="bg-amber-50 border border-amber-100 text-amber-600 text-[9px] font-bold px-2 py-0.5 rounded-lg">Unsaved Log</span>
-                  )}
-                </div>
-
-                {currLoading ? (
-                  <div className="py-2 text-center text-xs text-slate-400">Loading curriculum data...</div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="p-6 overflow-y-auto max-h-[75vh]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {/* Left Panel: Verification & Configuration */}
+                <div className="space-y-4">
+                  {/* Date & Batch Pickers */}
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Course</label>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Report Date</label>
+                      <input
+                        type="date"
+                        value={shareDate}
+                        onChange={handleDateChange}
+                        className="input-premium w-full text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Select Batch</label>
                       <select
-                        value={selCourseId}
-                        onChange={e => { setSelCourseId(e.target.value); setSelModuleId(''); setSelTopicIds([]); }}
-                        className="select-premium py-1 px-2 text-xs cursor-pointer bg-white"
+                        value={shareBatchId}
+                        onChange={handleBatchChange}
+                        className="select-premium w-full text-xs font-semibold cursor-pointer"
                       >
-                        <option value="">-- Select Course --</option>
-                        {courses.map(c => (
-                          <option key={c.id} value={c.id}>{c.name}</option>
+                        {data.batches.map(b => (
+                          <option key={b.id} value={b.id}>{b.name || b.id}</option>
                         ))}
                       </select>
                     </div>
+                  </div>
 
-                    <div>
-                      <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Module</label>
-                      <select
-                        disabled={!selCourseId}
-                        value={selModuleId}
-                        onChange={e => { setSelModuleId(e.target.value); setSelTopicIds([]); }}
-                        className="select-premium py-1 px-2 text-xs cursor-pointer bg-white"
-                      >
-                        <option value="">-- Select Module --</option>
-                        {modules.filter(m => m.courseId === selCourseId).map(m => (
-                          <option key={m.id} value={m.id}>{m.title}</option>
-                        ))}
-                      </select>
+                  {/* Curriculum Covered */}
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100/60 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-[#255A84]">Curriculum Covered</h4>
+                      {shareSession ? (
+                        <span className="badge-premium-blue text-[9px]">Logged Session</span>
+                      ) : (
+                        <span className="bg-amber-50 border border-amber-100 text-amber-600 text-[9px] font-bold px-2 py-0.5 rounded-lg">Unsaved Log</span>
+                      )}
                     </div>
 
-                    {selModuleId && (
-                      <div className="sm:col-span-2">
-                        <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Topics Completed</label>
-                        <div className="max-h-28 overflow-y-auto border border-slate-200/60 rounded-lg p-2.5 space-y-1.5 bg-white text-xs">
-                          {topics.filter(t => t.moduleId === selModuleId).length === 0 ? (
-                            <p className="text-[10px] text-slate-400 italic">No topics found in this module.</p>
-                          ) : (
-                            topics.filter(t => t.moduleId === selModuleId).map(topic => {
-                              const isChecked = selTopicIds.includes(topic.id);
-                              return (
-                                <label key={topic.id} className="flex items-center gap-2 cursor-pointer select-none">
-                                  <input
-                                    type="checkbox"
-                                    checked={isChecked}
-                                    onChange={() => {
-                                      setSelTopicIds(prev =>
-                                        isChecked ? prev.filter(id => id !== topic.id) : [...prev, topic.id]
-                                      );
-                                    }}
-                                    className="rounded border-slate-300 text-[#255A84] focus:ring-[#255A84]"
-                                  />
-                                  <span className="text-slate-600 font-medium text-[11px]">{topic.title}</span>
-                                </label>
-                              );
-                            })
-                          )}
+                    {currLoading ? (
+                      <div className="py-2 text-center text-xs text-slate-400">Loading curriculum data...</div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Course</label>
+                          <select
+                            value={selCourseId}
+                            onChange={e => { setSelCourseId(e.target.value); setSelModuleId(''); setSelTopicIds([]); }}
+                            className="select-premium py-1.5 px-2 text-[11px] cursor-pointer bg-white"
+                          >
+                            <option value="">-- Select Course --</option>
+                            {courses.map(c => (
+                              <option key={c.id} value={c.id}>{c.name}</option>
+                            ))}
+                          </select>
                         </div>
+
+                        <div>
+                          <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Module</label>
+                          <select
+                            disabled={!selCourseId}
+                            value={selModuleId}
+                            onChange={e => { setSelModuleId(e.target.value); setSelTopicIds([]); }}
+                            className="select-premium py-1.5 px-2 text-[11px] cursor-pointer bg-white"
+                          >
+                            <option value="">-- Select Module --</option>
+                            {modules.filter(m => m.courseId === selCourseId).map(m => (
+                              <option key={m.id} value={m.id}>{m.title}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {selModuleId && (
+                          <div className="col-span-2">
+                            <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Topics Completed</label>
+                            <div className="max-h-24 overflow-y-auto border border-slate-200/50 rounded-lg p-2 bg-white text-[11px]">
+                              {topics.filter(t => t.moduleId === selModuleId).length === 0 ? (
+                                <p className="text-[10px] text-slate-400 italic">No topics found in this module.</p>
+                              ) : (
+                                topics.filter(t => t.moduleId === selModuleId).map(topic => {
+                                  const isChecked = selTopicIds.includes(topic.id);
+                                  return (
+                                    <label key={topic.id} className="flex items-center gap-2 cursor-pointer select-none py-0.5">
+                                      <input
+                                        type="checkbox"
+                                        checked={isChecked}
+                                        onChange={() => {
+                                          setSelTopicIds(prev =>
+                                            isChecked ? prev.filter(id => id !== topic.id) : [...prev, topic.id]
+                                          );
+                                        }}
+                                        className="rounded border-slate-300 text-[#255A84] focus:ring-[#255A84]"
+                                      />
+                                      <span className="text-slate-600 font-medium">{topic.title}</span>
+                                    </label>
+                                  );
+                                })
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
-                )}
-              </div>
 
-              {/* Message Live Preview */}
-              <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">WhatsApp Message Preview (Editable)</label>
-                {detailsLoading ? (
-                  <div className="h-44 bg-slate-50 rounded-xl flex items-center justify-center border border-slate-100">
-                    <div className="flex flex-col items-center gap-2 text-slate-400 text-xs">
-                      <div className="animate-spin h-5 w-5 border-2 border-[#255A84] border-t-transparent rounded-full" />
-                      <span>Fetching details for report...</span>
+                  {/* Student Verification Tab */}
+                  <div className="bg-slate-50/50 rounded-xl border border-slate-100 p-4 space-y-3">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-600">Student Logs</h4>
+                      {detailsLoading ? (
+                        <div className="animate-spin h-3.5 w-3.5 border-2 border-slate-400 border-t-transparent rounded-full" />
+                      ) : (
+                        <span className="text-[10px] font-bold text-slate-400">{shareAttendance.length} logs found</span>
+                      )}
+                    </div>
+
+                    <div className="flex bg-slate-100 p-1 rounded-xl w-full text-[10px]">
+                      <button
+                        type="button"
+                        onClick={() => setActiveShareTab('present')}
+                        className={`flex-1 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all ${
+                          activeShareTab === 'present' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                        }`}
+                      >
+                        Attended ({attendedList.length})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveShareTab('absent')}
+                        className={`flex-1 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all ${
+                          activeShareTab === 'absent' ? 'bg-white text-rose-500 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                        }`}
+                      >
+                        Absent ({absentList.length})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveShareTab('leave')}
+                        className={`flex-1 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all ${
+                          activeShareTab === 'leave' ? 'bg-white text-amber-500 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                        }`}
+                      >
+                        Leave ({leaveList.length})
+                      </button>
+                    </div>
+
+                    <div className="max-h-36 overflow-y-auto pr-1 text-xs space-y-1">
+                      {detailsLoading ? (
+                        <p className="text-center text-slate-400 italic py-4">Fetching logs...</p>
+                      ) : activeShareTab === 'present' ? (
+                        attendedList.length === 0 ? (
+                          <p className="text-center text-slate-400 italic py-4">No students attended.</p>
+                        ) : (
+                          attendedList.map((name, i) => (
+                            <div key={i} className="flex items-center justify-between p-1.5 bg-emerald-50/50 border border-emerald-100/30 rounded-lg text-emerald-800 text-[11px] font-semibold">
+                              <span>{name}</span>
+                              <span className="text-[9px] uppercase tracking-wider bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">Attended</span>
+                            </div>
+                          ))
+                        )
+                      ) : activeShareTab === 'absent' ? (
+                        absentList.length === 0 ? (
+                          <p className="text-center text-slate-400 italic py-4">No students absent.</p>
+                        ) : (
+                          absentList.map((name, i) => (
+                            <div key={i} className="flex items-center justify-between p-1.5 bg-rose-50/50 border border-rose-100/30 rounded-lg text-rose-800 text-[11px] font-semibold">
+                              <span>{name}</span>
+                              <span className="text-[9px] uppercase tracking-wider bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded">Absent</span>
+                            </div>
+                          ))
+                        )
+                      ) : (
+                        leaveList.length === 0 ? (
+                          <p className="text-center text-slate-400 italic py-4">No students on leave.</p>
+                        ) : (
+                          leaveList.map((name, i) => (
+                            <div key={i} className="flex items-center justify-between p-1.5 bg-amber-50/50 border border-amber-100/30 rounded-lg text-amber-800 text-[11px] font-semibold">
+                              <span>{name}</span>
+                              <span className="text-[9px] uppercase tracking-wider bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">Leave</span>
+                            </div>
+                          ))
+                        )
+                      )}
                     </div>
                   </div>
-                ) : (
-                  <textarea
-                    rows={8}
-                    value={customMessage}
-                    onChange={e => { setIsEditingMessage(true); setCustomMessage(e.target.value); }}
-                    className="w-full text-xs font-mono p-4 border border-slate-200 rounded-xl focus:outline-none focus:border-[#255A84] focus:ring-0 bg-slate-50/50 leading-relaxed"
-                  />
-                )}
+                </div>
+
+                {/* Right Panel: Live Text Area & Action CTAs */}
+                <div className="flex flex-col h-full space-y-3">
+                  <div className="flex-1 flex flex-col min-h-0">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">WhatsApp Message Preview (Editable)</label>
+                      <button
+                        type="button"
+                        onClick={handleCopy}
+                        className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg border transition active:scale-95 cursor-pointer ${
+                          copied
+                            ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                            : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        {copied ? 'Copied!' : 'Copy Report'}
+                      </button>
+                    </div>
+
+                    {detailsLoading ? (
+                      <div className="flex-1 min-h-[300px] bg-slate-50 rounded-xl flex items-center justify-center border border-slate-100">
+                        <div className="flex flex-col items-center gap-2 text-slate-400 text-xs">
+                          <div className="animate-spin h-5 w-5 border-2 border-[#255A84] border-t-transparent rounded-full" />
+                          <span>Generating live summary...</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex-1 flex flex-col min-h-[300px]">
+                        {shareAttendance.length === 0 && (
+                          <div className="p-3 mb-2 bg-amber-50 border border-amber-100 text-amber-800 text-[10px] font-bold rounded-lg flex items-start gap-1.5 leading-relaxed">
+                            <span>⚠️ Warning: No check-in records found for this date. Run attendance broadcaster or mark manual logs first.</span>
+                          </div>
+                        )}
+                        <textarea
+                          rows={14}
+                          value={customMessage}
+                          onChange={e => { setIsEditingMessage(true); setCustomMessage(e.target.value); }}
+                          className="flex-1 w-full text-xs font-mono p-4 border border-slate-200 rounded-xl focus:outline-none focus:border-[#255A84] focus:ring-0 bg-slate-50/50 leading-relaxed resize-none"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
               </div>
             </div>
 
