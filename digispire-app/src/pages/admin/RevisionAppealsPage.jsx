@@ -151,7 +151,7 @@ export default function RevisionAppealsPage() {
         </div>
 
         {/* Search */}
-        <div className="relative w-full md:w-72">
+        <div className="relative w-full md:w-64">
           <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
