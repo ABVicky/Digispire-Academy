@@ -17,12 +17,14 @@ import ContentPage from './pages/admin/ContentPage';
 import AttendanceReportPage from './pages/admin/AttendanceReportPage';
 import StaffPage from './pages/admin/StaffPage';
 import RevisionAppealsPage from './pages/admin/RevisionAppealsPage';
+import SubmissionsPage from './pages/admin/SubmissionsPage';
 
 // Student pages
 import StudentDashboard from './pages/student/StudentDashboard';
 import StudentAttendancePage from './pages/student/StudentAttendancePage';
 import StudentCoursesPage from './pages/student/StudentCoursesPage';
 import StudentContentPage from './pages/student/StudentContentPage';
+import StudentSubmissionsPage from './pages/student/StudentSubmissionsPage';
 
 // Shared pages
 import ProfilePage from './pages/ProfilePage';
@@ -65,6 +67,7 @@ function App() {
               <Route path="content" element={<ContentPage />} />
               <Route path="reports" element={<AttendanceReportPage />} />
               <Route path="revisions" element={<RevisionAppealsPage />} />
+              <Route path="submissions" element={<SubmissionsPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
           </Route>
@@ -77,6 +80,7 @@ function App() {
               <Route path="attendance" element={<StudentAttendancePage />} />
               <Route path="courses" element={<StudentCoursesPage />} />
               <Route path="content" element={<StudentContentPage />} />
+              <Route path="submissions" element={<StudentSubmissionsPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
           </Route>

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, BookOpen, QrCode, User,
   LogOut, Menu, X, ChevronRight,
-  FileText
+  FileText, FolderUp
 } from 'lucide-react';
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
   { path: 'attendance', label: 'Attendance Terminal', shortLabel: 'Check-In', icon: QrCode, category: 'Core Portal' },
   { path: 'courses', label: 'Syllabus & Modules', shortLabel: 'Courses', icon: BookOpen, category: 'Academic Resources' },
   { path: 'content', label: 'Content Library', shortLabel: 'Library', icon: FileText, category: 'Academic Resources' },
+  { path: 'submissions', label: 'Module Submissions', shortLabel: 'Submit Work', icon: FolderUp, category: 'Academic Resources' },
   { path: 'profile', label: 'My Academic Profile', shortLabel: 'Profile', icon: User, category: 'Core Portal' },
 ];
 
