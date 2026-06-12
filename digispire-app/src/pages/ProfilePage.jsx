@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { storage } from '../firebase';
+import { storage, db } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { doc, getDoc } from 'firebase/firestore';
 import {
   User, Phone, Mail, GraduationCap, Lock, Key,
   CheckCircle2, AlertCircle, Camera, LogOut, Loader2,
@@ -20,6 +21,25 @@ export default function ProfilePage() {
   const fileInputRef = useRef(null);
   const [isFlipped, setIsFlipped] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [mentor, setMentor] = useState(null);
+
+  useEffect(() => {
+    if (userProfile?.role === 'student' && userProfile?.mentorId) {
+      const fetchMentor = async () => {
+        try {
+          const snap = await getDoc(doc(db, 'users', userProfile.mentorId));
+          if (snap.exists()) {
+            setMentor({ id: snap.id, ...snap.data() });
+          }
+        } catch (err) {
+          console.error('Failed to fetch mentor:', err);
+        }
+      };
+      fetchMentor();
+    } else {
+      setMentor(null);
+    }
+  }, [userProfile]);
 
   useEffect(() => {
     if (userProfile) {
@@ -183,7 +203,7 @@ export default function ProfilePage() {
                     {userProfile?.photoURL ? (
                       <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover" />
                     ) : (
-                      userProfile?.name?.charAt(0)
+                      <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-2" />
                     )}
                     
                     <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 ${uploading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
@@ -273,6 +293,20 @@ export default function ProfilePage() {
                       </p>
                     </div>
                   </div>
+                  {mentor && (
+                    <div className="flex items-center gap-3 text-slate-600 pt-3 border-t border-slate-100">
+                      <div className="h-9 w-9 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0">
+                        <User size={18} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest leading-none">Assigned Mentor</p>
+                        <p className="text-sm font-semibold mt-1">{mentor.name}</p>
+                        <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
+                          {mentor.email} {mentor.phone && `· ${mentor.phone}`}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -312,8 +346,8 @@ export default function ProfilePage() {
                       {userProfile?.photoURL ? (
                         <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover rounded-xl" />
                       ) : (
-                        <div className="h-full w-full bg-[#255A84]/50 flex items-center justify-center text-white text-3xl font-bold font-heading rounded-xl">
-                          {userProfile?.name?.charAt(0)}
+                        <div className="h-full w-full bg-white flex items-center justify-center rounded-xl p-2.5">
+                          <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
                         </div>
                       )}
                     </div>

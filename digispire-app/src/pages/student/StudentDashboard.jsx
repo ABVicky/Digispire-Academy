@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, query, where } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useAuth } from '../../context/AuthContext';
 import {
-  Calendar, Clock, Layers, ChevronRight, Award, QrCode, CreditCard, X
+  Calendar, Clock, Layers, ChevronRight, Award, QrCode, CreditCard, X, Mail, Phone, User, GraduationCap
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { calculateAttendance } from '../../utils/attendanceEngine';
@@ -14,7 +14,9 @@ export default function StudentDashboard() {
   const [data, setData] = useState({
     attendancePct: 0,
     enrolledBatches: [],
-    upcomingClasses: []
+    upcomingClasses: [],
+    mentor: null,
+    instructors: []
   });
   const [loading, setLoading] = useState(true);
   const [showIdCardModal, setShowIdCardModal] = useState(false);
@@ -44,7 +46,10 @@ export default function StudentDashboard() {
 
     const fetchStudentDashboardData = async () => {
       try {
-        const studentBatchIds = userProfile.batchIds || (userProfile.batchId ? [userProfile.batchId] : ['morning']);
+        const studentBatchIds = [...(userProfile.batchIds || (userProfile.batchId ? [userProfile.batchId] : ['morning']))];
+        if (userProfile.isIntern && !studentBatchIds.includes('internship')) {
+          studentBatchIds.push('internship');
+        }
         const [attSnap, batchesSnap, holidaysSnap, cancellationsSnap] = await Promise.all([
           getDocs(collection(db, 'attendance')),
           getDocs(collection(db, 'batches')),
@@ -92,7 +97,47 @@ export default function StudentDashboard() {
             upcomingClasses.push({ id: `${b.id}-tomorrow`, name: b.name || b.id, time: `${b.startTime || '09:00'} – ${b.endTime || '11:00'}`, day: 'Tomorrow', educator: b.educator || 'Faculty' });
           }
         });
-        setData({ attendancePct, enrolledBatches, upcomingClasses });
+
+        let mentorData = null;
+        if (userProfile.mentorId) {
+          try {
+            const mSnap = await getDoc(doc(db, 'users', userProfile.mentorId));
+            if (mSnap.exists()) {
+              mentorData = { id: mSnap.id, ...mSnap.data() };
+            }
+          } catch (err) {
+            console.error('Failed to fetch mentor:', err);
+          }
+        }
+
+        const educatorNames = enrolledBatches
+          .map(b => b.educator)
+          .filter(name => name && typeof name === 'string' && name.trim() !== '');
+
+        let instructorsList = [];
+        if (educatorNames.length > 0) {
+          try {
+            const staffSnap = await getDocs(
+              query(collection(db, 'users'), where('role', 'in', ['admin', 'educator']))
+            );
+            const staffList = staffSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+            
+            // Match staff by name (case-insensitive, trimmed comparison)
+            instructorsList = staffList.filter(s => 
+              educatorNames.some(name => s.name?.toLowerCase().trim() === name.toLowerCase().trim())
+            );
+          } catch (err) {
+            console.error('Failed to fetch instructors:', err);
+          }
+        }
+
+        setData({ 
+          attendancePct, 
+          enrolledBatches, 
+          upcomingClasses, 
+          mentor: mentorData,
+          instructors: instructorsList
+        });
       } catch (err) {
         console.error('Error fetching student stats:', err);
       } finally {
@@ -122,7 +167,7 @@ export default function StudentDashboard() {
             {userProfile?.photoURL ? (
               <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover" />
             ) : (
-              <span className="text-white font-bold text-xl">{userProfile?.name?.charAt(0)}</span>
+              <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-2 bg-white rounded-xl" />
             )}
           </div>
           <div className="flex-1 min-w-0">
@@ -196,7 +241,7 @@ export default function StudentDashboard() {
                 <div className="min-w-0">
                   <p className="font-bold text-slate-800 text-sm truncate">{b.name || b.id}</p>
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
-                    {b.startTime} – {b.endTime}
+                    {b.startTime} – {b.endTime} {b.educator ? `· ${b.educator}` : ''}
                   </p>
                 </div>
                 <span className="badge-premium-blue shrink-0">Enrolled</span>
@@ -229,6 +274,78 @@ export default function StudentDashboard() {
           ))
         )}
       </div>
+
+      {/* ─── Assigned Mentor ─── */}
+      {data.mentor && (
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-3">
+          <h2 className="text-[11px] font-black text-slate-600 uppercase tracking-widest flex items-center gap-2">
+            <User size={14} className="text-emerald-500" /> Assigned Mentor
+          </h2>
+          <div className="flex items-center gap-3.5 p-3.5 bg-slate-50 border border-slate-100 rounded-xl">
+            <div className="h-12 w-12 rounded-xl bg-[#255A84] text-white flex items-center justify-center font-bold text-sm overflow-hidden shrink-0">
+              {data.mentor.photoURL ? (
+                <img src={data.mentor.photoURL} alt={data.mentor.name} className="h-full w-full object-cover" />
+              ) : (
+                <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1.5 bg-white" />
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-bold text-slate-800 text-sm truncate">{data.mentor.name}</p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{data.mentor.role || 'Educator'}</p>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[10px] text-slate-500 font-medium">
+                {data.mentor.email && (
+                  <a href={`mailto:${data.mentor.email}`} className="hover:text-[#255A84] transition-colors flex items-center gap-1">
+                    <Mail size={12} className="text-slate-400" /> {data.mentor.email}
+                  </a>
+                )}
+                {data.mentor.phone && (
+                  <a href={`tel:${data.mentor.phone}`} className="hover:text-[#255A84] transition-colors flex items-center gap-1">
+                    <Phone size={12} className="text-slate-400" /> {data.mentor.phone}
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Teaching Faculty ─── */}
+      {data.instructors && data.instructors.length > 0 && (
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-3">
+          <h2 className="text-[11px] font-black text-slate-600 uppercase tracking-widest flex items-center gap-2">
+            <GraduationCap size={14} className="text-blue-500" /> Teaching Faculty
+          </h2>
+          <div className="grid grid-cols-1 gap-3">
+            {data.instructors.map(inst => (
+              <div key={inst.id} className="flex items-center gap-3.5 p-3.5 bg-slate-50 border border-slate-100 rounded-xl">
+                <div className="h-12 w-12 rounded-xl bg-[#255A84] text-white flex items-center justify-center font-bold text-sm overflow-hidden shrink-0">
+                  {inst.photoURL ? (
+                    <img src={inst.photoURL} alt={inst.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1.5 bg-white" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold text-slate-800 text-sm truncate">{inst.name}</p>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{inst.role === 'admin' ? 'Lead Faculty' : 'Educator'}</p>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[10px] text-slate-500 font-medium">
+                    {inst.email && (
+                      <a href={`mailto:${inst.email}`} className="hover:text-[#255A84] transition-colors flex items-center gap-1">
+                        <Mail size={12} className="text-slate-400" /> {inst.email}
+                      </a>
+                    )}
+                    {inst.phone && (
+                      <a href={`tel:${inst.phone}`} className="hover:text-[#255A84] transition-colors flex items-center gap-1">
+                        <Phone size={12} className="text-slate-400" /> {inst.phone}
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ─── Attendance History shortcut ─── */}
       <Link
@@ -289,8 +406,8 @@ export default function StudentDashboard() {
                         {userProfile?.photoURL ? (
                           <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover rounded-xl" />
                         ) : (
-                          <div className="h-full w-full bg-[#255A84]/50 flex items-center justify-center text-white text-3xl font-bold font-heading rounded-xl">
-                            {userProfile?.name?.charAt(0)}
+                          <div className="h-full w-full bg-white flex items-center justify-center rounded-xl p-2.5">
+                            <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
                           </div>
                         )}
                       </div>

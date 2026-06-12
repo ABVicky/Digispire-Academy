@@ -67,6 +67,7 @@ export default function StudentCoursesPage() {
         studentId: userProfile.studentId || 'N/A',
         studentName: userProfile.name || 'Anonymous Student',
         studentBatch: userProfile.batchId || 'N/A',
+        studentPhotoURL: userProfile.photoURL || '',
         type: revisionModal.type,
         courseId: revisionModal.courseId,
         courseName: revisionModal.courseName,

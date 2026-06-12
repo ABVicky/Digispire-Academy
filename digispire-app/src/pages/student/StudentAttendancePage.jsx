@@ -29,7 +29,11 @@ export default function StudentAttendancePage() {
 
   // History calculation states
   const [selectedBatchId, setSelectedBatchId] = useState(null);
-  const activeBatchId = selectedBatchId || userProfile?.batchIds?.[0] || userProfile?.batchId || 'morning';
+  const studentBatches = [...(userProfile?.batchIds || (userProfile?.batchId ? [userProfile.batchId] : ['morning']))];
+  if (userProfile?.isIntern && !studentBatches.includes('internship')) {
+    studentBatches.push('internship');
+  }
+  const activeBatchId = selectedBatchId || studentBatches[0] || 'morning';
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [myLogs, setMyLogs] = useState([]);
   const [myBatchSchedule, setMyBatchSchedule] = useState(null);
@@ -571,7 +575,7 @@ export default function StudentAttendancePage() {
               </div>
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">My Batches</p>
               <p className="text-sm font-bold text-slate-800 capitalize">
-                {(userProfile?.batchIds || [userProfile?.batchId || 'morning']).join(', ')}
+                {studentBatches.join(', ')}
               </p>
             </div>
             <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
@@ -603,7 +607,7 @@ export default function StudentAttendancePage() {
           ) : calculatedHistory ? (
             <div className="space-y-6">
               {/* Batch Selector if multiple batches exist */}
-              {(userProfile?.batchIds && userProfile.batchIds.length > 1) && (
+              {studentBatches.length > 1 && (
                 <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex items-center justify-between gap-4">
                   <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Batch Calendar</span>
                   <select
@@ -611,8 +615,8 @@ export default function StudentAttendancePage() {
                     onChange={(e) => setSelectedBatchId(e.target.value)}
                     className="select-premium py-1.5 px-3 text-xs uppercase font-bold tracking-widest max-w-[150px] bg-slate-50 border border-slate-100 rounded-lg cursor-pointer font-semibold"
                   >
-                    {userProfile.batchIds.map(bId => (
-                      <option key={bId} value={bId}>{bId}</option>
+                    {studentBatches.map(bId => (
+                      <option key={bId} value={bId}>{bId === 'internship' ? 'Internship Batch' : bId}</option>
                     ))}
                   </select>
                 </div>

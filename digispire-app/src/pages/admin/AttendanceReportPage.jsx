@@ -298,8 +298,8 @@ export default function AttendanceReportPage() {
                     <tr key={s.id} onClick={() => setInspectStudent(s)} className="hover:bg-slate-50/50 transition-colors group cursor-pointer">
                       <td className="px-6 py-3.5">
                         <div className="flex items-center gap-3">
-                          <div className={`h-9 w-9 rounded-xl flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0 ${reportType === 'internship' ? 'bg-emerald-500' : 'bg-[#255A84]'}`}>
-                            {s.name?.charAt(0)}
+                          <div className={`h-9 w-9 rounded-xl flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0 overflow-hidden ${reportType === 'internship' ? 'bg-emerald-500' : 'bg-[#255A84]'}`}>
+                            {s.photoURL ? <img src={s.photoURL} alt={s.name} className="h-full w-full object-cover" /> : <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1 bg-white" />}
                           </div>
                           <div className="min-w-0">
                             <p className="font-bold text-slate-800 text-sm truncate">{s.name}</p>
@@ -336,8 +336,8 @@ export default function AttendanceReportPage() {
                   className="w-full student-card-mobile text-left active:scale-[0.99] transition"
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 ${reportType === 'internship' ? 'bg-emerald-500' : 'bg-[#255A84]'}`}>
-                      {s.name?.charAt(0)}
+                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden ${reportType === 'internship' ? 'bg-emerald-500' : 'bg-[#255A84]'}`}>
+                      {s.photoURL ? <img src={s.photoURL} alt={s.name} className="h-full w-full object-cover" /> : <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1 bg-white" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-slate-800 text-sm truncate">{s.name}</p>

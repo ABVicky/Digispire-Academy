@@ -74,7 +74,7 @@ export default function AdminLayout() {
             {userProfile?.photoURL ? (
               <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover" />
             ) : (
-              <span className="text-xs font-black">{userProfile?.name?.charAt(0)}</span>
+              <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1.5" />
             )}
           </NavLink>
           <button
@@ -124,7 +124,7 @@ export default function AdminLayout() {
               {userProfile?.photoURL ? (
                 <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover" />
               ) : (
-                <span className="text-sm">{userProfile?.name?.charAt(0)}</span>
+                <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1.5" />
               )}
             </div>
             <div className="flex-1 min-w-0">

@@ -1427,8 +1427,12 @@ export default function AttendancePage() {
                 {/* Profile card */}
                 <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-xl bg-[#255A84] text-white flex items-center justify-center font-bold text-sm">
-                      {selectedStudent.name.charAt(0)}
+                    <div className="h-12 w-12 rounded-xl bg-[#255A84] text-white flex items-center justify-center font-bold text-sm overflow-hidden shrink-0">
+                      {selectedStudent.photoURL ? (
+                        <img src={selectedStudent.photoURL} alt={selectedStudent.name} className="h-full w-full object-cover" />
+                      ) : (
+                        <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1.5 bg-white" />
+                      )}
                     </div>
                     <div>
                       <h3 className="font-bold text-slate-800 text-sm">{selectedStudent.name}</h3>

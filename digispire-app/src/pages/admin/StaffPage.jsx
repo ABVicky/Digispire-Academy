@@ -253,10 +253,10 @@ export default function StaffPage() {
                       <tr key={member.id} className="group hover:bg-slate-50/60 transition-colors">
                         <td className="px-6 py-3.5">
                           <div className="flex items-center gap-3">
-                            <div className={`h-10 w-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 ${
+                            <div className={`h-10 w-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden ${
                               member.role === 'admin' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'
                             }`}>
-                              {member.name?.charAt(0)?.toUpperCase()}
+                              {member.photoURL ? <img src={member.photoURL} alt={member.name} className="h-full w-full object-cover" /> : <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1 bg-white" />}
                             </div>
                             <div className="min-w-0">
                               <p className="font-bold text-slate-800 text-sm truncate">{member.name}</p>
@@ -304,10 +304,10 @@ export default function StaffPage() {
                 return (
                   <div key={member.id} className="student-card-mobile">
                     <div className="flex items-start gap-3">
-                      <div className={`h-11 w-11 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 ${
+                      <div className={`h-11 w-11 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden ${
                         member.role === 'admin' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'
                       }`}>
-                        {member.name?.charAt(0)?.toUpperCase()}
+                        {member.photoURL ? <img src={member.photoURL} alt={member.name} className="h-full w-full object-cover" /> : <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1.5 bg-white" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-slate-800 text-sm truncate">{member.name}</p>

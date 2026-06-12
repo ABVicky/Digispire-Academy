@@ -38,8 +38,8 @@ function StudentCardMobile({ student, batches, onOpenIdCard }) {
   return (
     <div className="student-card-mobile">
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl bg-[#255A84] text-white flex items-center justify-center font-bold text-sm shrink-0">
-          {student.name?.charAt(0)}
+        <div className="h-10 w-10 rounded-xl bg-[#255A84] text-white flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden">
+          {student.photoURL ? <img src={student.photoURL} alt={student.name} className="h-full w-full object-cover" /> : <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1 bg-white" />}
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-bold text-slate-800 text-sm truncate">{student.name}</p>
@@ -1035,8 +1035,8 @@ export default function AdminDashboard() {
                         {selectedStudentForIdCard.photoURL ? (
                           <img src={selectedStudentForIdCard.photoURL} alt={selectedStudentForIdCard.name} className="h-full w-full object-cover rounded-xl" />
                         ) : (
-                          <div className="h-full w-full bg-[#255A84]/50 flex items-center justify-center text-white text-3xl font-bold font-heading rounded-xl">
-                            {selectedStudentForIdCard.name?.charAt(0)}
+                          <div className="h-full w-full bg-white flex items-center justify-center rounded-xl p-2.5">
+                            <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
                           </div>
                         )}
                       </div>

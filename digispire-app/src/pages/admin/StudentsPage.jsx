@@ -32,7 +32,8 @@ const emptyForm = {
   studentId: '', 
   tempPassword: '',
   joiningDate: new Date().toISOString().split('T')[0],
-  courseId: ''
+  courseId: '',
+  mentorId: ''
 };
 
 function StatChip({ label, value, icon: Icon, color }) {
@@ -55,6 +56,7 @@ export default function StudentsPage() {
   const [courses, setCourses] = useState([]);
   const [modules, setModules] = useState([]);
   const [batches, setBatches] = useState([]);
+  const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterBatch, setFilterBatch] = useState('all'); // all, morning, evening, internship
@@ -126,6 +128,13 @@ export default function StudentsPage() {
       console.error('Failed to fetch batches:', err);
     }
 
+    try {
+      const staffSnap = await getDocs(query(collection(db, 'users'), where('role', 'in', ['admin', 'educator'])));
+      setStaff(staffSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (err) {
+      console.error('Failed to fetch staff:', err);
+    }
+
     setLoading(false);
   };
 
@@ -157,7 +166,8 @@ export default function StudentsPage() {
       studentId: s.studentId,
       tempPassword: '',
       joiningDate: s.joiningDate || new Date().toISOString().split('T')[0],
-      courseId: s.courseId || ''
+      courseId: s.courseId || '',
+      mentorId: s.mentorId || ''
     });
     setEditingId(s.id);
     setShowModal(true);
@@ -188,7 +198,8 @@ export default function StudentsPage() {
         joiningDate: form.joiningDate,
         courseId: form.courseId || '',
         course: selectedCourseObj ? selectedCourseObj.name : '',
-        role: 'student'
+        role: 'student',
+        mentorId: form.mentorId || ''
       };
 
       if (!editingId) {
@@ -356,12 +367,17 @@ export default function StudentsPage() {
                         <td className="px-6 py-3.5">
                           <div className="flex items-center gap-3">
                             <div className="h-10 w-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden shrink-0 bg-[#255A84]">
-                              {s.photoURL ? <img src={s.photoURL} alt={s.name} className="h-full w-full object-cover" /> : s.name?.charAt(0)}
+                              {s.photoURL ? <img src={s.photoURL} alt={s.name} className="h-full w-full object-cover" /> : <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1.5 bg-white" />}
                             </div>
                             <div className="min-w-0">
                               <p className="font-bold text-slate-800 text-sm truncate">{s.name}</p>
-                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{s.studentId}</p>
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">{s.studentId}</p>
                               {s.course && <p className="text-[10px] font-semibold text-[#255A84] mt-0.5 truncate max-w-[160px]">{s.course}</p>}
+                              {s.mentorId && (
+                                <p className="text-[10px] font-bold text-emerald-600 mt-0.5 truncate max-w-[160px]">
+                                  Mentor: {staff.find(m => m.id === s.mentorId)?.name || 'Loading...'}
+                                </p>
+                              )}
                             </div>
                           </div>
                         </td>
@@ -415,12 +431,17 @@ export default function StudentsPage() {
                     {/* Top row: avatar + info */}
                     <div className="flex items-start gap-3">
                       <div className="h-11 w-11 rounded-xl bg-[#255A84] text-white flex items-center justify-center font-bold text-base shrink-0 overflow-hidden">
-                        {s.photoURL ? <img src={s.photoURL} alt={s.name} className="h-full w-full object-cover" /> : s.name?.charAt(0)}
+                        {s.photoURL ? <img src={s.photoURL} alt={s.name} className="h-full w-full object-cover" /> : <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1.5 bg-white" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-slate-800 text-sm truncate">{s.name}</p>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mt-0.5">{s.studentId}</p>
                         {s.course && <p className="text-[10px] text-[#255A84] font-semibold mt-0.5 truncate">{s.course}</p>}
+                        {s.mentorId && (
+                          <p className="text-[10px] font-bold text-emerald-600 mt-0.5 truncate">
+                            Mentor: {staff.find(m => m.id === s.mentorId)?.name || 'Loading...'}
+                          </p>
+                        )}
                       </div>
                       {/* Action buttons – always visible on touch */}
                       <div className="flex items-center gap-1.5 shrink-0">
@@ -521,6 +542,20 @@ export default function StudentsPage() {
                     <option value="">Select Course Track...</option>
                     {courses.map(c => (
                       <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Assigned Mentor / Educator</label>
+                  <select
+                    value={form.mentorId}
+                    onChange={e => setForm(f => ({ ...f, mentorId: e.target.value }))}
+                    className="select-premium cursor-pointer"
+                  >
+                    <option value="">No Mentor Assigned</option>
+                    {staff.map(member => (
+                      <option key={member.id} value={member.id}>{member.name} ({member.role})</option>
                     ))}
                   </select>
                 </div>
@@ -633,8 +668,8 @@ export default function StudentsPage() {
                         {selectedStudentForIdCard.photoURL ? (
                           <img src={selectedStudentForIdCard.photoURL} alt={selectedStudentForIdCard.name} className="h-full w-full object-cover rounded-xl" />
                         ) : (
-                          <div className="h-full w-full bg-[#255A84]/50 flex items-center justify-center text-white text-3xl font-bold font-heading rounded-xl">
-                            {selectedStudentForIdCard.name?.charAt(0)}
+                          <div className="h-full w-full bg-white flex items-center justify-center rounded-xl p-2.5">
+                            <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
                           </div>
                         )}
                       </div>

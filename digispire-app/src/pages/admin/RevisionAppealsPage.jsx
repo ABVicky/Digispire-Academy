@@ -181,8 +181,8 @@ export default function RevisionAppealsPage() {
               <div className="space-y-4">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-[#255A84] font-bold uppercase text-sm">
-                      {appeal.studentName?.charAt(0)}
+                    <div className="h-10 w-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-[#255A84] font-bold uppercase text-sm overflow-hidden shrink-0">
+                      {appeal.studentPhotoURL ? <img src={appeal.studentPhotoURL} alt={appeal.studentName} className="h-full w-full object-cover" /> : <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1.5 bg-white" />}
                     </div>
                     <div>
                       <p className="font-bold text-slate-800 text-sm leading-none">{appeal.studentName}</p>
