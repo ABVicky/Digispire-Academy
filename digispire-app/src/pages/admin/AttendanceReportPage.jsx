@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { calculateAttendance } from '../../utils/attendanceEngine';
 import AttendanceCalendar from '../../components/AttendanceCalendar';
+import { downloadCSV } from '../../utils/csvExport';
 
 export default function AttendanceReportPage() {
   const [loading, setLoading] = useState(true);
@@ -198,6 +199,89 @@ export default function AttendanceReportPage() {
 
   const filteredReport = processReport();
 
+  const handleDownloadExcel = () => {
+    if (filteredReport.length === 0) {
+      alert("No attendance data to download.");
+      return;
+    }
+
+    // 1. Gather all unique dates across all students in the report (excluding 'no-class' days)
+    const allDatesSet = new Set();
+    filteredReport.forEach(student => {
+      if (student.dailyStatus) {
+        Object.keys(student.dailyStatus).forEach(dateStr => {
+          if (student.dailyStatus[dateStr] !== 'no-class') {
+            allDatesSet.add(dateStr);
+          }
+        });
+      }
+    });
+
+    const sortedDates = Array.from(allDatesSet).sort();
+
+    // 2. Define headers
+    const headers = [
+      'Student ID',
+      'Name',
+      'Batch',
+      'Course',
+      'Eligible Classes',
+      'Present Classes',
+      'Leaves',
+      'Absent Classes',
+      'Attendance Score (%)',
+      ...sortedDates
+    ];
+
+    // Status display map
+    const statusMap = {
+      present: 'Present',
+      makeup: 'Makeup',
+      leave: 'Leave',
+      absent: 'Absent',
+      holiday: 'Holiday',
+      cancelled: 'Cancelled',
+      'no-class': '-'
+    };
+
+    // 3. Build rows
+    const rows = filteredReport.map(student => {
+      let batchName = 'Unknown';
+      if (reportType === 'internship') {
+        batchName = 'Internship';
+      } else if (selectedBatchId !== 'all') {
+        const bObj = batches.find(b => b.id === selectedBatchId);
+        batchName = bObj ? bObj.name : selectedBatchId;
+      } else {
+        const targetBatchId = student.batchId || student.batchIds?.[0] || 'morning';
+        const bObj = batches.find(b => b.id === targetBatchId);
+        batchName = bObj ? bObj.name : targetBatchId;
+      }
+
+      const dateStatuses = sortedDates.map(dateStr => {
+        const status = student.dailyStatus?.[dateStr] || 'no-class';
+        return statusMap[status] || status;
+      });
+
+      return [
+        student.studentId || '',
+        student.name || '',
+        batchName,
+        student.course || '',
+        student.totalHeld,
+        student.attended,
+        student.leaves,
+        student.absent,
+        `${student.percentage}%`,
+        ...dateStatuses
+      ];
+    });
+
+    const trackLabel = reportType === 'internship' ? 'Internship' : 'Academic';
+    const filename = `Attendance_Report_${trackLabel}_${selectedBatchId}_${new Date().toISOString().split('T')[0]}.csv`;
+    downloadCSV(headers, rows, filename);
+  };
+
   // Keep currently inspected student updated with fresh data
   const inspectStudentId = inspectStudent?.id;
   useEffect(() => {
@@ -218,9 +302,14 @@ export default function AttendanceReportPage() {
           <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Attendance Ledger</h1>
           <p className="text-xs text-slate-400 font-medium mt-0.5">Auto-computed statistics for regular and internship tracks</p>
         </div>
-        <button onClick={() => window.print()} className="flex items-center gap-2 btn-primary-premium px-4 py-2.5 self-start sm:self-auto">
-          <Download size={14} /> Print Report
-        </button>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <button onClick={() => window.print()} className="flex items-center gap-2 btn-outline-premium px-4 py-2.5">
+            <Download size={14} /> Print Report
+          </button>
+          <button onClick={handleDownloadExcel} className="flex items-center gap-2 btn-primary-premium px-4 py-2.5">
+            <Download size={14} /> Download Excel
+          </button>
+        </div>
       </div>
 
       {/* Control Bar */}

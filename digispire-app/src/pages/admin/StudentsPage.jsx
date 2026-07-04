@@ -7,9 +7,10 @@ import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { db, firebaseConfig } from '../../firebase';
 import { 
   Plus, Search, Pencil, Trash2, X, Users, Phone, Lock, 
-  Briefcase, Check, Calendar, Loader2, CreditCard
+  Briefcase, Check, Calendar, Loader2, CreditCard, Download
 } from 'lucide-react';
 import QRCode from 'qrcode';
+import { downloadCSV } from '../../utils/csvExport';
 
 function generateStudentId() {
   return 'DS' + Math.floor(100000 + Math.random() * 900000);
@@ -262,6 +263,55 @@ export default function StudentsPage() {
     return matchesSearch && enrolledBatches.includes(filterBatch);
   });
 
+  const handleDownloadStudents = () => {
+    if (filtered.length === 0) {
+      alert("No student records to download.");
+      return;
+    }
+
+    const headers = [
+      'Student ID',
+      'Name',
+      'Email',
+      'Phone',
+      'Course Track',
+      'Assigned Mentor',
+      'Joining Date',
+      'Academic Batches',
+      'Internship Enrolled',
+      'Progress (%)'
+    ];
+
+    const rows = filtered.map(s => {
+      const courseName = s.course || '—';
+      const mentorName = s.mentorId ? (staff.find(m => m.id === s.mentorId)?.name || 'Loading...') : 'None';
+      
+      const academicBatches = (s.batchIds || [s.batchId || 'morning']).map(bId => {
+        return batches.find(b => b.id === bId)?.name || bId;
+      }).join(', ');
+
+      const isInternEnrolled = s.isIntern ? 'Yes' : 'No';
+      const progressValue = `${calcProgress(s)}%`;
+
+      return [
+        s.studentId || '',
+        s.name || '',
+        s.email || '',
+        s.phone || '',
+        courseName,
+        mentorName,
+        s.joiningDate || '—',
+        academicBatches,
+        isInternEnrolled,
+        progressValue
+      ];
+    });
+
+    const batchLabel = filterBatch === 'all' ? 'All_Batches' : filterBatch;
+    const filename = `Student_Registry_${batchLabel}_${new Date().toISOString().split('T')[0]}.csv`;
+    downloadCSV(headers, rows, filename);
+  };
+
   return (
     <div className="space-y-5">
       <div className="section-header">
@@ -269,9 +319,14 @@ export default function StudentsPage() {
           <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Student Registry</h1>
           <p className="text-xs text-slate-400 font-medium mt-0.5">Manage profiles, joining dates, and batch enrolment</p>
         </div>
-        <button onClick={openAdd} className="btn-primary-premium px-4 py-2.5 self-start sm:self-auto">
-          <Plus size={16} /> New Student
-        </button>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <button onClick={handleDownloadStudents} className="btn-outline-premium px-4 py-2.5 flex items-center gap-2">
+            <Download size={15} /> Export Registry
+          </button>
+          <button onClick={openAdd} className="btn-primary-premium px-4 py-2.5 flex items-center gap-2">
+            <Plus size={16} /> New Student
+          </button>
+        </div>
       </div>
 
       {/* Stats grid – 2 col on mobile, auto on wider */}
