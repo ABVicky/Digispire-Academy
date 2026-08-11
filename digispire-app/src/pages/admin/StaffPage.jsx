@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   collection, getDocs, query, where, setDoc, doc,
   updateDoc, deleteDoc, serverTimestamp
@@ -35,7 +35,7 @@ export default function StaffPage() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(null);
 
-  const fetchStaff = async () => {
+  const fetchStaff = useCallback(async () => {
     setLoading(true);
     try {
       const snap = await getDocs(
@@ -47,11 +47,11 @@ export default function StaffPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchStaff();
-  }, []);
+  }, [fetchStaff]);
 
   const openAdd = () => {
     setForm(emptyForm);

@@ -3,7 +3,7 @@ import { collection, getDocs, updateDoc, deleteDoc, doc, query, orderBy, serverT
 import { db } from '../../firebase';
 import { useAuth } from '../../context/AuthContext';
 import {
-  FolderOpen, Calendar, Check, Trash2, X, MessageSquare, Search,
+  FolderOpen, Check, Trash2, X, MessageSquare, Search,
   CheckCircle2, Clock, AlertCircle, ExternalLink, Loader2
 } from 'lucide-react';
 

@@ -6,7 +6,7 @@ import {
 import { db } from '../../firebase';
 import {
   QrCode, Clock, History, Trash2, X, Users, Calendar, 
-  Settings, ShieldAlert, Plus, Check, Play, UserCheck, AlertTriangle
+  Settings, ShieldAlert, Plus, Play, UserCheck, AlertTriangle
 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { calculateAttendance } from '../../utils/attendanceEngine';
@@ -732,65 +732,92 @@ export default function AttendancePage() {
     : null;
 
   return (
-    <div className="space-y-5">
-      {/* ─── Page Header ─── */}
-      <div className="section-header">
+    <div className="space-y-5 pb-12 font-sans">
+      {/* ─── Page Header with Live Broadcast Pulse ─── */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-100/80 shadow-sm">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Live Attendance Console</h1>
-          <p className="text-xs text-slate-400 font-medium mt-0.5">Broadcast check-in codes, configure schedules, and inspect records</p>
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#255A84] to-[#1a4261] text-white flex items-center justify-center shadow-md shadow-[#255A84]/20 shrink-0">
+              <QrCode size={20} />
+            </div>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-lg sm:text-2xl font-extrabold text-slate-800 tracking-tight">Live Attendance Console</h1>
+                {qrData ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-extrabold bg-rose-50 text-rose-600 border border-rose-200 uppercase tracking-wider animate-pulse shrink-0">
+                    <span className="h-2 w-2 rounded-full bg-rose-600" />
+                    Broadcasting Live
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-extrabold bg-slate-100 text-slate-500 border border-slate-200/60 uppercase tracking-wider shrink-0">
+                    <span className="h-2 w-2 rounded-full bg-slate-400" />
+                    Console Ready
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5 truncate max-w-md sm:max-w-none">
+                Broadcast QR entry passes, manage schedules, and inspect student check-ins
+              </p>
+            </div>
+          </div>
         </div>
-        
-        {/* Tabs + action – responsive layout */}
-        <div className="flex flex-col gap-2 self-start sm:self-auto w-full sm:w-auto">
-          {/* Tab bar – horizontally scrollable on tiny phones */}
-          <div className="tabs-scroll bg-slate-100 rounded-2xl">
+
+        {/* Tab Switcher & Log Action */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <div className="bg-slate-100 p-1 rounded-2xl flex items-center gap-1 overflow-x-auto no-scrollbar max-w-full shrink-0">
             {[
-              { id: 'live', label: 'Live', icon: QrCode },
-              { id: 'schedules', label: 'Schedules', icon: Settings },
-              { id: 'calendar', label: 'Calendar', icon: Calendar },
-              { id: 'inspector', label: 'Inspector', icon: UserCheck },
+              { id: 'live', label: 'Live', fullLabel: 'Live Broadcaster', icon: QrCode },
+              { id: 'schedules', label: 'Schedules', fullLabel: 'Class Schedules', icon: Settings },
+              { id: 'calendar', label: 'Calendar', fullLabel: 'Calendar', icon: Calendar },
+              { id: 'inspector', label: 'Inspector', fullLabel: 'Student Inspector', icon: UserCheck },
             ].map(tab => (
               <button
                 key={tab.id}
                 onClick={() => { triggerHaptic('light'); setActiveTab(tab.id); }}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
-                  activeTab === tab.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+                  activeTab === tab.id
+                    ? 'bg-white text-[#255A84] shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
-                <tab.icon size={12} />
-                {tab.label}
+                <tab.icon size={14} />
+                <span className="sm:hidden">{tab.label}</span>
+                <span className="hidden sm:inline">{tab.fullLabel}</span>
               </button>
             ))}
           </div>
 
-          {/* Log Manual — full width on mobile, inline on sm+ */}
           <button
             onClick={() => { triggerHaptic('light'); setShowManualModal(true); }}
-            className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#255A84] hover:bg-[#1a4261] text-white rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-sm transition active:scale-95 cursor-pointer w-full sm:w-auto"
+            className="flex items-center justify-center gap-1.5 px-4 py-2 sm:py-2.5 bg-[#255A84] hover:bg-[#1a4261] text-white rounded-xl text-xs font-bold transition shadow-md shadow-[#255A84]/20 active:scale-95 cursor-pointer w-full sm:w-auto shrink-0"
           >
-            <Plus size={13} />
-            Log Manual Attendance
+            <Plus size={15} />
+            <span>Log Manual Entry</span>
           </button>
         </div>
       </div>
 
-      {/* Broadcaster Console Tab */}
+      {/* ─── Broadcaster Console Tab ─── */}
       {activeTab === 'live' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
-          {/* Left Control Card */}
-          <div className="lg:col-span-1 card-premium p-6 sm:p-8 flex flex-col justify-between">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 animate-in fade-in duration-300">
+          {/* Left Broadcaster Card */}
+          <div className="lg:col-span-1 bg-white rounded-2xl border border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col justify-between space-y-5">
             <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
-                  <QrCode size={18} className="text-[#255A84]" /> Code Broadcaster
-                </h2>
-                
-                {/* Switcher inside broadcaster */}
+              <div className="flex justify-between items-center pb-3.5 border-b border-slate-100 mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-blue-50 text-[#255A84] rounded-lg">
+                    <QrCode size={18} />
+                  </div>
+                  <h2 className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider">
+                    QR Broadcaster
+                  </h2>
+                </div>
+
                 <select
                   disabled={!!qrData}
                   value={broadcastBatch}
                   onChange={e => setBroadcastBatch(e.target.value)}
-                  className="select-premium py-1 px-3.5 text-xs uppercase font-bold tracking-widest max-w-[120px] bg-slate-50 border border-slate-100 rounded-lg cursor-pointer"
+                  className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider bg-slate-50 border border-slate-200/80 rounded-xl text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all cursor-pointer disabled:opacity-60 max-w-[130px]"
                 >
                   {batches.length === 0 ? (
                     <>
@@ -807,47 +834,53 @@ export default function AttendancePage() {
               </div>
 
               {qrData ? (
-                <div className="space-y-6 text-center">
-                  <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl inline-block shadow-sm">
-                    {qrImageUrl && <img src={qrImageUrl} alt="QR Code" className="h-52 w-52 mx-auto object-contain rounded-2xl" />}
+                <div className="space-y-4 text-center">
+                  <div className="p-4 bg-gradient-to-b from-slate-50 to-blue-50/30 border border-slate-200/80 rounded-3xl inline-block shadow-md max-w-full">
+                    {qrImageUrl && (
+                      <img src={qrImageUrl} alt="QR Code" className="max-w-[190px] sm:max-w-[210px] w-full h-auto mx-auto object-contain rounded-2xl bg-white p-2 shadow-xs" />
+                    )}
                   </div>
-                  <div>
-                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Active Verification Code</p>
-                    <p className="text-3xl font-black text-slate-800 tracking-widest mt-1 font-mono">{qrData.sessionId}</p>
+
+                  <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-1">
+                    <p className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">Active Verification Code</p>
+                    <p className="text-2xl sm:text-3xl font-black text-slate-800 tracking-widest font-mono text-[#255A84]">{qrData.sessionId}</p>
                   </div>
-                  
+
                   {qrData.coveredCourse && (
-                    <div className="p-4 bg-blue-50/50 border border-blue-100/40 rounded-2xl text-left space-y-1">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Class Details</p>
-                      <p className="text-xs font-bold text-slate-700">
+                    <div className="p-3.5 bg-blue-50/60 border border-blue-100 rounded-2xl text-left space-y-1">
+                      <p className="text-[9px] font-extrabold text-[#255A84] uppercase tracking-wider">Active Curriculum Topic</p>
+                      <p className="text-xs font-bold text-slate-800">
                         {courses.find(c => c.id === qrData.coveredCourse)?.name || qrData.coveredCourse}
                       </p>
                       {qrData.coveredModule && (
-                        <p className="text-[11px] text-slate-500 font-medium">
-                          {modules.find(m => m.id === qrData.coveredModule)?.title || qrData.coveredModule}
+                        <p className="text-[11px] text-slate-600 font-semibold">
+                          Module: {modules.find(m => m.id === qrData.coveredModule)?.title || qrData.coveredModule}
                         </p>
                       )}
                       {qrData.coveredTopics?.length > 0 && (
-                        <p className="text-[10px] text-slate-400 font-semibold mt-1">
+                        <p className="text-[10px] text-slate-500 font-medium">
                           Topics: {qrData.coveredTopics.map(tid => topics.find(t => t.id === tid)?.title || tid).join(', ')}
                         </p>
                       )}
                     </div>
                   )}
 
-                  <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center gap-3">
-                    <Clock size={16} className="text-[#255A84]" />
-                    <span className="text-xs font-bold text-slate-700">Expires: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</span>
+                  {/* Timer Ring */}
+                  <div className="p-3 bg-rose-50/60 border border-rose-100 rounded-2xl flex items-center justify-center gap-2">
+                    <Clock size={15} className="text-rose-600 animate-pulse" />
+                    <span className="text-xs font-bold text-rose-700">
+                      Session Expires in: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
+                    </span>
                   </div>
 
                   {/* Quick Manual Check-in */}
-                  <form onSubmit={handleQuickCheckIn} className="pt-4 border-t border-slate-200/60 space-y-3">
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest text-left ml-1">Quick Check-in Student</label>
+                  <form onSubmit={handleQuickCheckIn} className="pt-3 border-t border-slate-100 space-y-2 text-left">
+                    <label className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Quick Student Check-in</label>
                     <div className="flex gap-2">
                       <select
                         value={quickStudentId}
                         onChange={e => setQuickStudentId(e.target.value)}
-                        className="select-premium py-2 text-xs flex-1 cursor-pointer"
+                        className="px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 flex-1 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all min-w-0"
                       >
                         <option value="">Select Student...</option>
                         {students
@@ -863,38 +896,47 @@ export default function AttendancePage() {
                           ))
                         }
                       </select>
-                      <button type="submit" disabled={!quickStudentId} className="px-4 py-2 bg-[#255A84] hover:bg-[#1a4261] text-white rounded-xl text-xs font-bold transition disabled:opacity-50 active:scale-95 shrink-0">
+                      <button
+                        type="submit"
+                        disabled={!quickStudentId}
+                        className="px-3.5 py-2 bg-[#255A84] hover:bg-[#1a4261] text-white rounded-xl text-xs font-bold transition disabled:opacity-50 active:scale-95 shrink-0 shadow-xs"
+                      >
                         Check-in
                       </button>
                     </div>
                   </form>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <div className="p-4 bg-blue-50/50 border border-blue-100/60 rounded-2xl text-blue-600 text-xs font-medium leading-relaxed">
-                    Generate an entry pass for the <strong>{broadcastBatch}</strong> batch. Students scan this or input the session code to mark present.
+                /* Inactive Session Form */
+                <div className="space-y-3.5">
+                  <div className="p-3 bg-blue-50/60 border border-blue-100 rounded-2xl text-blue-700 text-xs font-semibold leading-relaxed flex items-start gap-2">
+                    <QrCode size={15} className="shrink-0 mt-0.5 text-[#255A84]" />
+                    <span>
+                      Generate an active entry pass for <strong>{broadcastBatch}</strong> batch. Students scan this QR code to mark attendance.
+                    </span>
                   </div>
-                  
+
                   {broadcastBatch !== 'internship' ? (
-                    <>
+                    <div className="space-y-3">
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Enrolled Course *</label>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Course Track *</label>
                         <select
                           value={selectedCourse}
                           onChange={e => { setSelectedCourse(e.target.value); setSelectedModule(''); setSelectedTopics([]); }}
-                          className="select-premium cursor-pointer"
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all"
                         >
                           <option value="">Select Course...</option>
                           {courses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
                       </div>
+
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Academic Module *</label>
-                        <select 
-                          value={selectedModule} 
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Academic Module *</label>
+                        <select
+                          value={selectedModule}
                           onChange={e => { setSelectedModule(e.target.value); setSelectedTopics([]); }}
                           disabled={!selectedCourse}
-                          className="select-premium disabled:opacity-50"
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all disabled:opacity-50"
                         >
                           <option value="">Select Module...</option>
                           {modules.filter(m => m.courseId === selectedCourse).map(m => (
@@ -905,16 +947,16 @@ export default function AttendancePage() {
 
                       {selectedModule && (
                         <div>
-                          <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Topics Credit Synced</label>
-                          <div className="mt-1 max-h-32 overflow-y-auto no-scrollbar border border-slate-100 rounded-2xl p-2 bg-slate-50/50">
+                          <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Topics Credit Synced</label>
+                          <div className="mt-1 max-h-32 overflow-y-auto no-scrollbar border border-slate-200/60 rounded-2xl p-2 bg-slate-50/70 space-y-1">
                             {topics.filter(t => t.moduleId === selectedModule).length === 0 ? (
-                              <p className="text-xs text-slate-400 p-2 text-center">No topics found.</p>
+                              <p className="text-xs text-slate-400 p-2 text-center">No topics configured in this module.</p>
                             ) : (
                               topics.filter(t => t.moduleId === selectedModule).map(topic => (
-                                <label key={topic.id} className="flex items-start gap-2.5 px-2.5 py-2 hover:bg-white rounded-xl cursor-pointer transition-colors border border-transparent hover:border-slate-100">
-                                  <input 
-                                    type="checkbox" 
-                                    className="mt-0.5 rounded text-[#255A84] focus:ring-[#255A84] border-slate-300 flex-shrink-0"
+                                <label key={topic.id} className="flex items-center gap-2 px-2.5 py-1.5 hover:bg-white rounded-xl cursor-pointer transition-colors border border-transparent hover:border-slate-100">
+                                  <input
+                                    type="checkbox"
+                                    className="rounded text-[#255A84] focus:ring-[#255A84] border-slate-300"
                                     checked={selectedTopics.includes(topic.id)}
                                     onChange={(e) => {
                                       if (e.target.checked) setSelectedTopics(prev => [...prev, topic.id]);
@@ -928,108 +970,193 @@ export default function AttendancePage() {
                           </div>
                         </div>
                       )}
-                    </>
+                    </div>
                   ) : (
-                    <div className="p-4 bg-emerald-50/50 border border-emerald-100/60 rounded-2xl text-emerald-600 text-xs font-semibold leading-relaxed">
-                      Internship track logs daily attendance only. No course curriculum topics are required.
+                    <div className="p-3 bg-emerald-50/60 border border-emerald-100 rounded-2xl text-emerald-700 text-xs font-semibold leading-relaxed">
+                      Internship track logs daily attendance only.
                     </div>
                   )}
                 </div>
               )}
             </div>
 
-            <div>
+            <div className="pt-3 border-t border-slate-100">
               {qrData ? (
                 <button
                   onClick={discardQR}
-                  className="w-full mt-8 py-4 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl font-bold text-xs uppercase tracking-widest transition active:scale-95 flex items-center justify-center gap-2 border border-rose-100 cursor-pointer"
+                  className="w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl font-bold text-xs uppercase tracking-wider transition active:scale-95 flex items-center justify-center gap-2 border border-rose-200 cursor-pointer"
                 >
-                  <X size={14} /> Discard Session
+                  <X size={15} /> Discard Live Session
                 </button>
               ) : (
                 <button
                   onClick={generateQR}
-                  className="w-full mt-8 py-4 text-white rounded-xl font-bold text-xs uppercase tracking-widest transition flex items-center justify-center gap-2 active:scale-95 cursor-pointer btn-primary-premium"
+                  className="w-full py-3 bg-gradient-to-r from-[#255A84] to-[#1c4566] hover:from-[#1c4566] hover:to-[#14334c] text-white rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-md shadow-[#255A84]/20 flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
                 >
-                  <Play size={14} />
+                  <Play size={15} fill="white" />
                   Start {broadcastBatch} Session
                 </button>
               )}
             </div>
           </div>
 
-          {/* Live Feed Card */}
-          <div className="lg:col-span-2 card-premium overflow-hidden">
-            <div className="p-6 border-b border-slate-50 flex items-center justify-between">
-              <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2 font-sans">
-                <History size={18} className="text-[#255A84]" /> Dynamic Live Feed (Today: {stats.today})
-              </h2>
+          {/* Right Live Stream Activity Feed */}
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col justify-between">
+            <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="p-1.5 bg-blue-50 text-[#255A84] rounded-lg shrink-0">
+                  <History size={18} />
+                </div>
+                <h2 className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider truncate">
+                  Live Attendance Check-ins
+                </h2>
+              </div>
+
+              <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[10px] sm:text-xs font-bold shrink-0">
+                Today: {stats.today}
+              </span>
             </div>
 
-            <div className="overflow-y-auto max-h-[60vh] sm:max-h-[500px]">
+            <div className="overflow-y-auto max-h-[500px] flex-1">
               {loadingFeed && records.length === 0 ? (
-                <div className="py-20 flex justify-center"><div className="animate-spin h-6 w-6 border-2 border-[#255A84] border-t-transparent rounded-full" /></div>
+                <div className="py-16 flex flex-col items-center justify-center gap-2 text-slate-400 text-xs font-bold">
+                  <div className="animate-spin h-6 w-6 border-2 border-[#255A84] border-t-transparent rounded-full" />
+                  Syncing live stream feed...
+                </div>
               ) : records.length === 0 ? (
-                <div className="py-20 text-center text-slate-400">
-                  <Users size={40} className="mx-auto mb-3 opacity-20" />
-                  <p className="text-sm font-bold">No attendance logs broadcasted today</p>
+                <div className="py-16 text-center text-slate-400 space-y-2">
+                  <Users size={40} className="mx-auto opacity-20 text-slate-500" />
+                  <p className="text-sm font-bold text-slate-700">No Check-in Logs Today</p>
+                  <p className="text-xs text-slate-400">Student check-ins will appear here in real-time as they scan.</p>
                 </div>
               ) : (
-                <table className="w-full text-sm responsive-table">
-                  <thead className="bg-slate-50/50 text-[11px] font-bold uppercase tracking-widest text-slate-400 sticky top-0 z-10">
-                    <tr>
-                      <th className="text-left px-8 py-3">Student</th>
-                      <th className="text-left px-4 py-3">Track</th>
-                      <th className="text-left px-4 py-3">Topic Credited</th>
-                      <th className="text-left px-4 py-3">Check-in Time</th>
-                      <th className="text-right px-8 py-3">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50">
+                <>
+                  {/* MOBILE STACKED CARDS VIEW (< md) */}
+                  <div className="block md:hidden divide-y divide-slate-100">
                     {records.map(record => (
-                      <tr key={record.id} className="group hover:bg-slate-50/50 transition-colors">
-                        <td className="px-8 py-4" data-label="Student">
-                          <p className="font-bold text-slate-800">{record.name}</p>
-                          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest font-mono">{record.studentId}</p>
-                        </td>
-                        <td className="px-4 py-4" data-label="Track">
-                          <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest ${
-                            record.type === 'internship' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 
-                            record.batchId === 'morning' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'
+                      <div key={record.id} className="p-4 space-y-2.5 hover:bg-slate-50/70 transition-colors">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="h-8 w-8 rounded-xl bg-[#255A84] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                              {record.name?.charAt(0) || 'S'}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-bold text-slate-800 text-xs truncate">{record.name}</p>
+                              <p className="text-[10px] font-mono text-slate-400 font-bold">{record.studentId}</p>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => deleteRecord(record.id)}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition shrink-0"
+                            title="Remove log"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+
+                        <div className="flex flex-wrap items-center justify-between gap-2 text-xs pt-1 border-t border-slate-50">
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider ${
+                            record.type === 'internship'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : record.batchId === 'morning' ? 'bg-blue-50 text-[#255A84] border border-blue-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
                           }`}>
                             {record.type === 'internship' ? 'Internship' : record.batchId}
                           </span>
-                        </td>
-                        <td className="px-4 py-4" data-label="Topic">
-                          {record.coveredCourse ? (
-                            <div>
-                              <p className="text-xs font-bold text-slate-700">
-                                {courses.find(c => c.id === record.coveredCourse)?.name || 'Unknown Course'}
-                              </p>
-                              <p className="text-[11px] text-slate-500 mt-0.5 font-medium">
-                                {modules.find(m => m.id === record.coveredModule)?.title || 'Unknown Module'}
-                                {record.coveredTopics?.length > 0 && ` • ${record.coveredTopics.length} Topics`}
-                              </p>
-                            </div>
-                          ) : (
-                            <span className="text-[11px] text-slate-400 font-medium italic">General Attendance</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-4 text-slate-500 font-medium" data-label="Check-in Time">
-                          <div className="flex items-center gap-2">
-                            <Clock size={14} className="text-slate-300" />
-                            <span className="text-xs font-semibold font-mono">{record.timestamp?.toDate ? record.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}</span>
+
+                          <span className="text-[10px] font-mono text-slate-500 font-semibold flex items-center gap-1">
+                            <Clock size={11} className="text-slate-400" />
+                            {record.timestamp?.toDate ? record.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
+                          </span>
+                        </div>
+
+                        {record.coveredCourse && (
+                          <div className="text-[10px] bg-slate-50 p-2 rounded-lg border border-slate-100 text-slate-600">
+                            <span className="font-bold text-slate-800">{courses.find(c => c.id === record.coveredCourse)?.name || record.coveredCourse}</span>
+                            {record.coveredModule && ` • ${modules.find(m => m.id === record.coveredModule)?.title || record.coveredModule}`}
                           </div>
-                        </td>
-                        <td className="px-8 py-4 text-right" data-label="Actions">
-                          <button onClick={() => deleteRecord(record.id)} className="p-2.5 btn-outline-premium text-slate-400 hover:text-red-500 hover:bg-slate-50 rounded-xl transition active:scale-95 border border-slate-100 sm:border-transparent hover:border-slate-100 shadow-sm sm:shadow-none sm:opacity-0 sm:group-hover:opacity-100">
-                            <Trash2 size={16} />
-                          </button>
-                        </td>
-                      </tr>
+                        )}
+                      </div>
                     ))}
-                  </tbody>
-                </table>
+                  </div>
+
+                  {/* DESKTOP TABLE VIEW (>= md) */}
+                  <div className="hidden md:block">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                          <th className="px-5 py-3">Student</th>
+                          <th className="px-4 py-3">Track / Batch</th>
+                          <th className="px-4 py-3">Curriculum Topic</th>
+                          <th className="px-4 py-3">Time</th>
+                          <th className="px-4 py-3 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {records.map(record => (
+                          <tr key={record.id} className="hover:bg-slate-50/70 transition-colors">
+                            <td className="px-5 py-3.5">
+                              <div className="flex items-center gap-2.5">
+                                <div className="h-8 w-8 rounded-xl bg-[#255A84] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                                  {record.name?.charAt(0) || 'S'}
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="font-bold text-slate-800 text-xs truncate">{record.name}</p>
+                                  <p className="text-[10px] font-mono text-slate-400 font-bold">{record.studentId}</p>
+                                </div>
+                              </div>
+                            </td>
+
+                            <td className="px-4 py-3.5">
+                              <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
+                                record.type === 'internship'
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                  : record.batchId === 'morning' ? 'bg-blue-50 text-[#255A84] border border-blue-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
+                              }`}>
+                                {record.type === 'internship' ? 'Internship' : record.batchId}
+                              </span>
+                            </td>
+
+                            <td className="px-4 py-3.5">
+                              {record.coveredCourse ? (
+                                <div>
+                                  <p className="text-xs font-bold text-slate-800">
+                                    {courses.find(c => c.id === record.coveredCourse)?.name || record.coveredCourse}
+                                  </p>
+                                  <p className="text-[10px] text-slate-400 font-medium">
+                                    {modules.find(m => m.id === record.coveredModule)?.title || record.coveredModule}
+                                    {record.coveredTopics?.length > 0 && ` • ${record.coveredTopics.length} Topics`}
+                                  </p>
+                                </div>
+                              ) : (
+                                <span className="text-xs text-slate-400 italic">General Check-in</span>
+                              )}
+                            </td>
+
+                            <td className="px-4 py-3.5 text-slate-500 font-medium">
+                              <div className="flex items-center gap-1 text-xs">
+                                <Clock size={12} className="text-slate-400" />
+                                <span className="font-mono text-slate-700 font-bold">
+                                  {record.timestamp?.toDate ? record.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
+                                </span>
+                              </div>
+                            </td>
+
+                            <td className="px-4 py-3.5 text-right">
+                              <button
+                                onClick={() => deleteRecord(record.id)}
+                                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                                title="Remove log"
+                              >
+                                <Trash2 size={15} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               )}
             </div>
           </div>

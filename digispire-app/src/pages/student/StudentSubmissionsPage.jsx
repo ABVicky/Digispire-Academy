@@ -64,7 +64,7 @@ export default function StudentSubmissionsPage() {
     // Simple URL validation
     try {
       new URL(form.link);
-    } catch (_) {
+    } catch {
       setMessage({ type: 'error', text: 'Please enter a valid URL including http:// or https://' });
       return;
     }

@@ -15,6 +15,7 @@ import AttendancePage from './pages/admin/AttendancePage';
 import CoursesPage from './pages/admin/CoursesPage';
 import ContentPage from './pages/admin/ContentPage';
 import AttendanceReportPage from './pages/admin/AttendanceReportPage';
+import CourseCompletionReportPage from './pages/admin/CourseCompletionReportPage';
 import StaffPage from './pages/admin/StaffPage';
 import RevisionAppealsPage from './pages/admin/RevisionAppealsPage';
 import SubmissionsPage from './pages/admin/SubmissionsPage';
@@ -66,6 +67,7 @@ function App() {
               <Route path="courses" element={<CoursesPage />} />
               <Route path="content" element={<ContentPage />} />
               <Route path="reports" element={<AttendanceReportPage />} />
+              <Route path="completion-reports" element={<CourseCompletionReportPage />} />
               <Route path="revisions" element={<RevisionAppealsPage />} />
               <Route path="submissions" element={<SubmissionsPage />} />
               <Route path="profile" element={<ProfilePage />} />

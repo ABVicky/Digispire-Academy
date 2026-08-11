@@ -325,7 +325,7 @@ export default function AdminDashboard() {
     }
 
     if (!isEditingMessage) {
-      setCustomMessage(msg);
+      setCustomMessage(prev => prev === msg ? prev : msg);
     }
   }, [
     showShareModal, shareDate, shareBatchId, selCourseId, selModuleId, selTopicIds,

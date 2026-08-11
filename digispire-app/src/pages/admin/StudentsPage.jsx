@@ -72,6 +72,7 @@ export default function StudentsPage() {
   const [isIdCardFlipped, setIsIdCardFlipped] = useState(false);
 
   useEffect(() => {
+    let isSubscribed = true;
     if (selectedStudentForIdCard) {
       const payload = {
         uid: selectedStudentForIdCard.uid || selectedStudentForIdCard.id,
@@ -84,12 +85,14 @@ export default function StudentsPage() {
         margin: 1,
         width: 256
       })
-      .then(url => setIdCardQrCodeUrl(url))
+      .then(url => {
+        if (isSubscribed) setIdCardQrCodeUrl(url);
+      })
       .catch(err => console.error('Error generating QR code:', err));
-    } else {
-      setIdCardQrCodeUrl('');
-      setIsIdCardFlipped(false);
     }
+    return () => {
+      isSubscribed = false;
+    };
   }, [selectedStudentForIdCard]);
   const fetchData = async () => {
     setLoading(true);
@@ -416,7 +419,6 @@ export default function StudentsPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-50">
                   {filtered.map(s => {
-                    const progress = calcProgress(s);
                     return (
                       <tr key={s.id} className="group hover:bg-slate-50/80 transition-colors">
                         <td className="px-6 py-3.5">

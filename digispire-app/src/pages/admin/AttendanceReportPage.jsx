@@ -246,17 +246,14 @@ export default function AttendanceReportPage() {
 
     // 3. Build rows
     const rows = filteredReport.map(student => {
-      let batchName = 'Unknown';
-      if (reportType === 'internship') {
-        batchName = 'Internship';
-      } else if (selectedBatchId !== 'all') {
-        const bObj = batches.find(b => b.id === selectedBatchId);
-        batchName = bObj ? bObj.name : selectedBatchId;
-      } else {
-        const targetBatchId = student.batchId || student.batchIds?.[0] || 'morning';
-        const bObj = batches.find(b => b.id === targetBatchId);
-        batchName = bObj ? bObj.name : targetBatchId;
-      }
+      const batchName = reportType === 'internship'
+        ? 'Internship'
+        : selectedBatchId !== 'all'
+          ? (batches.find(b => b.id === selectedBatchId)?.name || selectedBatchId)
+          : (() => {
+              const targetBatchId = student.batchId || student.batchIds?.[0] || 'morning';
+              return batches.find(b => b.id === targetBatchId)?.name || targetBatchId;
+            })();
 
       const dateStatuses = sortedDates.map(dateStr => {
         const status = student.dailyStatus?.[dateStr] || 'no-class';

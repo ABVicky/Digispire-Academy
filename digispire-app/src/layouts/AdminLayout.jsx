@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Users, CalendarCheck, FileText,
   LogOut, Menu, X, GraduationCap, ChevronRight,
-  FileSpreadsheet, UserCog, History, FolderOpen
+  FileSpreadsheet, UserCog, History, FolderOpen, Award
 } from 'lucide-react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -17,6 +17,7 @@ const navItems = [
   { path: 'courses', label: 'Course Curriculum', shortLabel: 'Courses', icon: GraduationCap, category: 'Curriculum & Learning' },
   { path: 'content', label: 'Resources Library', shortLabel: 'Library', icon: FileText, category: 'Curriculum & Learning' },
   { path: 'reports', label: 'Attendance Ledgers', shortLabel: 'Reports', icon: FileSpreadsheet, category: 'Evaluation & Audits' },
+  { path: 'completion-reports', label: 'Course Completion Reports', shortLabel: 'Completions', icon: Award, category: 'Evaluation & Audits' },
   { path: 'revisions', label: 'Revision Appeals', shortLabel: 'Revisions', icon: History, category: 'Evaluation & Audits' },
   { path: 'submissions', label: 'Student Submissions', shortLabel: 'Submissions', icon: FolderOpen, category: 'Evaluation & Audits' },
 ];
