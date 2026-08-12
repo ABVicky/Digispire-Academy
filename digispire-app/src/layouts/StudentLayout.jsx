@@ -6,6 +6,8 @@ import {
   LogOut, Menu, X, ChevronRight,
   FileText, FolderUp
 } from 'lucide-react';
+import TriColorConfetti from '../components/TriColorConfetti';
+import { isIndependenceDayActive } from '../utils/independenceDayTheme';
 
 const navItems = [
   { path: 'dashboard', label: 'Portal Overview', shortLabel: 'Home', icon: LayoutDashboard, category: 'Core Portal' },
@@ -29,6 +31,7 @@ export default function StudentLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const isFestiveActive = isIndependenceDayActive();
 
   const handleLogout = async () => {
     await logout();
@@ -36,14 +39,31 @@ export default function StudentLayout() {
   };
 
   return (
-    <div className="min-h-screen-ios bg-slate-50/50 flex flex-col md:flex-row font-sans selection:bg-[#255A84]/15">
+    <div className="min-h-screen-ios bg-slate-50/50 flex flex-col md:flex-row font-sans selection:bg-[#255A84]/15 relative">
+      {/* TriColor Confetti Overlay */}
+      {isFestiveActive && <TriColorConfetti />}
+
+      {/* Top Tri-Color Ribbon */}
+      {isFestiveActive && (
+        <div className="fixed top-0 left-0 right-0 h-1 z-50 flex pointer-events-none">
+          <div className="flex-1 bg-[#FF9933]" />
+          <div className="flex-1 bg-white" />
+          <div className="flex-1 bg-[#138808]" />
+        </div>
+      )}
+
       {/* ── Mobile Top Header ── */}
       <div className="md:hidden bg-white/90 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-slate-100 sticky top-0 z-40 shadow-sm shadow-slate-100/50">
         <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 bg-white border border-slate-100 rounded-xl flex items-center justify-center shadow-sm">
+          <div className="h-8 w-8 bg-white border border-slate-100 rounded-xl flex items-center justify-center shadow-sm relative">
             <img src="/logo.png" alt="Logo" className="h-5 w-5 object-contain" />
           </div>
-          <span className="font-heading font-bold text-slate-800 tracking-tight text-base">DIGISPIRE</span>
+          <div>
+            <span className="font-heading font-bold text-slate-800 tracking-tight text-base">DIGISPIRE</span>
+            {isFestiveActive && (
+              <span className="ml-2 px-1.5 py-0.5 rounded bg-orange-100 text-[9px] font-black text-orange-700">🇮🇳 15 Aug</span>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-1">
           <NavLink
@@ -79,11 +99,14 @@ export default function StudentLayout() {
         <div className="flex flex-col h-full p-5">
           <div className="flex items-center justify-between md:block mb-6">
             <div className="flex items-center gap-3 px-1">
-              <div className="h-10 w-10 bg-white border border-slate-100 rounded-xl flex items-center justify-center shadow-sm">
+              <div className="h-10 w-10 bg-white border border-slate-100 rounded-xl flex items-center justify-center shadow-sm relative">
                 <img src="/logo.png" alt="Logo" className="h-7 w-7 object-contain" />
               </div>
               <div>
-                <h1 className="font-heading font-extrabold text-slate-800 tracking-tight leading-none text-xl">DIGISPIRE</h1>
+                <div className="flex items-center gap-1.5">
+                  <h1 className="font-heading font-extrabold text-slate-800 tracking-tight leading-none text-xl">DIGISPIRE</h1>
+                  {isFestiveActive && <span className="text-sm">🇮🇳</span>}
+                </div>
                 <p className="text-[10px] font-bold text-[#255A84] uppercase tracking-widest mt-1">Student Portal</p>
               </div>
             </div>

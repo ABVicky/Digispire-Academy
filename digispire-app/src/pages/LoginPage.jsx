@@ -3,10 +3,12 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Phone, Mail, Eye, EyeOff } from 'lucide-react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { isIndependenceDayActive } from '../utils/independenceDayTheme';
 
 export default function LoginPage() {
   const { userProfile, loading: authLoading, loginAdmin, loginStudent } = useAuth();
   const navigate = useNavigate();
+  const isFestiveActive = isIndependenceDayActive();
 
   const [tab, setTab] = useState('admin'); // 'admin' | 'student'
   const [email, setEmail] = useState('');
@@ -33,6 +35,10 @@ export default function LoginPage() {
   const [particles, setParticles] = useState([]);
 
   const spawnParticles = (clientX, clientY) => {
+    const flagColors = ['#FF9933', '#FFFFFF', '#138808', '#000080'];
+    const brandColors = ['#255A84', '#F48B1F'];
+    const activePalette = isFestiveActive ? flagColors : brandColors;
+
     const newParticles = Array.from({ length: 12 }).map((_, i) => {
       const angle = (i / 12) * 2 * Math.PI + (Math.random() - 0.5) * 0.4;
       const velocity = 60 + Math.random() * 90;
@@ -47,7 +53,7 @@ export default function LoginPage() {
         dy: `${dy}px`,
         rot: `${rot}deg`,
         size: 3 + Math.random() * 5,
-        color: Math.random() > 0.5 ? '#255A84' : '#F48B1F', // Brand colors
+        color: activePalette[Math.floor(Math.random() * activePalette.length)],
         shape: Math.random() > 0.5 ? 'circle' : 'square',
       };
     });
@@ -318,6 +324,13 @@ export default function LoginPage() {
       <div className="w-full max-w-md relative z-10 page-transition my-auto">
         {/* Logo & Brand */}
         <div className="flex flex-col items-center mb-6">
+          {isFestiveActive && (
+            <div className="mb-3 px-3 py-1 rounded-full bg-gradient-to-r from-orange-500/20 via-white/20 to-emerald-500/20 border border-white/20 text-white text-[10px] font-black tracking-widest uppercase flex items-center gap-1.5 backdrop-blur-md shadow-lg animate-pulse">
+              <span>🇮🇳</span>
+              <span>Happy Independence Day</span>
+              <span>🇮🇳</span>
+            </div>
+          )}
           <img src="/logo.png" alt="DIGISPIRE Academy" className="h-16 w-auto object-contain rounded-2xl shadow-2xl mb-3" />
           <h1 className="text-2xl font-heading font-black text-white tracking-tight">DIGISPIRE</h1>
           <p className="text-blue-300 text-[10px] font-bold tracking-[0.2em] uppercase mt-1 opacity-80 font-sans">Academy Portal</p>

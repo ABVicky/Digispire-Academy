@@ -9,6 +9,9 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import QRCode from 'qrcode';
+import IndependenceDayBanner from '../../components/IndependenceDayBanner';
+import { isIndependenceDayActive } from '../../utils/independenceDayTheme';
+import AshokaChakra from '../../components/AshokaChakra';
 
 function getBatchBadgeColor(bId, name = '') {
   const label = (name || bId || '').toLowerCase();
@@ -19,8 +22,9 @@ function getBatchBadgeColor(bId, name = '') {
 }
 
 function StatCard({ icon: Icon, label, value, color, colorBg, description }) {
+  const isFestiveActive = isIndependenceDayActive();
   return (
-    <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-3 hover:shadow-md transition duration-300 group">
+    <div className={`bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-3 hover:shadow-md transition duration-300 group ${isFestiveActive ? 'patriotic-card-glow' : ''}`}>
       <div className={`h-11 w-11 rounded-xl flex items-center justify-center ${colorBg} shrink-0 group-hover:scale-105 transition-transform`}>
         <Icon size={20} className={color} />
       </div>
@@ -490,6 +494,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-5 font-sans pb-4">
+      {/* ─── Festive Independence Day Banner ─── */}
+      <IndependenceDayBanner />
+
       {/* ─── Page Header ─── */}
       <div className="section-header">
         <div>
