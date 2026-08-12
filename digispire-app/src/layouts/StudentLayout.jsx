@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import TriColorConfetti from '../components/TriColorConfetti';
 import { isIndependenceDayActive } from '../utils/independenceDayTheme';
+import PatrioticDecorations from '../components/PatrioticDecorations';
 
 const navItems = [
   { path: 'dashboard', label: 'Portal Overview', shortLabel: 'Home', icon: LayoutDashboard, category: 'Core Portal' },
@@ -40,12 +41,17 @@ export default function StudentLayout() {
 
   return (
     <div className="min-h-screen-ios bg-slate-50/50 flex flex-col md:flex-row font-sans selection:bg-[#255A84]/15 relative">
-      {/* TriColor Confetti Overlay */}
-      {isFestiveActive && <TriColorConfetti />}
+      {/* TriColor Confetti & Festoon Decorations Overlay */}
+      {isFestiveActive && (
+        <>
+          <TriColorConfetti />
+          <PatrioticDecorations />
+        </>
+      )}
 
       {/* Top Tri-Color Ribbon */}
       {isFestiveActive && (
-        <div className="fixed top-0 left-0 right-0 h-1 z-50 flex pointer-events-none">
+        <div className="fixed top-0 left-0 right-0 h-1.5 z-50 flex pointer-events-none">
           <div className="flex-1 bg-[#FF9933]" />
           <div className="flex-1 bg-white" />
           <div className="flex-1 bg-[#138808]" />

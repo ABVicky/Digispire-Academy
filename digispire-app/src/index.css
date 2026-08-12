@@ -714,6 +714,40 @@ select { min-height: 44px; }
   pointer-events: none;
 }
 
+/* ========================
+   VIBEY PATRIOTIC GLOW & ANIMATIONS
+======================== */
+.vibey-shimmer-text {
+  background: linear-gradient(90deg, #FF9933 0%, #1e293b 35%, #138808 70%, #FF9933 100%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: vibey-shimmer 4s linear infinite;
+}
+@keyframes vibey-shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+.vibey-neon-border {
+  position: relative;
+}
+.vibey-neon-border::after {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(135deg, #FF9933, rgba(255,255,255,0.8), #138808, #FF9933);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
 } /* end @layer components */
+
 
 

@@ -413,6 +413,11 @@ export default function StudentDashboard() {
                   <div className="id-card-front bg-gradient-to-br from-[#1a3852] via-[#255A84] to-[#0c1a26] text-white flex flex-col justify-between p-6 absolute inset-0 overflow-hidden select-none">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-[#F48B1F]/10 rounded-full blur-2xl pointer-events-none" />
                     <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#255A84]/40 rounded-full blur-2xl pointer-events-none" />
+                    {isFestiveActive && (
+                      <div className="absolute -right-6 -bottom-6 opacity-10 pointer-events-none text-white">
+                        <AshokaChakra size={160} animate={true} />
+                      </div>
+                    )}
                     
                     <div className="flex items-center justify-between border-b border-white/10 pb-3">
                       <div className="flex items-center gap-2">
@@ -424,9 +429,15 @@ export default function StudentDashboard() {
                           <span className="text-[7px] text-[#F48B1F] tracking-[0.25em] font-extrabold uppercase mt-0.5 block">Academy Portal</span>
                         </div>
                       </div>
-                      <span className="text-[8px] font-bold uppercase tracking-widest text-slate-300 border border-white/15 px-2 py-0.5 rounded bg-white/5">
-                        ID Badge
-                      </span>
+                      {isFestiveActive ? (
+                        <span className="text-[7px] font-black uppercase tracking-wider text-amber-300 border border-amber-300/40 px-2 py-0.5 rounded bg-gradient-to-r from-orange-500/30 to-emerald-500/30 flex items-center gap-1 shadow-sm">
+                          🇮🇳 80th Independence Edition
+                        </span>
+                      ) : (
+                        <span className="text-[8px] font-bold uppercase tracking-widest text-slate-300 border border-white/15 px-2 py-0.5 rounded bg-white/5">
+                          ID Badge
+                        </span>
+                      )}
                     </div>
 
                     <div className="text-center my-auto py-2 space-y-4">
