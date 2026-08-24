@@ -8,13 +8,9 @@ import {
 import { Link } from 'react-router-dom';
 import { calculateAttendance } from '../../utils/attendanceEngine';
 import QRCode from 'qrcode';
-import IndependenceDayBanner from '../../components/IndependenceDayBanner';
-import { isIndependenceDayActive } from '../../utils/independenceDayTheme';
-import AshokaChakra from '../../components/AshokaChakra';
 
 export default function StudentDashboard() {
   const { userProfile } = useAuth();
-  const isFestiveActive = isIndependenceDayActive();
   const [data, setData] = useState({
     attendancePct: 0,
     enrolledBatches: [],
@@ -164,13 +160,10 @@ export default function StudentDashboard() {
 
   return (
     <div className="space-y-4 pb-4 font-sans">
-      {/* ─── Festive Independence Day Banner ─── */}
-      <IndependenceDayBanner />
-
       {/* ─── Hero Welcome Card ─── */}
-      <div className="relative bg-gradient-to-br from-[#255A84] via-[#1d486b] to-[#163650] rounded-2xl p-5 text-white overflow-hidden shadow-lg border border-white/10">
+      <div className="relative bg-gradient-to-br from-[#255A84] to-[#1a4261] rounded-2xl p-5 text-white overflow-hidden shadow-lg border border-white/10">
         <div className="relative z-10 flex items-center gap-4">
-          <div className="h-14 w-14 rounded-xl bg-white/20 backdrop-blur-md border border-white/20 shadow-xl overflow-hidden flex-shrink-0 flex items-center justify-center relative">
+          <div className="h-14 w-14 rounded-xl bg-white/20 backdrop-blur-md border border-white/20 shadow-xl overflow-hidden flex-shrink-0 flex items-center justify-center">
             {userProfile?.photoURL ? (
               <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover" />
             ) : (
@@ -178,14 +171,7 @@ export default function StudentDashboard() {
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <p className="text-blue-200 text-[10px] font-bold uppercase tracking-[0.2em]">Student Portal</p>
-              {isFestiveActive && (
-                <span className="text-[10px] font-black tracking-wider text-amber-300 uppercase px-1.5 py-0.5 rounded bg-white/10 border border-white/10 inline-flex items-center gap-1">
-                  🇮🇳 Happy 15 Aug
-                </span>
-              )}
-            </div>
+            <p className="text-blue-200 text-[10px] font-bold uppercase tracking-[0.2em]">Student Portal</p>
             <h1 className="text-lg font-bold mt-0.5 tracking-tight truncate">{userProfile?.name || 'Student'}</h1>
             <div className="flex flex-wrap items-center gap-2 mt-0.5">
               <span className="text-[11px] font-mono font-bold text-blue-300">ID: {userProfile?.studentId}</span>
@@ -199,22 +185,8 @@ export default function StudentDashboard() {
             </div>
           </div>
         </div>
-
-        {/* Ambient Backdrops (Saffron + Green + Blue glows if festive active) */}
-        {isFestiveActive ? (
-          <>
-            <div className="absolute -right-6 -top-6 w-36 h-36 bg-[#FF9933]/30 rounded-full blur-2xl pointer-events-none" />
-            <div className="absolute -left-6 -bottom-6 w-36 h-36 bg-[#138808]/30 rounded-full blur-2xl pointer-events-none" />
-            <div className="chakra-watermark pointer-events-none text-white/10">
-              <AshokaChakra size={180} animate={true} />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-[#F48B1F]/20 rounded-full blur-2xl" />
-            <div className="absolute -left-4 -top-4 w-24 h-24 bg-white/5 rounded-full blur-xl" />
-          </>
-        )}
+        <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-[#F48B1F]/20 rounded-full blur-2xl" />
+        <div className="absolute -left-4 -top-4 w-24 h-24 bg-white/5 rounded-full blur-xl" />
       </div>
 
       {/* ─── Attendance + Quick Check-in Row ─── */}
@@ -413,11 +385,6 @@ export default function StudentDashboard() {
                   <div className="id-card-front bg-gradient-to-br from-[#1a3852] via-[#255A84] to-[#0c1a26] text-white flex flex-col justify-between p-6 absolute inset-0 overflow-hidden select-none">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-[#F48B1F]/10 rounded-full blur-2xl pointer-events-none" />
                     <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#255A84]/40 rounded-full blur-2xl pointer-events-none" />
-                    {isFestiveActive && (
-                      <div className="absolute -right-6 -bottom-6 opacity-10 pointer-events-none text-white">
-                        <AshokaChakra size={160} animate={true} />
-                      </div>
-                    )}
                     
                     <div className="flex items-center justify-between border-b border-white/10 pb-3">
                       <div className="flex items-center gap-2">
@@ -429,15 +396,9 @@ export default function StudentDashboard() {
                           <span className="text-[7px] text-[#F48B1F] tracking-[0.25em] font-extrabold uppercase mt-0.5 block">Academy Portal</span>
                         </div>
                       </div>
-                      {isFestiveActive ? (
-                        <span className="text-[7px] font-black uppercase tracking-wider text-amber-300 border border-amber-300/40 px-2 py-0.5 rounded bg-gradient-to-r from-orange-500/30 to-emerald-500/30 flex items-center gap-1 shadow-sm">
-                          🇮🇳 80th Independence Edition
-                        </span>
-                      ) : (
-                        <span className="text-[8px] font-bold uppercase tracking-widest text-slate-300 border border-white/15 px-2 py-0.5 rounded bg-white/5">
-                          ID Badge
-                        </span>
-                      )}
+                      <span className="text-[8px] font-bold uppercase tracking-widest text-slate-300 border border-white/15 px-2 py-0.5 rounded bg-white/5">
+                        ID Badge
+                      </span>
                     </div>
 
                     <div className="text-center my-auto py-2 space-y-4">

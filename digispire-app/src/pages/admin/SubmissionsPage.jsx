@@ -20,9 +20,14 @@ export default function SubmissionsPage() {
 
   const fetchSubmissions = async () => {
     try {
-      const q = query(collection(db, 'submissions'), orderBy('createdAt', 'desc'));
-      const snap = await getDocs(q);
-      setSubmissions(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const snap = await getDocs(collection(db, 'submissions'));
+      const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      list.sort((a, b) => {
+        const tA = a.createdAt?.seconds || 0;
+        const tB = b.createdAt?.seconds || 0;
+        return tB - tA;
+      });
+      setSubmissions(list);
     } catch (err) {
       console.error("Error fetching submissions:", err);
     } finally {

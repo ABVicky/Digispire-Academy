@@ -30,9 +30,10 @@ export default function StudentSubmissionsPage() {
 
       setCourses(allCourses);
 
-      // Filter modules if student has a courseId, otherwise show all
+      // Filter modules if student has a courseId, otherwise fallback to all modules if filtered is empty
       if (userProfile.courseId) {
-        setModules(allModules.filter(m => m.courseId === userProfile.courseId));
+        const filtered = allModules.filter(m => m.courseId === userProfile.courseId);
+        setModules(filtered.length > 0 ? filtered : allModules);
       } else {
         setModules(allModules);
       }
@@ -40,11 +41,16 @@ export default function StudentSubmissionsPage() {
       // 2. Fetch past submissions of this student
       const q = query(
         collection(db, 'submissions'),
-        where('studentUid', '==', userProfile.uid),
-        orderBy('createdAt', 'desc')
+        where('studentUid', '==', userProfile.uid)
       );
       const subSnap = await getDocs(q);
-      setSubmissions(subSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const subList = subSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      subList.sort((a, b) => {
+        const tA = a.createdAt?.seconds || 0;
+        const tB = b.createdAt?.seconds || 0;
+        return tB - tA;
+      });
+      setSubmissions(subList);
 
     } catch (err) {
       console.error('Error fetching submission page data:', err);
@@ -60,12 +66,17 @@ export default function StudentSubmissionsPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.moduleId || !form.link) return;
+
+    let targetLink = form.link.trim();
+    if (!/^https?:\/\//i.test(targetLink)) {
+      targetLink = `https://${targetLink}`;
+    }
     
-    // Simple URL validation
+    // URL validation
     try {
-      new URL(form.link);
+      new URL(targetLink);
     } catch {
-      setMessage({ type: 'error', text: 'Please enter a valid URL including http:// or https://' });
+      setMessage({ type: 'error', text: 'Please enter a valid web URL.' });
       return;
     }
 
@@ -85,7 +96,7 @@ export default function StudentSubmissionsPage() {
         courseName: selectedCourse?.name || userProfile.course || 'General Curriculum',
         moduleId: form.moduleId,
         moduleTitle: selectedModule?.title || 'Unknown Module',
-        link: form.link.trim(),
+        link: targetLink,
         notes: form.notes.trim(),
         status: 'pending',
         createdAt: serverTimestamp()
@@ -96,17 +107,22 @@ export default function StudentSubmissionsPage() {
       setForm({ moduleId: '', link: '', notes: '' });
       setMessage({ type: 'success', text: 'Work submitted successfully!' });
       
-      // Reload submissions list
+      // Reload submissions list without composite index dependency
       const q = query(
         collection(db, 'submissions'),
-        where('studentUid', '==', userProfile.uid),
-        orderBy('createdAt', 'desc')
+        where('studentUid', '==', userProfile.uid)
       );
       const subSnap = await getDocs(q);
-      setSubmissions(subSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const subList = subSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      subList.sort((a, b) => {
+        const tA = a.createdAt?.seconds || 0;
+        const tB = b.createdAt?.seconds || 0;
+        return tB - tA;
+      });
+      setSubmissions(subList);
     } catch (err) {
       console.error('Error adding submission:', err);
-      setMessage({ type: 'error', text: 'Failed to submit work. Please try again.' });
+      setMessage({ type: 'error', text: err.message || 'Failed to submit work. Please try again.' });
     } finally {
       setSubmitting(false);
     }
