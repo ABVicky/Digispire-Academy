@@ -37,15 +37,15 @@ const emptyForm = {
   mentorId: ''
 };
 
-function StatChip({ label, value, icon: Icon, color }) {
+function StatChip({ label, value, icon: Icon, colorBg = 'bg-slate-100', colorText = 'text-slate-700' }) {
   return (
-    <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-3 flex-1 min-w-[150px]">
-      <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${color} bg-opacity-10`}>
-        <Icon size={18} className={color.replace('bg-', 'text-')} />
+    <div className="bg-white rounded-xl p-4 shadow-2xs border border-slate-200 flex items-center gap-3 flex-1 min-w-[140px]">
+      <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${colorBg} ${colorText} shrink-0`}>
+        <Icon size={18} />
       </div>
-      <div>
-        <p className="text-lg font-bold text-slate-800 leading-none">{value}</p>
-        <p className="text-[11px] font-bold text-slate-400 uppercase mt-1">{label}</p>
+      <div className="min-w-0">
+        <p className="text-lg font-bold text-slate-800 leading-none font-mono">{value}</p>
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1 truncate">{label}</p>
       </div>
     </div>
   );
@@ -334,11 +334,11 @@ export default function StudentsPage() {
 
       {/* Stats grid – 2 col on mobile, auto on wider */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-        <StatChip label="Total Students" value={students.length} icon={Users} color="bg-[#255A84]" />
+        <StatChip label="Total Students" value={students.length} icon={Users} colorBg="bg-blue-50" colorText="text-[#1E3A5F]" />
         {batches.length === 0 ? (
           <>
-            <StatChip label="Morning" value={students.filter(s => (s.batchIds || [s.batchId || 'morning']).includes('morning')).length} icon={Users} color="bg-orange-500" />
-            <StatChip label="Evening" value={students.filter(s => (s.batchIds || [s.batchId || 'morning']).includes('evening')).length} icon={Users} color="bg-[#255A84]" />
+            <StatChip label="Morning" value={students.filter(s => (s.batchIds || [s.batchId || 'morning']).includes('morning')).length} icon={Users} colorBg="bg-orange-50" colorText="text-orange-700" />
+            <StatChip label="Evening" value={students.filter(s => (s.batchIds || [s.batchId || 'morning']).includes('evening')).length} icon={Users} colorBg="bg-blue-50" colorText="text-[#1E3A5F]" />
           </>
         ) : (
           batches.filter(b => b.id !== 'internship').map((b) => (
@@ -347,11 +347,12 @@ export default function StudentsPage() {
               label={b.name || b.id}
               value={students.filter(s => (s.batchIds || [s.batchId || 'morning']).includes(b.id)).length}
               icon={Users}
-              color={b.id.toLowerCase().includes('morning') ? "bg-orange-500" : "bg-[#255A84]"}
+              colorBg={b.id.toLowerCase().includes('morning') ? "bg-orange-50" : "bg-blue-50"}
+              colorText={b.id.toLowerCase().includes('morning') ? "text-orange-700" : "text-[#1E3A5F]"}
             />
           ))
         )}
-        <StatChip label="Interns" value={students.filter(s => s.isIntern).length} icon={Briefcase} color="bg-emerald-500" />
+        <StatChip label="Interns" value={students.filter(s => s.isIntern).length} icon={Briefcase} colorBg="bg-emerald-50" colorText="text-emerald-700" />
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">

@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { collection, addDoc, getDocs, query, where, deleteDoc, doc, serverTimestamp, orderBy } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useAuth } from '../../context/AuthContext';
 import { 
-  FolderUp, ExternalLink, Trash2, Clock, CheckCircle, 
+  FolderUp, ExternalLink, Trash2, Clock, CheckCircle2, 
   AlertCircle, MessageSquare, Loader2, Link as LinkIcon 
 } from 'lucide-react';
 
@@ -20,7 +20,6 @@ export default function StudentSubmissionsPage() {
   const fetchData = useCallback(async () => {
     if (!userProfile?.uid) return;
     try {
-      // 1. Fetch courses and modules to display selection
       const [cSnap, mSnap] = await Promise.all([
         getDocs(collection(db, 'courses')),
         getDocs(collection(db, 'modules'))
@@ -30,7 +29,6 @@ export default function StudentSubmissionsPage() {
 
       setCourses(allCourses);
 
-      // Filter modules if student has a courseId, otherwise fallback to all modules if filtered is empty
       if (userProfile.courseId) {
         const filtered = allModules.filter(m => m.courseId === userProfile.courseId);
         setModules(filtered.length > 0 ? filtered : allModules);
@@ -38,7 +36,6 @@ export default function StudentSubmissionsPage() {
         setModules(allModules);
       }
 
-      // 2. Fetch past submissions of this student
       const q = query(
         collection(db, 'submissions'),
         where('studentUid', '==', userProfile.uid)
@@ -53,7 +50,7 @@ export default function StudentSubmissionsPage() {
       setSubmissions(subList);
 
     } catch (err) {
-      console.error('Error fetching submission page data:', err);
+      console.error('Error fetching submissions:', err);
     } finally {
       setLoading(false);
     }
@@ -72,11 +69,10 @@ export default function StudentSubmissionsPage() {
       targetLink = `https://${targetLink}`;
     }
     
-    // URL validation
     try {
       new URL(targetLink);
     } catch {
-      setMessage({ type: 'error', text: 'Please enter a valid web URL.' });
+      setMessage({ type: 'error', text: 'Please enter a valid web URL (e.g. Google Drive, GitHub repository, or document link).' });
       return;
     }
 
@@ -105,9 +101,8 @@ export default function StudentSubmissionsPage() {
       await addDoc(collection(db, 'submissions'), submissionPayload);
       
       setForm({ moduleId: '', link: '', notes: '' });
-      setMessage({ type: 'success', text: 'Work submitted successfully!' });
+      setMessage({ type: 'success', text: 'Assignment deliverable submitted successfully for faculty review.' });
       
-      // Reload submissions list without composite index dependency
       const q = query(
         collection(db, 'submissions'),
         where('studentUid', '==', userProfile.uid)
@@ -122,73 +117,75 @@ export default function StudentSubmissionsPage() {
       setSubmissions(subList);
     } catch (err) {
       console.error('Error adding submission:', err);
-      setMessage({ type: 'error', text: err.message || 'Failed to submit work. Please try again.' });
+      setMessage({ type: 'error', text: err.message || 'Failed to submit deliverable. Please try again.' });
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this submission?')) return;
+    if (!window.confirm('Are you sure you want to retract this submission record?')) return;
     try {
       await deleteDoc(doc(db, 'submissions', id));
       setSubmissions(submissions.filter(sub => sub.id !== id));
-      setMessage({ type: 'success', text: 'Submission removed successfully.' });
+      setMessage({ type: 'success', text: 'Submission record removed.' });
     } catch (err) {
       console.error('Error deleting submission:', err);
-      setMessage({ type: 'error', text: 'Failed to delete submission.' });
+      setMessage({ type: 'error', text: 'Failed to delete submission record.' });
     }
   };
 
   if (loading) return (
-    <div className="flex flex-col items-center justify-center h-64 gap-3">
-      <div className="animate-spin rounded-full h-8 w-8 border-4 border-[#255A84] border-t-transparent" />
-      <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">Loading submissions console...</p>
+    <div className="flex flex-col items-center justify-center h-48 gap-3">
+      <div className="animate-spin rounded-full h-8 w-8 border-3 border-[#1E3A5F] border-t-transparent" />
+      <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Loading Submission Records...</p>
     </div>
   );
 
   return (
-    <div className="space-y-6 pb-12 font-sans">
+    <div className="space-y-5 pb-8 font-sans">
       {/* ─── Header ─── */}
-      <div className="flex items-center justify-between px-1">
+      <div className="section-header">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Module Submissions</h1>
-          <p className="text-sm text-slate-500 font-medium mt-1">Submit your doc links, folder links, and project works for educator review.</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Assignment Deliverables & Submissions</h1>
+          <p className="text-xs text-slate-500 mt-0.5">Submit project files, code repositories, and documentation for faculty evaluation</p>
         </div>
-        <div className="h-10 w-10 bg-[#255A84]/15 rounded-xl flex items-center justify-center text-[#255A84] shrink-0">
-          <FolderUp size={20} />
+        <div className="h-9 w-9 bg-slate-100 rounded-lg flex items-center justify-center text-[#1E3A5F] shrink-0 border border-slate-200">
+          <FolderUp size={16} />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* ─── Submission Form (Left 5 Cols) ─── */}
-        <div className="lg:col-span-5 bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-4">
-          <h2 className="text-sm font-black text-slate-700 uppercase tracking-wider">Submit New Work</h2>
+        <div className="lg:col-span-5 bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-4">
+          <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">New Deliverable Submission</h2>
           
           {message && (
-            <div className={`p-3.5 rounded-xl text-xs font-semibold flex items-start gap-2 animate-in fade-in duration-200 ${
-              message.type === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-500 border border-rose-100'
+            <div className={`p-3 rounded-lg text-xs font-medium flex items-start gap-2.5 ${
+              message.type === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200'
             }`}>
-              {message.type === 'success' ? <CheckCircle size={14} className="shrink-0 mt-0.5" /> : <AlertCircle size={14} className="shrink-0 mt-0.5" />}
-              <span>{message.text}</span>
+              {message.type === 'success' ? <CheckCircle2 size={15} className="shrink-0 mt-0.5" /> : <AlertCircle size={15} className="shrink-0 mt-0.5" />}
+              <span className="leading-tight">{message.text}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3.5">
             <div>
-              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Select Module *</label>
+              <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 ml-0.5">
+                Target Module <span className="text-rose-500">*</span>
+              </label>
               {modules.length === 0 ? (
-                <p className="text-[11px] text-amber-500 bg-amber-50 p-2.5 rounded-xl border border-amber-100 font-medium">
-                  No modules found in your enrolled course curriculum.
+                <p className="text-xs text-amber-700 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+                  No modules available for deliverable assignment.
                 </p>
               ) : (
                 <select
                   required
                   value={form.moduleId}
                   onChange={e => setForm({ ...form, moduleId: e.target.value })}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#255A84] focus:bg-white transition-all cursor-pointer"
+                  className="select-premium cursor-pointer text-xs"
                 >
-                  <option value="">Choose Module...</option>
+                  <option value="">Select Target Module...</option>
                   {modules.map(mod => (
                     <option key={mod.id} value={mod.id}>{mod.title}</option>
                   ))}
@@ -197,126 +194,130 @@ export default function StudentSubmissionsPage() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Work link *</label>
+              <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 ml-0.5">
+                Deliverable URL Link <span className="text-rose-500">*</span>
+              </label>
               <input
                 required
                 type="url"
                 value={form.link}
                 onChange={e => setForm({ ...form, link: e.target.value })}
-                placeholder="https://docs.google.com/document/... or Google Drive / GitHub"
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#255A84] focus:bg-white transition-all"
+                placeholder="https://github.com/... or Google Drive URL"
+                className="input-premium text-xs"
               />
             </div>
 
             <div>
-              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Remarks / Notes (Optional)</label>
+              <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 ml-0.5">
+                Student Remarks / Notes (Optional)
+              </label>
               <textarea
                 value={form.notes}
                 onChange={e => setForm({ ...form, notes: e.target.value })}
-                rows="4"
-                placeholder="Any special remarks or comments for the educator..."
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#255A84] focus:bg-white transition-all resize-none"
+                rows="3"
+                placeholder="Briefly describe project deliverables, branch names, or instructions..."
+                className="textarea-premium text-xs resize-none"
               />
             </div>
 
             <button
               type="submit"
               disabled={submitting || modules.length === 0}
-              className="w-full py-3.5 bg-[#255A84] text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#1c4464] active:scale-[0.98] transition-all shadow-md shadow-[#255A84]/15 disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2"
+              className="w-full btn-primary-premium text-xs py-2.5 mt-1"
             >
               {submitting ? <Loader2 size={14} className="animate-spin" /> : <FolderUp size={14} />}
-              {submitting ? 'Submitting...' : 'Submit Work'}
+              <span>{submitting ? 'Submitting to Faculty...' : 'Submit Deliverable'}</span>
             </button>
           </form>
         </div>
 
         {/* ─── Submission History (Right 7 Cols) ─── */}
-        <div className="lg:col-span-7 bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-4">
-          <h2 className="text-sm font-black text-slate-700 uppercase tracking-wider">Your Submission History</h2>
+        <div className="lg:col-span-7 bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-4">
+          <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Submission Ledger & Faculty Evaluation</h2>
           
           {submissions.length === 0 ? (
-            <div className="text-center py-14 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
-              <LinkIcon size={32} className="mx-auto mb-3 text-slate-300" />
-              <p className="text-xs text-slate-400 font-bold">No submissions found</p>
-              <p className="text-[10px] text-slate-400 mt-1 max-w-[250px] mx-auto">Select a module above to submit your first project/doc link.</p>
+            <div className="text-center py-12 bg-slate-50 rounded-xl border border-slate-200">
+              <LinkIcon size={28} className="mx-auto mb-2 text-slate-300" />
+              <p className="text-xs text-slate-500 font-bold">No Deliverables Submitted</p>
+              <p className="text-[10px] text-slate-400 mt-0.5 max-w-xs mx-auto">Select an academic module on the left to submit project work.</p>
             </div>
           ) : (
-            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1 no-scrollbar">
+            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1 custom-scrollbar">
               {submissions.map(sub => {
-                const dateStr = sub.createdAt ? new Date(sub.createdAt.seconds * 1000).toLocaleDateString(undefined, {
-                  month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                const dateStr = sub.createdAt ? new Date(sub.createdAt.seconds * 1000).toLocaleDateString('en-IN', {
+                  month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
                 }) : 'Just now';
 
                 return (
-                  <div key={sub.id} className="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-3 hover:border-slate-200 transition-all">
+                  <div key={sub.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg space-y-2.5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <span className="inline-block text-[8px] bg-slate-200/60 text-slate-500 border border-slate-300/40 px-2 py-0.5 rounded font-black tracking-wider uppercase mb-1.5">
+                        <span className="inline-block text-[8px] bg-slate-200 text-slate-700 font-bold uppercase tracking-wider px-1.5 py-0.5 rounded mb-1">
                           {sub.courseName}
                         </span>
-                        <h3 className="font-extrabold text-slate-800 text-xs truncate">{sub.moduleTitle}</h3>
-                        <p className="text-[9px] text-slate-400 font-medium mt-0.5">Submitted {dateStr}</p>
+                        <h3 className="font-bold text-slate-800 text-xs truncate">{sub.moduleTitle}</h3>
+                        <p className="text-[10px] text-slate-400 mt-0.5 font-mono">Submitted: {dateStr}</p>
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0">
                         {sub.status === 'pending' && (
-                          <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-600 border border-amber-100 text-[8px] font-black uppercase tracking-wider flex items-center gap-1">
-                            <Clock size={8} /> Pending
+                          <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1">
+                            <Clock size={9} /> Under Review
                           </span>
                         )}
                         {sub.status === 'reviewed' && (
-                          <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 border border-emerald-100 text-[8px] font-black uppercase tracking-wider flex items-center gap-1">
-                            <CheckCircle size={8} /> Reviewed
+                          <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1">
+                            <CheckCircle2 size={9} /> Evaluated
                           </span>
                         )}
                         {sub.status === 'needs_revision' && (
-                          <span className="px-2 py-0.5 rounded bg-rose-50 text-rose-600 border border-rose-100 text-[8px] font-black uppercase tracking-wider flex items-center gap-1">
-                            <AlertCircle size={8} /> Revision Required
+                          <span className="px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1">
+                            <AlertCircle size={9} /> Revision Required
                           </span>
                         )}
 
                         {sub.status === 'pending' && (
                           <button
                             onClick={() => handleDelete(sub.id)}
-                            className="p-1 text-slate-300 hover:text-rose-500 rounded transition-colors"
-                            title="Delete Submission"
+                            className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
+                            title="Retract Submission"
                           >
-                            <Trash2 size={12} />
+                            <Trash2 size={13} />
                           </button>
                         )}
                       </div>
                     </div>
 
                     {sub.notes && (
-                      <div className="p-2.5 bg-white rounded-lg border border-slate-100 text-[10px] text-slate-500 leading-normal font-medium">
-                        <span className="font-bold text-slate-400 uppercase tracking-widest text-[8px] block mb-0.5">Your Remarks</span>
+                      <div className="p-2 bg-white rounded border border-slate-200/60 text-[11px] text-slate-600 leading-normal">
+                        <span className="font-bold text-slate-400 uppercase text-[8px] block mb-0.5">Student Remarks:</span>
                         {sub.notes}
                       </div>
                     )}
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 pt-0.5">
                       <a
                         href={sub.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#255A84]/5 hover:bg-[#255A84]/10 text-[#255A84] rounded-lg text-[9px] font-black tracking-wider uppercase transition-all"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-white hover:bg-slate-100 text-[#1E3A5F] border border-slate-200 rounded text-[10px] font-semibold transition"
                       >
-                        <ExternalLink size={10} /> View Link
+                        <ExternalLink size={11} /> Open Deliverable URL
                       </a>
                     </div>
 
-                    {/* Educator Feedback section */}
+                    {/* Faculty Feedback Section */}
                     {(sub.feedback || sub.reviewedBy) && (
-                      <div className="p-3 bg-blue-50/40 border border-blue-100/50 rounded-lg space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-[9px] text-[#255A84] font-black uppercase tracking-wider">
-                          <MessageSquare size={10} />
-                          <span>Educator Feedback</span>
-                          {sub.reviewedBy && <span className="text-slate-400 font-medium normal-case">by {sub.reviewedBy}</span>}
+                      <div className="p-2.5 bg-blue-50/60 border border-blue-200/80 rounded-lg space-y-1">
+                        <div className="flex items-center gap-1.5 text-[9.5px] text-[#1E3A5F] font-bold uppercase tracking-wider">
+                          <MessageSquare size={11} />
+                          <span>Faculty Evaluation & Remarks</span>
+                          {sub.reviewedBy && <span className="text-slate-500 font-normal normal-case">· {sub.reviewedBy}</span>}
                         </div>
                         {sub.feedback ? (
-                          <p className="text-[10px] text-slate-600 font-medium leading-relaxed">{sub.feedback}</p>
+                          <p className="text-xs text-slate-700 font-normal leading-relaxed">{sub.feedback}</p>
                         ) : (
-                          <p className="text-[10px] text-slate-400 italic font-medium">Reviewed with no written remarks.</p>
+                          <p className="text-xs text-slate-400 italic">Evaluated with satisfactory completion.</p>
                         )}
                       </div>
                     )}

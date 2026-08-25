@@ -16,17 +16,14 @@ export default function InstallPrompt() {
     if (pwaStatus === 'dismissed' || pwaStatus === 'installed') return;
 
     if (isIOS) {
-      // Show iOS instructions after 5 seconds
       const timer = setTimeout(() => {
         setShowPrompt(true);
       }, 5000);
       return () => clearTimeout(timer);
     } else {
-      // Handle Android/Chrome beforeinstallprompt
       const handleBeforeInstallPrompt = (e) => {
         e.preventDefault();
         setDeferredPrompt(e);
-        // Show prompt after 5 seconds
         setTimeout(() => {
           setShowPrompt(true);
         }, 5000);
@@ -39,8 +36,6 @@ export default function InstallPrompt() {
 
   const handleInstall = async () => {
     if (isIOS) {
-      // For iOS, we just show the instructions. The user has to do it manually.
-      // We'll mark it as dismissed so we don't annoy them again.
       handleDismiss();
     } else if (deferredPrompt) {
       deferredPrompt.prompt();
@@ -61,37 +56,35 @@ export default function InstallPrompt() {
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed bottom-24 left-4 right-4 z-[100] animate-in slide-in-from-bottom-10 duration-500">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 p-6 flex items-center gap-4 relative overflow-hidden">
-        {/* Background Accent */}
-        <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full -mr-12 -mt-12 opacity-50" />
-        
-        <div className="h-14 w-14 bg-white border border-slate-100 rounded-2xl flex items-center justify-center shadow-sm shrink-0 relative z-10">
-          <img src="/logo.png" alt="App Icon" className="h-10 w-10 object-contain" />
+    <div className="fixed bottom-24 md:bottom-6 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-50 animate-in slide-in-from-bottom-4 duration-300">
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-4 flex items-center gap-3.5 relative overflow-hidden">
+        <div className="h-10 w-10 bg-white border border-slate-200 rounded-lg flex items-center justify-center p-1 shadow-2xs shrink-0">
+          <img src="/logo.png" alt="DIGISPIRE" className="h-full w-full object-contain" />
         </div>
 
-        <div className="flex-1 relative z-10">
-          <h3 className="font-bold text-slate-800 text-sm">Install DIGISPIRE</h3>
-          <p className="text-[11px] font-medium text-slate-500 leading-relaxed mt-0.5">
+        <div className="flex-1 min-w-0">
+          <h4 className="font-bold text-slate-800 text-xs tracking-tight leading-tight">Install Academic Portal</h4>
+          <p className="text-[10px] text-slate-500 leading-tight mt-0.5 truncate">
             {isIOS 
-              ? 'Tap Share then "Add to Home Screen"' 
-              : 'Add to your home screen for a better experience'}
+              ? 'Tap Share → "Add to Home Screen"' 
+              : 'Add to desktop/home screen for quick access'}
           </p>
         </div>
 
-        <div className="flex items-center gap-2 relative z-10">
+        <div className="flex items-center gap-1.5 shrink-0">
           <button 
             onClick={handleInstall}
-            className="bg-[#255A84] text-white px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest shadow-md flex items-center gap-2"
+            className="bg-[#1E3A5F] hover:bg-[#12243A] text-white px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-2xs flex items-center gap-1.5 transition cursor-pointer"
           >
-            {isIOS ? <Share size={14} /> : <Download size={14} />}
-            {isIOS ? 'How?' : 'Install'}
+            {isIOS ? <Share size={12} /> : <Download size={12} />}
+            <span>{isIOS ? 'Instructions' : 'Install App'}</span>
           </button>
           <button 
             onClick={handleDismiss}
-            className="p-2 text-slate-300 hover:text-slate-500 transition"
+            className="p-1.5 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-100 transition cursor-pointer"
+            aria-label="Dismiss banner"
           >
-            <X size={20} />
+            <X size={15} />
           </button>
         </div>
       </div>
