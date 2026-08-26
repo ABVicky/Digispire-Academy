@@ -77,14 +77,14 @@ export default function AdminLayout() {
   return (
     <div className="min-h-screen-ios bg-[#F8FAFC] flex flex-col md:flex-row font-sans selection:bg-[#1E3A5F] selection:text-white">
       {/* ── Mobile Institutional Header ── */}
-      <header className="md:hidden bg-white px-4 py-3 flex items-center justify-between border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+      <header className="md:hidden bg-white/95 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-slate-200 sticky top-0 z-40 shadow-xs pt-[max(0.75rem,env(safe-area-inset-top))]">
         <div className="flex items-center gap-2.5">
           <div className="h-8 w-8 bg-white border border-slate-200 rounded-lg flex items-center justify-center p-1 shadow-2xs">
             <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
           </div>
           <div>
             <span className="font-heading font-extrabold text-slate-900 text-sm tracking-tight leading-none block">DIGISPIRE ACADEMY</span>
-            <span className="text-[9px] font-bold text-slate-500 tracking-wider uppercase mt-0.5 block">Faculty Management</span>
+            <span className="text-[9px] font-bold text-slate-500 tracking-wider uppercase mt-0.5 block">Admin Portal</span>
           </div>
         </div>
         <div className="flex items-center gap-1.5">

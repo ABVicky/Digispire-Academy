@@ -23,8 +23,6 @@ export default function StudentDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [showIdCardModal, setShowIdCardModal] = useState(false);
-  const [qrCodeUrl, setQrCodeUrl] = useState('');
-  const [isFlipped, setIsFlipped] = useState(false);
   
   // Announcements state
   const [dismissedIds, setDismissedIds] = useState([]);
@@ -60,24 +58,6 @@ export default function StudentDashboard() {
     setDismissedIds([]);
     localStorage.removeItem(`ds_dismissed_announcements_${userProfile.studentId}`);
   };
-
-  useEffect(() => {
-    if (userProfile) {
-      const payload = {
-        uid: userProfile.uid,
-        name: userProfile.name,
-        role: userProfile.role,
-        studentId: userProfile.studentId || '',
-        phone: userProfile.phone || ''
-      };
-      QRCode.toDataURL(JSON.stringify(payload), {
-        margin: 1,
-        width: 256
-      })
-      .then(url => setQrCodeUrl(url))
-      .catch(err => console.error('Error generating QR code:', err));
-    }
-  }, [userProfile]);
 
   useEffect(() => {
     if (!userProfile?.uid || !userProfile?.studentId) return;
