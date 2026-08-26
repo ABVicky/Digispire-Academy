@@ -91,7 +91,7 @@ export default function StudentIDCardModal({ student, onClose }) {
             <div className={`id-card-inner rounded-3xl transition-transform duration-700 shadow-2xl ${isFlipped ? 'id-card-flipped' : ''}`}>
               
               {/* ═══════════ CARD FRONT ═══════════ */}
-              <div className="id-card-front bg-gradient-to-br from-[#0F243E] via-[#163355] to-[#1E3A5F] text-white p-5 rounded-3xl border-2 border-white/20 flex flex-col justify-between select-none relative">
+              <div className="id-card-front bg-gradient-to-br from-[#0F243E] via-[#163355] to-[#1E3A5F] text-white p-5 rounded-3xl border-2 border-white/20 flex flex-col justify-between select-none absolute inset-0">
                 {/* Background Ambient Guilloche Pattern */}
                 <div className="absolute inset-0 bg-[radial-gradient(#38BDF8_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none rounded-3xl" />
                 <div className="absolute -top-16 -right-16 w-36 h-36 bg-sky-500/10 rounded-full blur-2xl pointer-events-none" />
@@ -173,7 +173,7 @@ export default function StudentIDCardModal({ student, onClose }) {
               </div>
 
               {/* ═══════════ CARD BACK ═══════════ */}
-              <div className="id-card-back bg-gradient-to-br from-[#0F243E] via-[#163355] to-[#1E3A5F] text-white p-5 rounded-3xl border-2 border-white/20 flex flex-col justify-between select-none relative">
+              <div className="id-card-back bg-gradient-to-br from-[#0F243E] via-[#163355] to-[#1E3A5F] text-white p-5 rounded-3xl border-2 border-white/20 flex flex-col justify-between select-none absolute inset-0">
                 {/* Background Ambient Pattern */}
                 <div className="absolute inset-0 bg-[radial-gradient(#38BDF8_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none rounded-3xl" />
 
