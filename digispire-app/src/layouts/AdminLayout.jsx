@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Users, CalendarCheck, FileText,
   LogOut, Menu, X, GraduationCap, ChevronRight,
-  FileSpreadsheet, UserCog, History, FolderOpen, Award, Shield
+  FileSpreadsheet, UserCog, History, FolderOpen, Award, Shield, Megaphone
 } from 'lucide-react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -12,6 +12,7 @@ import AmbientBackground from '../components/AmbientBackground';
 
 const navItems = [
   { path: 'dashboard', label: 'Executive Dashboard', shortLabel: 'Overview', icon: LayoutDashboard, category: 'Operations & Registry' },
+  { path: 'announcements', label: 'Batch Announcements', shortLabel: 'Notices', icon: Megaphone, category: 'Operations & Registry' },
   { path: 'students', label: 'Student Academic Registry', shortLabel: 'Students', icon: Users, category: 'Operations & Registry' },
   { path: 'staff', label: 'Faculty & Staff Directory', shortLabel: 'Faculty', icon: UserCog, category: 'Operations & Registry' },
   { path: 'attendance', label: 'Live Attendance Console', shortLabel: 'Attendance', icon: CalendarCheck, category: 'Operations & Registry' },

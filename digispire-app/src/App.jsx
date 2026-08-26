@@ -19,6 +19,7 @@ import CourseCompletionReportPage from './pages/admin/CourseCompletionReportPage
 import StaffPage from './pages/admin/StaffPage';
 import RevisionAppealsPage from './pages/admin/RevisionAppealsPage';
 import SubmissionsPage from './pages/admin/SubmissionsPage';
+import AnnouncementsPage from './pages/admin/AnnouncementsPage';
 
 // Student pages
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -70,6 +71,7 @@ function App() {
               <Route path="completion-reports" element={<CourseCompletionReportPage />} />
               <Route path="revisions" element={<RevisionAppealsPage />} />
               <Route path="submissions" element={<SubmissionsPage />} />
+              <Route path="announcements" element={<AnnouncementsPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
           </Route>

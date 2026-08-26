@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
   Users, CalendarCheck, Clock, UserPlus, Layers,
   ChevronRight, Calendar, AlertCircle, Sparkles, TrendingUp,
-  Share2, X, CreditCard
+  Share2, X, CreditCard, Megaphone
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import QRCode from 'qrcode';
@@ -519,6 +519,14 @@ export default function AdminDashboard() {
               </button>
             </div>
           )}
+
+          <Link
+            to="/admin/announcements"
+            className="flex items-center gap-1.5 px-3.5 py-2.5 bg-[#1E3A5F] hover:bg-[#2B5282] text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+          >
+            <Megaphone size={13} />
+            Broadcast Notice
+          </Link>
 
           <button
             onClick={() => setShowShareModal(true)}

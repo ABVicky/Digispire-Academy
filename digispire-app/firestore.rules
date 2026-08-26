@@ -108,6 +108,24 @@ service cloud.firestore {
       allow create: if isAuth();
       allow update, delete: if isAuth();
     }
+
+    // Announcements
+    match /announcements/{id} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+
+    // FCM Device Push Tokens
+    match /fcm_tokens/{tokenId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+
+    // Push Broadcast Logs
+    match /push_broadcasts/{id} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
   }
 }
 

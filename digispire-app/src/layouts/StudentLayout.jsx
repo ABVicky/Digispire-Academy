@@ -7,6 +7,7 @@ import {
   FileText, FolderUp
 } from 'lucide-react';
 import AmbientBackground from '../components/AmbientBackground';
+import AnnouncementNotificationWatcher from '../components/AnnouncementNotificationWatcher';
 
 const navItems = [
   { path: 'dashboard', label: 'Academic Overview', shortLabel: 'Overview', icon: LayoutDashboard, category: 'Student Portal' },
@@ -156,6 +157,9 @@ export default function StudentLayout() {
           </div>
         </div>
       </aside>
+
+      {/* ── Real-Time Announcement System Notification Watcher ── */}
+      <AnnouncementNotificationWatcher />
 
       {/* ── Ambient Background Mesh & Gradient Shapes ── */}
       <AmbientBackground variant="light" />
