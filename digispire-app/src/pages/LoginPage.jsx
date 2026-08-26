@@ -105,7 +105,7 @@ export default function LoginPage() {
             <img src="/logo.png" alt="DIGISPIRE Academy" className="h-full w-full object-contain" />
           </div>
           <h1 className="text-2xl font-heading font-extrabold text-white tracking-tight">DIGISPIRE ACADEMY</h1>
-          <p className="text-slate-400 text-xs font-semibold tracking-widest uppercase mt-1">Official Academic Portal</p>
+          <p className="text-slate-400 text-xs font-semibold tracking-widest uppercase mt-1">Learning & Student Portal</p>
         </div>
 
         {/* Portal Authentication Card */}
@@ -122,7 +122,7 @@ export default function LoginPage() {
               }`}
             >
               <ShieldCheck size={14} />
-              <span>Faculty & Staff</span>
+              <span>Teachers & Staff</span>
             </button>
             <button
               type="button"
@@ -134,7 +134,7 @@ export default function LoginPage() {
               }`}
             >
               <GraduationCap size={14} />
-              <span>Student Access</span>
+              <span>Students</span>
             </button>
           </div>
 
@@ -151,7 +151,7 @@ export default function LoginPage() {
               <form onSubmit={handleAdminLogin} className="space-y-4">
                 <div>
                   <label htmlFor="faculty-email" className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                    Institutional Email Address
+                    Email Address
                   </label>
                   <div className="relative">
                     <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
@@ -162,7 +162,7 @@ export default function LoginPage() {
                       autoComplete="username"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      placeholder="faculty@digispire.in"
+                      placeholder="teacher@digispire.in"
                       className="w-full pl-10 pr-4 py-2.5 bg-[#0F172A] border border-slate-600 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-[#38BDF8] focus:ring-1 focus:ring-[#38BDF8] transition"
                     />
                   </div>
@@ -170,7 +170,7 @@ export default function LoginPage() {
 
                 <div>
                   <label htmlFor="faculty-password" className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                    Account Password
+                    Password
                   </label>
                   <div className="relative">
                     <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
@@ -200,7 +200,7 @@ export default function LoginPage() {
                   disabled={loading}
                   className="w-full py-3 bg-[#1E3A5F] hover:bg-[#2B5282] text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm border border-slate-600 mt-2 cursor-pointer disabled:opacity-60"
                 >
-                  {loading ? 'Authenticating Official Session...' : 'Sign In to Faculty Portal'}
+                  {loading ? 'Signing in...' : 'Sign In as Teacher / Admin'}
                 </button>
               </form>
             )}
@@ -229,7 +229,7 @@ export default function LoginPage() {
 
                 <div>
                   <label htmlFor="student-password" className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                    Academic Access Password
+                    Password
                   </label>
                   <div className="relative">
                     <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
@@ -240,7 +240,7 @@ export default function LoginPage() {
                       autoComplete="current-password"
                       value={studentPassword}
                       onChange={e => setStudentPassword(e.target.value)}
-                      placeholder="Enter assigned password"
+                      placeholder="Enter your password"
                       className="w-full pl-10 pr-10 py-2.5 bg-[#0F172A] border border-slate-600 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-[#FB923C] focus:ring-1 focus:ring-[#FB923C] transition"
                     />
                     <button
@@ -259,14 +259,14 @@ export default function LoginPage() {
                   disabled={loading}
                   className="w-full py-3 bg-[#C2410C] hover:bg-[#EA580C] text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm border border-orange-600/50 mt-2 cursor-pointer disabled:opacity-60"
                 >
-                  {loading ? 'Verifying Student Record...' : 'Sign In to Student Portal'}
+                  {loading ? 'Signing in...' : 'Sign In as Student'}
                 </button>
               </form>
             )}
 
             <div className="mt-6 pt-5 border-t border-slate-700/60 text-center">
               <p className="text-[11px] text-slate-400 leading-relaxed font-normal">
-                Authorized institutional access only. Unauthorized attempts are logged. For credential support, contact the academic registrar.
+                Welcome to DIGISPIRE Academy. For login assistance or password resets, contact your administrator.
               </p>
             </div>
           </div>

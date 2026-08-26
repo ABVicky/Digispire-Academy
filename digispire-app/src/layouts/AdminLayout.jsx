@@ -11,17 +11,17 @@ import { db } from '../firebase';
 import AmbientBackground from '../components/AmbientBackground';
 
 const navItems = [
-  { path: 'dashboard', label: 'Executive Dashboard', shortLabel: 'Overview', icon: LayoutDashboard, category: 'Operations & Registry' },
-  { path: 'announcements', label: 'Batch Announcements', shortLabel: 'Notices', icon: Megaphone, category: 'Operations & Registry' },
-  { path: 'students', label: 'Student Academic Registry', shortLabel: 'Students', icon: Users, category: 'Operations & Registry' },
-  { path: 'staff', label: 'Faculty & Staff Directory', shortLabel: 'Faculty', icon: UserCog, category: 'Operations & Registry' },
-  { path: 'attendance', label: 'Live Attendance Console', shortLabel: 'Attendance', icon: CalendarCheck, category: 'Operations & Registry' },
-  { path: 'courses', label: 'Curriculum & Course Syllabus', shortLabel: 'Curriculum', icon: GraduationCap, category: 'Curriculum & Learning' },
-  { path: 'content', label: 'Academic Resource Library', shortLabel: 'Library', icon: FileText, category: 'Curriculum & Learning' },
-  { path: 'reports', label: 'Attendance Ledgers & Audits', shortLabel: 'Ledgers', icon: FileSpreadsheet, category: 'Evaluation & Audits' },
-  { path: 'completion-reports', label: 'Course Completion Audits', shortLabel: 'Completions', icon: Award, category: 'Evaluation & Audits' },
-  { path: 'revisions', label: 'Revision & Review Appeals', shortLabel: 'Revisions', icon: History, category: 'Evaluation & Audits' },
-  { path: 'submissions', label: 'Student Work Submissions', shortLabel: 'Submissions', icon: FolderOpen, category: 'Evaluation & Audits' },
+  { path: 'dashboard', label: 'Dashboard', shortLabel: 'Overview', icon: LayoutDashboard, category: 'Management' },
+  { path: 'announcements', label: 'Announcements', shortLabel: 'Notices', icon: Megaphone, category: 'Management' },
+  { path: 'students', label: 'Students', shortLabel: 'Students', icon: Users, category: 'Management' },
+  { path: 'staff', label: 'Teachers & Staff', shortLabel: 'Staff', icon: UserCog, category: 'Management' },
+  { path: 'attendance', label: 'Take Attendance', shortLabel: 'Attendance', icon: CalendarCheck, category: 'Management' },
+  { path: 'courses', label: 'Courses & Syllabus', shortLabel: 'Courses', icon: GraduationCap, category: 'Courses & Content' },
+  { path: 'content', label: 'Study Material', shortLabel: 'Material', icon: FileText, category: 'Courses & Content' },
+  { path: 'reports', label: 'Attendance Reports', shortLabel: 'Reports', icon: FileSpreadsheet, category: 'Submissions & Reports' },
+  { path: 'completion-reports', label: 'Completion Reports', shortLabel: 'Completions', icon: Award, category: 'Submissions & Reports' },
+  { path: 'revisions', label: 'Revision Requests', shortLabel: 'Revisions', icon: History, category: 'Submissions & Reports' },
+  { path: 'submissions', label: 'Student Assignments', shortLabel: 'Assignments', icon: FolderOpen, category: 'Submissions & Reports' },
 ];
 
 const bottomNavItems = [
@@ -150,14 +150,14 @@ export default function AdminLayout() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-bold text-slate-800 text-xs truncate group-hover:text-[#1E3A5F] transition-colors">{userProfile?.name || 'Administrator'}</p>
-              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate mt-0.5">Faculty Officer</p>
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate mt-0.5">{userProfile?.role === 'admin' ? 'Admin' : 'Teacher'}</p>
             </div>
             <ChevronRight size={14} className="text-slate-400 group-hover:text-slate-700 transition-transform shrink-0" />
           </NavLink>
 
           {/* Nav Links */}
           <nav className="flex-1 space-y-4 overflow-y-auto no-scrollbar custom-scrollbar pr-1">
-            {['Operations & Registry', 'Curriculum & Learning', 'Evaluation & Audits'].map((category) => {
+            {['Management', 'Courses & Content', 'Submissions & Reports'].map((category) => {
               const items = navItems.filter(item => item.category === category);
               if (items.length === 0) return null;
               return (
@@ -204,7 +204,7 @@ export default function AdminLayout() {
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
             >
               <LogOut size={14} />
-              <span>Sign Out Session</span>
+              <span>Sign Out</span>
             </button>
           </div>
         </div>

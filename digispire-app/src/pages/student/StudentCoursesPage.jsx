@@ -106,7 +106,7 @@ export default function StudentCoursesPage() {
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-48 gap-3">
       <div className="animate-spin rounded-full h-8 w-8 border-3 border-[#1E3A5F] border-t-transparent" />
-      <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Loading Academic Syllabus...</p>
+      <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Loading Courses...</p>
     </div>
   );
 
@@ -114,19 +114,19 @@ export default function StudentCoursesPage() {
     <div className="space-y-5 pb-6 font-sans">
       <div className="section-header">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Academic Syllabus & Modules</h1>
-          <p className="text-xs text-slate-500 mt-0.5">Track topic completions and submit revision requests to faculty</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">My Courses & Syllabus</h1>
+          <p className="text-xs text-slate-500 mt-0.5">Track your progress and request revision classes whenever needed</p>
         </div>
         <div className="bg-[#1E3A5F]/10 px-3.5 py-1.5 rounded-lg flex items-center gap-2 self-start sm:self-auto border border-[#1E3A5F]/20">
           <Award size={15} className="text-[#1E3A5F]" />
-          <span className="text-xs font-bold text-[#1E3A5F]">Academic Progress</span>
+          <span className="text-xs font-bold text-[#1E3A5F]">Course Progress</span>
         </div>
       </div>
 
       {courses.length === 0 ? (
         <div className="text-center py-16 text-slate-400 bg-white rounded-xl border border-slate-200">
           <BookOpen size={40} className="mx-auto mb-3 opacity-30" />
-          <p className="font-bold text-sm">No course syllabi published yet.</p>
+          <p className="font-bold text-sm">No courses added yet.</p>
         </div>
       ) : (
         <div className="space-y-3.5">

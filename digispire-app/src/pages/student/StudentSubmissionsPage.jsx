@@ -138,7 +138,7 @@ export default function StudentSubmissionsPage() {
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-48 gap-3">
       <div className="animate-spin rounded-full h-8 w-8 border-3 border-[#1E3A5F] border-t-transparent" />
-      <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Loading Submission Records...</p>
+      <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Loading Assignments...</p>
     </div>
   );
 
@@ -147,8 +147,8 @@ export default function StudentSubmissionsPage() {
       {/* ─── Header ─── */}
       <div className="section-header">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Assignment Deliverables & Submissions</h1>
-          <p className="text-xs text-slate-500 mt-0.5">Submit project files, code repositories, and documentation for faculty evaluation</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Assignments & Homework</h1>
+          <p className="text-xs text-slate-500 mt-0.5">Submit your project links, documents, and code for teacher review</p>
         </div>
         <div className="h-9 w-9 bg-slate-100 rounded-lg flex items-center justify-center text-[#1E3A5F] shrink-0 border border-slate-200">
           <FolderUp size={16} />
@@ -158,7 +158,7 @@ export default function StudentSubmissionsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* ─── Submission Form (Left 5 Cols) ─── */}
         <div className="lg:col-span-5 bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-4">
-          <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">New Deliverable Submission</h2>
+          <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Submit an Assignment</h2>
           
           {message && (
             <div className={`p-3 rounded-lg text-xs font-medium flex items-start gap-2.5 ${
@@ -172,11 +172,11 @@ export default function StudentSubmissionsPage() {
           <form onSubmit={handleSubmit} className="space-y-3.5">
             <div>
               <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 ml-0.5">
-                Target Module <span className="text-rose-500">*</span>
+                Select Module <span className="text-rose-500">*</span>
               </label>
               {modules.length === 0 ? (
                 <p className="text-xs text-amber-700 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
-                  No modules available for deliverable assignment.
+                  No modules available yet.
                 </p>
               ) : (
                 <select
@@ -185,7 +185,7 @@ export default function StudentSubmissionsPage() {
                   onChange={e => setForm({ ...form, moduleId: e.target.value })}
                   className="select-premium cursor-pointer text-xs"
                 >
-                  <option value="">Select Target Module...</option>
+                  <option value="">Choose a module...</option>
                   {modules.map(mod => (
                     <option key={mod.id} value={mod.id}>{mod.title}</option>
                   ))}
@@ -195,27 +195,27 @@ export default function StudentSubmissionsPage() {
 
             <div>
               <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 ml-0.5">
-                Deliverable URL Link <span className="text-rose-500">*</span>
+                Link to your work <span className="text-rose-500">*</span>
               </label>
               <input
                 required
                 type="url"
                 value={form.link}
                 onChange={e => setForm({ ...form, link: e.target.value })}
-                placeholder="https://github.com/... or Google Drive URL"
+                placeholder="https://github.com/... or Google Drive link"
                 className="input-premium text-xs"
               />
             </div>
 
             <div>
               <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 ml-0.5">
-                Student Remarks / Notes (Optional)
+                Notes or Comments (Optional)
               </label>
               <textarea
                 value={form.notes}
                 onChange={e => setForm({ ...form, notes: e.target.value })}
                 rows="3"
-                placeholder="Briefly describe project deliverables, branch names, or instructions..."
+                placeholder="Any comments or instructions for your teacher..."
                 className="textarea-premium text-xs resize-none"
               />
             </div>
@@ -223,10 +223,19 @@ export default function StudentSubmissionsPage() {
             <button
               type="submit"
               disabled={submitting || modules.length === 0}
-              className="w-full btn-primary-premium text-xs py-2.5 mt-1"
+              className="w-full py-2.5 bg-[#1E3A5F] hover:bg-[#2B5282] text-white rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-2 cursor-pointer shadow-xs disabled:opacity-60"
             >
-              {submitting ? <Loader2 size={14} className="animate-spin" /> : <FolderUp size={14} />}
-              <span>{submitting ? 'Submitting to Faculty...' : 'Submit Deliverable'}</span>
+              {submitting ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  <span>Submitting...</span>
+                </>
+              ) : (
+                <>
+                  <FolderUp size={14} />
+                  <span>Submit Assignment</span>
+                </>
+              )}
             </button>
           </form>
         </div>

@@ -10,19 +10,19 @@ import AmbientBackground from '../components/AmbientBackground';
 import AnnouncementNotificationWatcher from '../components/AnnouncementNotificationWatcher';
 
 const navItems = [
-  { path: 'dashboard', label: 'Academic Overview', shortLabel: 'Overview', icon: LayoutDashboard, category: 'Student Portal' },
-  { path: 'attendance', label: 'Attendance Check-In Terminal', shortLabel: 'Attendance', icon: QrCode, category: 'Student Portal' },
-  { path: 'courses', label: 'Curriculum & Module Syllabus', shortLabel: 'Courses', icon: BookOpen, category: 'Academic Resources' },
-  { path: 'content', label: 'Course Resource Library', shortLabel: 'Library', icon: FileText, category: 'Academic Resources' },
-  { path: 'submissions', label: 'Assignment & Work Submissions', shortLabel: 'Submissions', icon: FolderUp, category: 'Academic Resources' },
-  { path: 'profile', label: 'Official Student Profile', shortLabel: 'Profile', icon: User, category: 'Student Portal' },
+  { path: 'dashboard', label: 'Dashboard', shortLabel: 'Dashboard', icon: LayoutDashboard, category: 'Main Menu' },
+  { path: 'attendance', label: 'Mark Attendance', shortLabel: 'Attendance', icon: QrCode, category: 'Main Menu' },
+  { path: 'courses', label: 'My Courses', shortLabel: 'Courses', icon: BookOpen, category: 'Courses & Learning' },
+  { path: 'content', label: 'Study Materials', shortLabel: 'Materials', icon: FileText, category: 'Courses & Learning' },
+  { path: 'submissions', label: 'Assignments', shortLabel: 'Assignments', icon: FolderUp, category: 'Courses & Learning' },
+  { path: 'profile', label: 'My Profile', shortLabel: 'Profile', icon: User, category: 'Main Menu' },
 ];
 
 const bottomNavItems = [
   navItems.find(i => i.path === 'dashboard'),
   navItems.find(i => i.path === 'attendance'),
   navItems.find(i => i.path === 'courses'),
-  navItems.find(i => i.path === 'content'),
+  navItems.find(i => i.path === 'submissions'),
   navItems.find(i => i.path === 'profile'),
 ];
 
@@ -119,7 +119,7 @@ export default function StudentLayout() {
 
           {/* Navigation Links */}
           <nav className="flex-1 space-y-4 overflow-y-auto no-scrollbar custom-scrollbar pr-1">
-            {['Student Portal', 'Academic Resources'].map((category) => {
+            {['Main Menu', 'Courses & Learning'].map((category) => {
               const items = navItems.filter(item => item.category === category);
               if (items.length === 0) return null;
               return (
@@ -152,7 +152,7 @@ export default function StudentLayout() {
           <div className="pt-3 mt-2 border-t border-slate-100">
             <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer">
               <LogOut size={14} />
-              <span>Sign Out Session</span>
+              <span>Sign Out</span>
             </button>
           </div>
         </div>

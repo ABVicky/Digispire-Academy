@@ -214,7 +214,7 @@ export default function StudentDashboard() {
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-48 gap-3">
       <div className="animate-spin rounded-full h-8 w-8 border-3 border-[#1E3A5F] border-t-transparent" />
-      <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Loading Academic Dossier...</p>
+      <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Loading Dashboard...</p>
     </div>
   );
 
@@ -224,7 +224,7 @@ export default function StudentDashboard() {
 
   return (
     <div className="space-y-5 pb-6 font-sans">
-      {/* ─── Formal Student Dossier Banner ─── */}
+      {/* ─── Student Header Banner ─── */}
       <div className="bg-[#1E3A5F] rounded-xl p-5 sm:p-6 text-white shadow-sm border border-slate-700/50 relative overflow-hidden">
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -237,14 +237,14 @@ export default function StudentDashboard() {
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Official Student Record</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-300">Student Profile</span>
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
               </div>
               <h1 className="text-xl font-bold tracking-tight mt-0.5 truncate">{userProfile?.name || 'Student'}</h1>
               <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-slate-300">
                 <span className="font-mono font-bold tracking-wider">ID: {userProfile?.studentId}</span>
                 <span>·</span>
-                <span className="font-medium text-slate-200">{userProfile?.course || 'General Curriculum'}</span>
+                <span className="font-medium text-slate-200">{userProfile?.course || 'General Track'}</span>
               </div>
             </div>
           </div>
@@ -255,7 +255,7 @@ export default function StudentDashboard() {
             className="self-start sm:self-auto inline-flex items-center gap-2 px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition border border-white/20 cursor-pointer"
           >
             <CreditCard size={14} />
-            <span>Digital Identity Badge</span>
+            <span>View Student ID</span>
           </button>
         </div>
       </div>
@@ -266,7 +266,7 @@ export default function StudentDashboard() {
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700">
               <Megaphone size={14} className="text-[#1E3A5F]" />
-              <span>Official Academic Notices</span>
+              <span>Announcements & Notices</span>
               <span className="h-5 min-w-[20px] px-1.5 rounded-full bg-[#1E3A5F] text-white text-[10px] font-bold flex items-center justify-center">
                 {activeAnnouncements.length}
               </span>
@@ -276,7 +276,7 @@ export default function StudentDashboard() {
                 onClick={() => setShowAllAnnouncementsModal(true)}
                 className="text-[11px] font-bold text-[#1E3A5F] hover:underline flex items-center gap-1 cursor-pointer"
               >
-                <span>Notice Archive</span>
+                <span>View All Notices</span>
                 <ChevronRight size={12} />
               </button>
             )}
@@ -320,7 +320,7 @@ export default function StudentDashboard() {
                           <span className={`text-[9px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-full ${
                             isUrgent ? 'bg-rose-200/80 text-rose-800' : isImportant ? 'bg-amber-200/80 text-amber-900' : 'bg-blue-200/80 text-[#1E3A5F]'
                           }`}>
-                            {isUrgent ? 'Urgent Alert' : isImportant ? 'Important Notice' : 'Faculty Broadcast'}
+                            {isUrgent ? 'Urgent Alert' : isImportant ? 'Important Notice' : 'Notice'}
                           </span>
                           {ann.pinned && (
                             <span className="text-[9px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100/80 px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -353,14 +353,14 @@ export default function StudentDashboard() {
                     </p>
                     <div className="mt-3 pt-2.5 border-t border-black/5 flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-500">
                       <span>
-                        Audience: <strong className="text-slate-700 uppercase">
+                        Target: <strong className="text-slate-700 uppercase">
                           {Array.isArray(ann.targetBatchIds)
                             ? (ann.targetBatchIds.includes('all') ? 'All Batches' : ann.targetBatchIds.join(', '))
                             : (ann.targetBatchId === 'all' ? 'All Batches' : (ann.targetBatchId || 'Enrolled Track'))}
                         </strong>
                       </span>
                       <span>
-                        Published by: <strong className="text-slate-700">{ann.authorName}</strong> ({ann.authorRole})
+                        By: <strong className="text-slate-700">{ann.authorName}</strong>
                       </span>
                     </div>
                   </div>
@@ -377,8 +377,8 @@ export default function StudentDashboard() {
         <div className={`${pctBg} rounded-xl p-5 border flex flex-col justify-between`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-600">Attendance Compliance</p>
-              <p className="text-[10px] text-slate-500 mt-0.5 font-medium">Minimum standard: 75.0% required</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-600">Overall Attendance</p>
+              <p className="text-[10px] text-slate-500 mt-0.5 font-medium">Goal: 75% or higher</p>
             </div>
             <Award size={18} className={pctColor} />
           </div>
@@ -386,7 +386,7 @@ export default function StudentDashboard() {
             <div className="flex items-baseline gap-2">
               <p className={`text-3xl font-extrabold ${pctColor} leading-none font-mono`}>{data.attendancePct}%</p>
               <span className="text-xs text-slate-500 font-semibold">
-                {data.attendancePct >= 75 ? 'Compliant' : 'Attention Required'}
+                {data.attendancePct >= 75 ? 'Good Standing' : 'Needs Attention'}
               </span>
             </div>
             <div className="mt-2.5 h-1.5 bg-slate-200/80 rounded-full overflow-hidden">
@@ -402,15 +402,15 @@ export default function StudentDashboard() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Classroom Check-In</p>
-              <p className="text-sm font-bold text-slate-800 mt-0.5">Session Verification Terminal</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Class Attendance</p>
+              <p className="text-sm font-bold text-slate-800 mt-0.5">Scan Classroom QR Code</p>
             </div>
             <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center text-[#1E3A5F]">
               <QrCode size={16} />
             </div>
           </div>
           <div className="mt-4 flex items-center justify-between pt-2 border-t border-slate-100">
-            <span className="text-xs font-semibold text-[#1E3A5F]">Scan Session Broadcaster</span>
+            <span className="text-xs font-semibold text-[#1E3A5F]">Open QR Scanner</span>
             <ChevronRight size={14} className="text-[#1E3A5F]" />
           </div>
         </Link>
@@ -419,10 +419,10 @@ export default function StudentDashboard() {
       {/* ─── Enrolled Academic Batches ─── */}
       <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-3">
         <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-          <Layers size={14} className="text-[#1E3A5F]" /> Enrolled Academic Batches
+          <Layers size={14} className="text-[#1E3A5F]" /> My Batches
         </h2>
         {data.enrolledBatches.length === 0 ? (
-          <p className="text-xs text-slate-400 py-3 italic">No active batch enrolment recorded.</p>
+          <p className="text-xs text-slate-400 py-3 italic">No active batch enrolled.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             {data.enrolledBatches.map(b => (
@@ -430,10 +430,10 @@ export default function StudentDashboard() {
                 <div>
                   <h3 className="font-bold text-slate-800 text-xs tracking-tight">{b.name || b.id}</h3>
                   <p className="text-[10px] text-slate-500 font-medium mt-0.5">
-                    Schedule: {b.startTime || '09:00'} – {b.endTime || '11:00'}
+                    Time: {b.startTime || '09:00'} – {b.endTime || '11:00'}
                   </p>
                   <p className="text-[10px] text-slate-400 mt-0.5">
-                    Lead: {b.educator || 'Faculty Lead'}
+                    Teacher: {b.educator || 'Faculty Lead'}
                   </p>
                 </div>
                 <span className="badge-premium-blue text-[9px]">Enrolled</span>
@@ -446,10 +446,10 @@ export default function StudentDashboard() {
       {/* ─── Scheduled Lectures Timetable ─── */}
       <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-3">
         <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-          <Calendar size={14} className="text-[#1E3A5F]" /> Scheduled Lectures
+          <Calendar size={14} className="text-[#1E3A5F]" /> Upcoming Classes
         </h2>
         {data.upcomingClasses.length === 0 ? (
-          <p className="text-xs text-slate-400 py-3 italic">No scheduled lectures today or tomorrow.</p>
+          <p className="text-xs text-slate-400 py-3 italic">No classes scheduled for today or tomorrow.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             {data.upcomingClasses.map(c => (
@@ -479,7 +479,7 @@ export default function StudentDashboard() {
       {(data.mentor || data.instructors.length > 0) && (
         <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-3">
           <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-            <GraduationCap size={14} className="text-[#1E3A5F]" /> Faculty & Mentorship Directory
+            <GraduationCap size={14} className="text-[#1E3A5F]" /> My Teachers & Mentors
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             {data.mentor && (
@@ -488,7 +488,7 @@ export default function StudentDashboard() {
                   <User size={16} />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Assigned Advisor</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">My Mentor</span>
                   <h3 className="font-bold text-slate-800 text-xs truncate mt-0.5">{data.mentor.name}</h3>
                   <div className="mt-1 space-y-0.5 text-[10px] text-slate-500">
                     {data.mentor.email && <p className="flex items-center gap-1.5 truncate"><Mail size={10} /> {data.mentor.email}</p>}
@@ -503,7 +503,7 @@ export default function StudentDashboard() {
                   <GraduationCap size={16} />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Course Faculty</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Teacher</span>
                   <h3 className="font-bold text-slate-800 text-xs truncate mt-0.5">{inst.name}</h3>
                   <div className="mt-1 space-y-0.5 text-[10px] text-slate-500">
                     {inst.email && <p className="flex items-center gap-1.5 truncate"><Mail size={10} /> {inst.email}</p>}

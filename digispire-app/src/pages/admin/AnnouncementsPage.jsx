@@ -322,11 +322,11 @@ export default function AnnouncementsPage() {
       <div className="section-header">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Academic Announcements & Batch Alerts</h1>
-            <span className="badge-premium-blue">Targeted Broadcast Hub</span>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Announcements & Notices</h1>
+            <span className="badge-premium-blue">Batch Alerts</span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Publish precise batch-targeted announcements, schedule shifts, and emergency alerts to student portals
+            Send announcements, class notices, and batch updates to students
           </p>
         </div>
         <div className="flex items-center gap-2 self-start sm:self-auto">
@@ -335,7 +335,7 @@ export default function AnnouncementsPage() {
             className="btn-primary-premium px-4 py-2.5 flex items-center gap-2"
           >
             <Plus size={16} />
-            <span>New Batch Announcement</span>
+            <span>New Announcement</span>
           </button>
         </div>
       </div>
@@ -348,7 +348,7 @@ export default function AnnouncementsPage() {
           </div>
           <div className="min-w-0">
             <p className="text-lg font-bold text-slate-800 leading-none font-mono">{announcements.length}</p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1 truncate">Total Broadcasts</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1 truncate">Total Announcements</p>
           </div>
         </div>
 
@@ -378,7 +378,7 @@ export default function AnnouncementsPage() {
           </div>
           <div className="min-w-0">
             <p className="text-lg font-bold text-slate-800 leading-none font-mono">{pinnedCount}</p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1 truncate">Pinned Notices</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1 truncate">Pinned</p>
           </div>
         </div>
       </div>
