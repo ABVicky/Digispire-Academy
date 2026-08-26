@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { calculateAttendance } from '../../utils/attendanceEngine';
-import QRCode from 'qrcode';
+import StudentIDCardModal from '../../components/StudentIDCardModal';
 
 export default function StudentDashboard() {
   const { userProfile } = useAuth();
@@ -518,100 +518,10 @@ export default function StudentDashboard() {
 
       {/* ─── Digital ID Card Modal ─── */}
       {showIdCardModal && (
-        <div className="modal-backdrop-premium" onClick={() => setShowIdCardModal(false)}>
-          <div className="modal-container-premium max-w-sm" onClick={e => e.stopPropagation()}>
-            <div className="modal-header-premium">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-600">Digital Student ID</span>
-              <button onClick={() => setShowIdCardModal(false)} className="p-1 text-slate-400 hover:text-slate-600 rounded">
-                <X size={16} />
-              </button>
-            </div>
-            
-            <div className="modal-body-premium flex flex-col items-center gap-4 py-4">
-              <div className="id-card-perspective w-68 h-[420px] cursor-pointer" onClick={() => setIsFlipped(!isFlipped)}>
-                <div className={`id-card-inner rounded-2xl shadow-xl ${isFlipped ? 'id-card-flipped' : ''}`}>
-                  
-                  {/* CARD FRONT */}
-                  <div className="id-card-front bg-[#1E3A5F] text-white flex flex-col justify-between p-5 absolute inset-0 border border-slate-600 select-none">
-                    <div className="flex items-center justify-between border-b border-white/15 pb-3">
-                      <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 bg-white rounded-md flex items-center justify-center p-1 shrink-0">
-                          <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
-                        </div>
-                        <div>
-                          <h4 className="font-heading font-extrabold tracking-tight text-xs leading-none">DIGISPIRE ACADEMY</h4>
-                          <span className="text-[7px] text-slate-300 tracking-widest uppercase mt-0.5 block">Official Credential</span>
-                        </div>
-                      </div>
-                      <span className="text-[8px] font-bold uppercase tracking-wider text-slate-300 border border-white/20 px-1.5 py-0.5 rounded bg-white/5">
-                        STUDENT
-                      </span>
-                    </div>
-
-                    <div className="text-center my-auto py-2 space-y-2.5">
-                      <div className="h-20 w-20 rounded-xl bg-white p-1 border border-white/20 mx-auto overflow-hidden">
-                        {userProfile?.photoURL ? (
-                          <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover rounded-lg" />
-                        ) : (
-                          <div className="h-full w-full bg-slate-100 flex items-center justify-center rounded-lg p-1.5">
-                            <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-bold text-white tracking-tight">{userProfile?.name}</h3>
-                        <p className="text-[9px] text-slate-300 mt-0.5">{userProfile?.course || 'General Curriculum'}</p>
-                      </div>
-                    </div>
-
-                    <div className="border-t border-white/15 pt-2.5 flex items-end justify-between text-xs">
-                      <div className="space-y-0.5">
-                        <p className="text-[7px] font-bold uppercase text-slate-300">Identifier ID</p>
-                        <p className="font-mono font-bold text-white text-[11px] tracking-wider">{userProfile?.studentId}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[7px] font-bold uppercase text-slate-300">Status</p>
-                        <p className="text-[9px] font-semibold text-emerald-300">Verified</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* CARD BACK */}
-                  <div className="id-card-back bg-[#1E3A5F] text-white flex flex-col justify-between p-5 absolute inset-0 border border-slate-600 select-none">
-                    <div className="text-center border-b border-white/15 pb-2">
-                      <h4 className="font-heading font-bold text-xs tracking-tight">DIGISPIRE ACADEMY</h4>
-                      <span className="text-[7px] text-slate-300 uppercase tracking-wider block mt-0.5">Verification Barcode</span>
-                    </div>
-
-                    <div className="my-auto text-center space-y-2">
-                      <div className="w-28 h-28 bg-white p-2 rounded-xl flex items-center justify-center mx-auto border border-white/20">
-                        {qrCodeUrl ? (
-                          <img src={qrCodeUrl} alt="QR Code" className="h-full w-full object-contain" />
-                        ) : (
-                          <div className="text-xs text-slate-400">Loading...</div>
-                        )}
-                      </div>
-                      <p className="text-[7px] font-mono text-slate-300 uppercase tracking-widest">Scan for Verification</p>
-                    </div>
-
-                    <div className="border-t border-white/15 pt-2 text-[7px] text-slate-300 text-center leading-normal">
-                      This digital credential certifies official enrollment. Property of DIGISPIRE Academy.
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-              <button 
-                type="button"
-                onClick={() => setIsFlipped(!isFlipped)} 
-                className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs transition cursor-pointer"
-              >
-                Flip Credential
-              </button>
-            </div>
-          </div>
-        </div>
+        <StudentIDCardModal
+          student={userProfile}
+          onClose={() => setShowIdCardModal(false)}
+        />
       )}
 
       {/* ─── Notice Archive Drawer Modal ─── */}

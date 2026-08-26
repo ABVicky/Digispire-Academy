@@ -6,7 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import {
   User, Phone, Mail, GraduationCap, Key,
   CheckCircle2, AlertCircle, Camera, LogOut, Loader2,
-  ShieldCheck, CreditCard
+  ShieldCheck, CreditCard, Sparkles, RotateCw, Printer
 } from 'lucide-react';
 import QRCode from 'qrcode';
 
@@ -321,88 +321,135 @@ export default function ProfilePage() {
           </div>
         ) : activeTab === 'idcard' ? (
           /* Digital ID Card */
-          <div className="flex flex-col items-center gap-4 py-2">
-            <div className="id-card-perspective w-76 h-[460px] cursor-pointer" onClick={() => setIsFlipped(!isFlipped)}>
-              <div className={`id-card-inner rounded-2xl shadow-xl ${isFlipped ? 'id-card-flipped' : ''}`}>
+          <div className="flex flex-col items-center gap-5 py-4">
+            <div
+              className="id-card-perspective w-72 sm:w-80 h-[480px] cursor-pointer group"
+              onClick={() => setIsFlipped(!isFlipped)}
+              title="Click to flip ID card"
+            >
+              <div className={`id-card-inner rounded-3xl transition-transform duration-700 shadow-2xl ${isFlipped ? 'id-card-flipped' : ''}`}>
                 
                 {/* CARD FRONT */}
-                <div className="id-card-front bg-[#1E3A5F] text-white flex flex-col justify-between p-5 absolute inset-0 border border-slate-600 select-none">
-                  <div className="flex items-center justify-between border-b border-white/15 pb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="h-7 w-7 bg-white rounded-md flex items-center justify-center p-1 shrink-0">
+                <div className="id-card-front bg-gradient-to-br from-[#0F243E] via-[#163355] to-[#1E3A5F] text-white p-5 rounded-3xl border-2 border-white/20 shadow-2xl flex flex-col justify-between select-none relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[radial-gradient(#38BDF8_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
+                  <div className="absolute -top-16 -right-16 w-36 h-36 bg-sky-500/10 rounded-full blur-2xl pointer-events-none" />
+
+                  {/* Header */}
+                  <div className="relative z-10 flex items-center justify-between border-b border-white/15 pb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="h-9 w-9 bg-white rounded-xl flex items-center justify-center p-1 shadow-md border border-white/30 shrink-0">
                         <img src="/logo.png" alt="DIGISPIRE Logo" className="h-full w-full object-contain" />
                       </div>
                       <div>
-                        <h4 className="font-heading font-extrabold tracking-tight text-xs leading-none">DIGISPIRE ACADEMY</h4>
-                        <span className="text-[7px] text-slate-300 tracking-widest uppercase mt-0.5 block">Official Credential</span>
+                        <h4 className="font-heading font-black tracking-tight text-xs sm:text-sm text-white leading-none">DIGISPIRE</h4>
+                        <span className="text-[8px] font-bold text-sky-300 tracking-widest uppercase mt-0.5 block">ACADEMY</span>
                       </div>
                     </div>
-                    <span className="text-[8px] font-bold uppercase tracking-wider text-slate-300 border border-white/20 px-1.5 py-0.5 rounded bg-white/5">
-                      {userProfile?.role === 'admin' ? 'FACULTY' : 'STUDENT'}
+                    <span className="px-2 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> Verified
                     </span>
                   </div>
 
-                  <div className="text-center my-auto py-2 space-y-3">
-                    <div className="h-24 w-24 rounded-xl bg-white p-1 border border-white/20 mx-auto overflow-hidden">
-                      {userProfile?.photoURL ? (
-                        <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover rounded-lg" />
-                      ) : (
-                        <div className="h-full w-full bg-slate-100 flex items-center justify-center rounded-lg p-2">
-                          <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
-                        </div>
-                      )}
+                  {/* Photo and Name */}
+                  <div className="relative z-10 my-auto py-2 text-center flex flex-col items-center space-y-3">
+                    <div className="relative">
+                      <div className="h-24 w-24 rounded-2xl bg-white p-1 shadow-lg border-2 border-white/30 overflow-hidden mx-auto">
+                        {userProfile?.photoURL ? (
+                          <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover rounded-xl" />
+                        ) : (
+                          <div className="h-full w-full bg-slate-100 flex items-center justify-center rounded-xl p-2">
+                            <img src="/logo.png" alt="Logo" className="h-full w-full object-contain opacity-70" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="absolute -bottom-1.5 -right-1.5 bg-amber-400 text-slate-950 p-1 rounded-full shadow-md border border-white">
+                        <ShieldCheck size={14} />
+                      </div>
                     </div>
+
                     <div>
-                      <h3 className="text-base font-bold text-white tracking-tight">{userProfile?.name}</h3>
-                      <p className="text-[10px] text-slate-300 mt-0.5">{userProfile?.course || 'General Curriculum'}</p>
+                      <h3 className="text-base sm:text-lg font-extrabold text-white tracking-tight leading-tight">{userProfile?.name}</h3>
+                      <p className="text-[11px] font-semibold text-sky-200 mt-0.5 line-clamp-1">{userProfile?.course || 'Advanced Skills Program'}</p>
+                      <div className="flex items-center justify-center gap-2 mt-1.5">
+                        <span className="px-2 py-0.5 rounded-md bg-white/10 text-white font-mono text-[9px] font-bold tracking-wider border border-white/10 uppercase">
+                          {userProfile?.isIntern ? 'Internship Track' : (userProfile?.batchId || 'Academic Cohort')}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="border-t border-white/15 pt-3 flex items-end justify-between text-xs">
-                    <div className="space-y-1">
-                      <p className="text-[8px] font-bold uppercase text-slate-300">Identifier ID</p>
-                      <p className="font-mono font-bold text-white tracking-wider">{userProfile?.studentId || 'DS-FACULTY'}</p>
+                  {/* Security Band */}
+                  <div className="relative z-10 py-1.5 px-3 my-1 rounded-lg bg-gradient-to-r from-amber-400/20 via-sky-400/20 to-purple-400/20 border border-white/15 flex items-center justify-between text-[8px] font-mono tracking-widest text-slate-300 uppercase">
+                    <span>SECURE IDENTITY</span>
+                    <Sparkles size={11} className="text-amber-300" />
+                    <span>SESSION {new Date().getFullYear()} – {new Date().getFullYear() + 1}</span>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="relative z-10 border-t border-white/15 pt-2.5 flex items-end justify-between text-xs">
+                    <div className="space-y-0.5 text-left">
+                      <p className="text-[8px] font-bold uppercase tracking-wider text-slate-400">STUDENT ID</p>
+                      <p className="font-mono font-black text-white text-xs tracking-wider">{userProfile?.studentId || 'DS-STD-0000'}</p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-[8px] font-bold uppercase text-slate-300">Status</p>
-                      <p className="text-[10px] font-semibold text-emerald-300">Verified</p>
+                    <div className="text-right space-y-0.5">
+                      <p className="text-[8px] font-bold uppercase tracking-wider text-slate-400">ROLE</p>
+                      <p className="text-[10px] font-extrabold text-amber-300 uppercase tracking-wide">
+                        {userProfile?.role === 'admin' ? 'Faculty' : userProfile?.isIntern ? 'Intern' : 'Student'}
+                      </p>
                     </div>
                   </div>
                 </div>
 
                 {/* CARD BACK */}
-                <div className="id-card-back bg-[#1E3A5F] text-white flex flex-col justify-between p-5 absolute inset-0 border border-slate-600 select-none">
-                  <div className="text-center border-b border-white/15 pb-2">
-                    <h4 className="font-heading font-bold text-xs tracking-tight">DIGISPIRE ACADEMY</h4>
-                    <span className="text-[7px] text-slate-300 uppercase tracking-wider block mt-0.5">Verification Barcode</span>
+                <div className="id-card-back bg-gradient-to-br from-[#0F243E] via-[#163355] to-[#1E3A5F] text-white p-5 rounded-3xl border-2 border-white/20 shadow-2xl flex flex-col justify-between select-none relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[radial-gradient(#38BDF8_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
+
+                  <div className="relative z-10 text-center border-b border-white/15 pb-2">
+                    <h4 className="font-heading font-extrabold text-xs tracking-tight text-white uppercase">DIGISPIRE ACADEMY</h4>
+                    <span className="text-[8px] text-sky-300 uppercase tracking-widest block mt-0.5 font-bold">Official Verification Barcode</span>
                   </div>
 
-                  <div className="my-auto text-center space-y-2">
-                    <div className="w-32 h-32 bg-white p-2 rounded-xl flex items-center justify-center mx-auto border border-white/20">
+                  <div className="relative z-10 my-auto text-center space-y-2">
+                    <div className="w-32 h-32 bg-white p-2 rounded-2xl flex items-center justify-center mx-auto shadow-xl border-2 border-white/30">
                       {qrCodeUrl ? (
                         <img src={qrCodeUrl} alt="QR Code" className="h-full w-full object-contain" />
                       ) : (
                         <div className="text-xs text-slate-400">Loading...</div>
                       )}
                     </div>
-                    <p className="text-[8px] font-mono text-slate-300 uppercase tracking-widest">Scan for Verification</p>
+                    <p className="text-[8px] font-mono text-sky-200 uppercase tracking-widest font-semibold">Scan to Verify Enrollment</p>
                   </div>
 
-                  <div className="border-t border-white/15 pt-3 text-[8px] text-slate-300 text-center leading-normal">
-                    This digital credential certifies official enrollment. Property of DIGISPIRE Academy.
+                  <div className="relative z-10 border-t border-white/15 pt-2.5 space-y-1 text-[8px] text-slate-300 text-center leading-relaxed">
+                    <p className="font-semibold text-white">DIGISPIRE Academy of Advanced Skills</p>
+                    <p className="text-slate-400">Official digital credential. Property of DIGISPIRE Academy.</p>
                   </div>
                 </div>
 
               </div>
             </div>
 
-            <button 
-              type="button"
-              onClick={() => setIsFlipped(!isFlipped)} 
-              className="w-full max-w-xs py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-lg text-xs transition cursor-pointer"
-            >
-              Flip Document
-            </button>
+            {/* Actions Bar */}
+            <div className="w-full max-w-sm flex items-center justify-center gap-3">
+              <button 
+                type="button"
+                onClick={() => setIsFlipped(!isFlipped)} 
+                className="flex-1 py-2.5 px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-95"
+              >
+                <RotateCw size={14} className={isFlipped ? 'rotate-180 transition-transform duration-500' : ''} />
+                <span>{isFlipped ? 'Show Front' : 'Flip to Back'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="py-2.5 px-4 bg-[#1E3A5F] hover:bg-[#2B5282] text-white rounded-xl text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                title="Print or Save ID Card"
+              >
+                <Printer size={14} />
+                <span>Print</span>
+              </button>
+            </div>
           </div>
         ) : (
           /* Security Card */
