@@ -323,15 +323,15 @@ export default function ProfilePage() {
           /* Digital ID Card */
           <div className="flex flex-col items-center gap-5 py-4">
             <div
-              className="id-card-perspective w-72 sm:w-80 h-[480px] cursor-pointer group"
+              className="id-card-perspective w-72 sm:w-80 h-[480px] cursor-pointer group shadow-2xl rounded-3xl"
               onClick={() => setIsFlipped(!isFlipped)}
               title="Click to flip ID card"
             >
-              <div className={`id-card-inner rounded-3xl transition-transform duration-700 shadow-2xl ${isFlipped ? 'id-card-flipped' : ''}`}>
+              <div className={`id-card-inner ${isFlipped ? 'id-card-flipped' : ''}`}>
                 
                 {/* CARD FRONT */}
-                <div className="id-card-front bg-gradient-to-br from-[#0F243E] via-[#163355] to-[#1E3A5F] text-white p-5 rounded-3xl border-2 border-white/20 shadow-2xl flex flex-col justify-between select-none relative overflow-hidden">
-                  <div className="absolute inset-0 bg-[radial-gradient(#38BDF8_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
+                <div className="id-card-front bg-gradient-to-br from-[#0F243E] via-[#163355] to-[#1E3A5F] text-white p-5 rounded-3xl border-2 border-white/20 flex flex-col justify-between select-none relative">
+                  <div className="absolute inset-0 bg-[radial-gradient(#38BDF8_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none rounded-3xl" />
                   <div className="absolute -top-16 -right-16 w-36 h-36 bg-sky-500/10 rounded-full blur-2xl pointer-events-none" />
 
                   {/* Header */}
@@ -401,8 +401,8 @@ export default function ProfilePage() {
                 </div>
 
                 {/* CARD BACK */}
-                <div className="id-card-back bg-gradient-to-br from-[#0F243E] via-[#163355] to-[#1E3A5F] text-white p-5 rounded-3xl border-2 border-white/20 shadow-2xl flex flex-col justify-between select-none relative overflow-hidden">
-                  <div className="absolute inset-0 bg-[radial-gradient(#38BDF8_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
+                <div className="id-card-back bg-gradient-to-br from-[#0F243E] via-[#163355] to-[#1E3A5F] text-white p-5 rounded-3xl border-2 border-white/20 flex flex-col justify-between select-none relative">
+                  <div className="absolute inset-0 bg-[radial-gradient(#38BDF8_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none rounded-3xl" />
 
                   <div className="relative z-10 text-center border-b border-white/15 pb-2">
                     <h4 className="font-heading font-extrabold text-xs tracking-tight text-white uppercase">DIGISPIRE ACADEMY</h4>
