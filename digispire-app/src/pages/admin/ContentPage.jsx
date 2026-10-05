@@ -5,11 +5,10 @@ import {
 import { db } from '../../firebase';
 import {
   Plus, FileText, Globe, Trash2, Pencil, X,
-  ExternalLink, Search, BookOpen, Video, FolderOpen,
+  ExternalLink, Search, BookOpen, Video,
   Eye, Copy, Check, LayoutGrid, Table as TableIcon,
-  RotateCcw, Sparkles, Pin, Play, Maximize2, Tag,
-  Presentation, Code2, FolderGit2, CheckCircle2,
-  TrendingUp, BarChart3, Layers, Filter, Clock, Info
+  RotateCcw, Sparkles, Pin, Play, Maximize2,
+  Layers, FolderGit2, CheckCircle2, TrendingUp
 } from 'lucide-react';
 import { triggerHaptic } from '../../utils/haptic';
 
@@ -17,9 +16,7 @@ import { triggerHaptic } from '../../utils/haptic';
 function detectType(url) {
   if (!url) return 'link';
   const lower = url.toLowerCase();
-  if (lower.includes('drive.google.com') || lower.includes('docs.google.com/folder')) return 'gdrive';
-  if (lower.includes('docs.google.com/presentation') || lower.includes('slideshare.net') || lower.includes('canva.com/design') || lower.includes('.ppt') || lower.includes('.pptx')) return 'slides';
-  if (lower.includes('github.com') || lower.includes('gitlab.com') || lower.includes('codesandbox.io') || lower.includes('replit.com') || lower.includes('codepen.io')) return 'code';
+  if (lower.includes('drive.google.com') || lower.includes('docs.google.com')) return 'gdrive';
   if (lower.includes('.pdf') || lower.includes('pdf')) return 'pdf';
   if (lower.includes('youtube.com') || lower.includes('youtu.be') || lower.includes('vimeo.com') || lower.includes('loom.com')) return 'video';
   return 'link';
@@ -30,8 +27,6 @@ function typeLabel(type) {
     pdf: 'PDF Document',
     gdrive: 'Google Drive Folder',
     video: 'Video Masterclass',
-    slides: 'Presentation Slides',
-    code: 'Code / GitHub Repo',
     link: 'Web Resource'
   };
   return map[type] || 'Resource Link';
@@ -42,8 +37,6 @@ function typeBadgeStyle(type) {
     pdf: 'bg-rose-50 text-rose-700 border-rose-200/80',
     gdrive: 'bg-sky-50 text-sky-700 border-sky-200/80',
     video: 'bg-purple-50 text-purple-700 border-purple-200/80',
-    slides: 'bg-amber-50 text-amber-700 border-amber-200/80',
-    code: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
     link: 'bg-blue-50 text-blue-700 border-blue-200/80',
   };
   return map[type] || map.link;
@@ -54,8 +47,6 @@ function typeIconColor(type) {
     pdf: 'text-rose-600 bg-rose-50 border-rose-100',
     gdrive: 'text-sky-600 bg-sky-50 border-sky-100',
     video: 'text-purple-600 bg-purple-50 border-purple-100',
-    slides: 'text-amber-600 bg-amber-50 border-amber-100',
-    code: 'text-emerald-600 bg-emerald-50 border-emerald-100',
     link: 'text-[#255A84] bg-blue-50 border-blue-100',
   };
   return map[type] || map.link;
@@ -66,8 +57,6 @@ function typeHeaderGradient(type) {
     pdf: 'from-rose-500/10 via-rose-500/5 to-transparent text-rose-600',
     gdrive: 'from-sky-500/10 via-sky-500/5 to-transparent text-sky-600',
     video: 'from-purple-500/10 via-purple-500/5 to-transparent text-purple-600',
-    slides: 'from-amber-500/10 via-amber-500/5 to-transparent text-amber-600',
-    code: 'from-emerald-500/10 via-emerald-500/5 to-transparent text-emerald-600',
     link: 'from-blue-500/10 via-blue-500/5 to-transparent text-blue-600',
   };
   return map[type] || map.link;
@@ -77,8 +66,6 @@ function TypeIcon({ type, size = 18 }) {
   if (type === 'pdf') return <FileText size={size} className="text-rose-600" />;
   if (type === 'gdrive') return <FolderGit2 size={size} className="text-sky-600" />;
   if (type === 'video') return <Video size={size} className="text-purple-600" />;
-  if (type === 'slides') return <Presentation size={size} className="text-amber-600" />;
-  if (type === 'code') return <Code2 size={size} className="text-emerald-600" />;
   return <Globe size={size} className="text-[#255A84]" />;
 }
 
@@ -96,10 +83,6 @@ function getEmbedUrl(url) {
   if (url.includes('drive.google.com/file/d/')) {
     const id = url.split('/file/d/')[1]?.split('/')[0];
     return `https://drive.google.com/file/d/${id}/preview`;
-  }
-  if (url.includes('docs.google.com/presentation/d/')) {
-    const id = url.split('/presentation/d/')[1]?.split('/')[0];
-    return `https://docs.google.com/presentation/d/${id}/embed?start=false&loop=false&delayms=3000`;
   }
   if (url.includes('loom.com/share/')) {
     const id = url.split('/share/')[1]?.split('?')[0];
@@ -126,11 +109,6 @@ function isValidUrl(url) {
 
 const emptyForm = { title: '', description: '', url: '', courseId: '', subject: '', isPinned: false };
 
-const TOPIC_SUGGESTIONS = [
-  'React', 'JavaScript', 'HTML/CSS', 'Python', 'NodeJS', 'Database & SQL',
-  'UI/UX Design', 'DSA & Algorithms', 'Git & GitHub', 'Interview Prep'
-];
-
 export default function ContentPage() {
   const [contents, setContents] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -156,8 +134,7 @@ export default function ContentPage() {
   // Filter & Tab States
   const [search, setSearch] = useState('');
   const [filterCourse, setFilterCourse] = useState('all');
-  const [selectedSubject, setSelectedSubject] = useState('all');
-  const [activeTab, setActiveTab] = useState('all'); // 'all', 'pinned', 'pdf', 'gdrive', 'video', 'slides', 'code', 'link'
+  const [activeTab, setActiveTab] = useState('all'); // 'all', 'pinned', 'pdf', 'gdrive', 'video', 'link'
   const [sortBy, setSortBy] = useState('newest'); // 'newest', 'popular', 'title', 'pinned'
 
   const fetchAll = async () => {
@@ -279,17 +256,6 @@ export default function ContentPage() {
 
   const getCourseName = id => courses.find(c => c.id === id)?.name || '';
 
-  // Extract all unique subjects
-  const allSubjects = useMemo(() => {
-    const subjects = new Set();
-    contents.forEach(item => {
-      if (item.subject && item.subject.trim()) {
-        subjects.add(item.subject.trim());
-      }
-    });
-    return Array.from(subjects);
-  }, [contents]);
-
   // Executive Metrics
   const totalResources = contents.length;
   const pinnedCount = contents.filter(c => c.isPinned).length;
@@ -313,13 +279,12 @@ export default function ContentPage() {
           courseName.includes(q);
 
         const matchCourse = filterCourse === 'all' || item.courseId === filterCourse;
-        const matchSubject = selectedSubject === 'all' || item.subject === selectedSubject;
 
         let matchTab = true;
         if (activeTab === 'pinned') matchTab = !!item.isPinned;
         else if (activeTab !== 'all') matchTab = type === activeTab;
 
-        return matchSearch && matchCourse && matchSubject && matchTab;
+        return matchSearch && matchCourse && matchTab;
       })
       .sort((a, b) => {
         if (sortBy === 'pinned') {
@@ -335,14 +300,13 @@ export default function ContentPage() {
         if (a.isPinned !== b.isPinned) return b.isPinned ? 1 : -1;
         return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
       });
-  }, [contents, search, filterCourse, selectedSubject, activeTab, sortBy, courses]);
+  }, [contents, search, filterCourse, activeTab, sortBy, courses]);
 
-  const hasActiveFilters = search || filterCourse !== 'all' || selectedSubject !== 'all' || activeTab !== 'all';
+  const hasActiveFilters = search || filterCourse !== 'all' || activeTab !== 'all';
 
   const handleResetFilters = () => {
     setSearch('');
     setFilterCourse('all');
-    setSelectedSubject('all');
     setActiveTab('all');
     setSortBy('newest');
   };
@@ -365,7 +329,7 @@ export default function ContentPage() {
               </span>
             </div>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Publish lecture masterclasses, PDF notes, slides, code repositories, and monitor student engagement
+              Publish lecture masterclasses, PDF notes, drive folders, and monitor student engagement
             </p>
           </div>
         </div>
@@ -465,7 +429,7 @@ export default function ContentPage() {
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search materials by title, topic tag, or course track..."
+              placeholder="Search materials by title, topic, or course track..."
               className="w-full pl-10 pr-9 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all"
             />
             {search && (
@@ -512,10 +476,8 @@ export default function ContentPage() {
             { id: 'pinned', label: `📌 Pinned`, count: pinnedCount },
             { id: 'video', label: `🎥 Video Lectures`, count: videoCount },
             { id: 'pdf', label: `📄 PDF Notes`, count: docsCount },
-            { id: 'slides', label: `📊 Slides` },
-            { id: 'code', label: `💻 Code Repos` },
             { id: 'gdrive', label: `📁 Drive Folders`, count: driveCount },
-            { id: 'link', label: `🔗 Links` },
+            { id: 'link', label: `🔗 Web Links` },
           ].map(tab => {
             const isActive = activeTab === tab.id;
             return (
@@ -540,38 +502,6 @@ export default function ContentPage() {
             );
           })}
         </div>
-
-        {/* Dynamic Subject Tags Cloud */}
-        {allSubjects.length > 0 && (
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 border-t border-slate-100 text-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
-              <Tag size={11} /> Filter Tag:
-            </span>
-            <button
-              onClick={() => setSelectedSubject('all')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition ${
-                selectedSubject === 'all'
-                  ? 'bg-slate-800 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              All Topics
-            </button>
-            {allSubjects.map(sub => (
-              <button
-                key={sub}
-                onClick={() => setSelectedSubject(selectedSubject === sub ? 'all' : sub)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition ${
-                  selectedSubject === sub
-                    ? 'bg-[#255A84] text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                #{sub}
-              </button>
-            ))}
-          </div>
-        )}
 
         {hasActiveFilters && (
           <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
@@ -979,7 +909,7 @@ export default function ContentPage() {
                   <h2 className="font-extrabold text-slate-800 text-base">
                     {editingId ? 'Edit Study Material' : 'Publish Study Material'}
                   </h2>
-                  <p className="text-[11px] text-slate-400 font-medium">Link video lectures, drive folders, slides, notes, or code</p>
+                  <p className="text-[11px] text-slate-400 font-medium">Link video lectures, drive folders, or PDF notes</p>
                 </div>
               </div>
               <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600 transition p-1 rounded-lg">
@@ -1015,7 +945,7 @@ export default function ContentPage() {
                   className={`w-full px-3.5 py-2.5 bg-slate-50 border rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none transition-all ${
                     urlError ? 'border-rose-300 focus:border-rose-500' : 'border-slate-200/80 focus:border-[#255A84]'
                   }`}
-                  placeholder="https://youtube.com/..., https://drive.google.com/..., https://github.com/..."
+                  placeholder="https://youtube.com/..., https://drive.google.com/..."
                 />
                 {urlError && <p className="text-xs text-rose-500 font-semibold mt-1">{urlError}</p>}
 
@@ -1056,37 +986,14 @@ export default function ContentPage() {
 
                 <div>
                   <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-                    Topic / Subject Tag
+                    Topic Tag <span className="normal-case text-slate-400 font-normal">(optional)</span>
                   </label>
                   <input
                     value={form.subject}
                     onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all"
-                    placeholder="e.g. React, Python, UI/UX"
+                    placeholder="e.g. React, Python, Notes"
                   />
-                </div>
-              </div>
-
-              {/* Quick Topic Suggestions */}
-              <div>
-                <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                  Quick Suggestion Chips:
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {TOPIC_SUGGESTIONS.map(tag => (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => setForm(f => ({ ...f, subject: tag }))}
-                      className={`text-[10px] font-bold px-2 py-1 rounded-lg transition ${
-                        form.subject === tag
-                          ? 'bg-[#255A84] text-white'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                      }`}
-                    >
-                      +{tag}
-                    </button>
-                  ))}
                 </div>
               </div>
 
@@ -1100,7 +1007,7 @@ export default function ContentPage() {
                   onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all resize-none"
                   rows={2}
-                  placeholder="Summary of topics covered, prerequisites, or download notes..."
+                  placeholder="Summary of topics covered, prerequisites, or notes..."
                 />
               </div>
 

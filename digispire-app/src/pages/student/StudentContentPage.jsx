@@ -4,19 +4,16 @@ import { db } from '../../firebase';
 import {
   FileText, Globe, ExternalLink, Search, BookOpen, Star, Video,
   Copy, Check, Play, Maximize2, Pin, X, CheckCircle2, Circle,
-  Sparkles, Filter, Clock, Tag, Presentation, Code2, FolderGit2,
-  Share2, ArrowUpRight, Award, Compass, Layers, CheckCheck,
-  Flame, LayoutGrid, ListFilter, RotateCcw, AlertCircle
+  Sparkles, Award, Layers, CheckCheck,
+  Flame, LayoutGrid, ListFilter, RotateCcw, FolderGit2
 } from 'lucide-react';
 import { triggerHaptic } from '../../utils/haptic';
 
-// Smart Resource Type Detector
+// Resource Type Detector
 function detectType(url) {
   if (!url) return 'link';
   const lower = url.toLowerCase();
-  if (lower.includes('drive.google.com') || lower.includes('docs.google.com/folder')) return 'gdrive';
-  if (lower.includes('docs.google.com/presentation') || lower.includes('slideshare.net') || lower.includes('canva.com/design') || lower.includes('.ppt') || lower.includes('.pptx')) return 'slides';
-  if (lower.includes('github.com') || lower.includes('gitlab.com') || lower.includes('codesandbox.io') || lower.includes('replit.com') || lower.includes('codepen.io')) return 'code';
+  if (lower.includes('drive.google.com') || lower.includes('docs.google.com')) return 'gdrive';
   if (lower.includes('.pdf') || lower.includes('pdf')) return 'pdf';
   if (lower.includes('youtube.com') || lower.includes('youtu.be') || lower.includes('vimeo.com') || lower.includes('loom.com')) return 'video';
   return 'link';
@@ -27,9 +24,7 @@ function typeLabel(type) {
     pdf: 'PDF Guide & Notes',
     gdrive: 'Drive Folder & Assets',
     video: 'Video Masterclass',
-    slides: 'Presentation Slides',
-    code: 'Code & Repository',
-    link: 'Web Reference'
+    link: 'Web Resource'
   };
   return map[type] || 'Resource Link';
 }
@@ -39,8 +34,6 @@ function typeBadgeStyle(type) {
     pdf: 'bg-rose-50 text-rose-700 border-rose-200/80',
     gdrive: 'bg-sky-50 text-sky-700 border-sky-200/80',
     video: 'bg-purple-50 text-purple-700 border-purple-200/80',
-    slides: 'bg-amber-50 text-amber-700 border-amber-200/80',
-    code: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
     link: 'bg-blue-50 text-blue-700 border-blue-200/80',
   };
   return map[type] || map.link;
@@ -51,8 +44,6 @@ function typeIconColor(type) {
     pdf: 'text-rose-600 bg-rose-50 border-rose-100',
     gdrive: 'text-sky-600 bg-sky-50 border-sky-100',
     video: 'text-purple-600 bg-purple-50 border-purple-100',
-    slides: 'text-amber-600 bg-amber-50 border-amber-100',
-    code: 'text-emerald-600 bg-emerald-50 border-emerald-100',
     link: 'text-[#255A84] bg-blue-50 border-blue-100',
   };
   return map[type] || map.link;
@@ -63,8 +54,6 @@ function typeHeaderGradient(type) {
     pdf: 'from-rose-500/10 via-rose-500/5 to-transparent text-rose-600',
     gdrive: 'from-sky-500/10 via-sky-500/5 to-transparent text-sky-600',
     video: 'from-purple-500/10 via-purple-500/5 to-transparent text-purple-600',
-    slides: 'from-amber-500/10 via-amber-500/5 to-transparent text-amber-600',
-    code: 'from-emerald-500/10 via-emerald-500/5 to-transparent text-emerald-600',
     link: 'from-blue-500/10 via-blue-500/5 to-transparent text-blue-600',
   };
   return map[type] || map.link;
@@ -74,8 +63,6 @@ function TypeIcon({ type, size = 18 }) {
   if (type === 'pdf') return <FileText size={size} className="text-rose-600" />;
   if (type === 'gdrive') return <FolderGit2 size={size} className="text-sky-600" />;
   if (type === 'video') return <Video size={size} className="text-purple-600" />;
-  if (type === 'slides') return <Presentation size={size} className="text-amber-600" />;
-  if (type === 'code') return <Code2 size={size} className="text-emerald-600" />;
   return <Globe size={size} className="text-[#255A84]" />;
 }
 
@@ -93,10 +80,6 @@ function getEmbedUrl(url) {
   if (url.includes('drive.google.com/file/d/')) {
     const id = url.split('/file/d/')[1]?.split('/')[0];
     return `https://drive.google.com/file/d/${id}/preview`;
-  }
-  if (url.includes('docs.google.com/presentation/d/')) {
-    const id = url.split('/presentation/d/')[1]?.split('/')[0];
-    return `https://docs.google.com/presentation/d/${id}/embed?start=false&loop=false&delayms=3000`;
   }
   if (url.includes('loom.com/share/')) {
     const id = url.split('/share/')[1]?.split('?')[0];
@@ -124,8 +107,7 @@ export default function StudentContentPage() {
   // Search, Filters & Sorting
   const [search, setSearch] = useState('');
   const [filterCourse, setFilterCourse] = useState('all');
-  const [selectedSubject, setSelectedSubject] = useState('all');
-  const [activeTab, setActiveTab] = useState('all'); // 'all', 'bookmarks', 'completed', 'pinned', 'video', 'pdf', 'slides', 'code', 'gdrive', 'link'
+  const [activeTab, setActiveTab] = useState('all'); // 'all', 'bookmarks', 'completed', 'pinned', 'video', 'pdf', 'gdrive', 'link'
   const [sortBy, setSortBy] = useState('newest'); // 'newest', 'popular', 'title', 'pinned'
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'compact'
 
@@ -215,23 +197,13 @@ export default function StudentContentPage() {
 
   const getCourseName = (id) => courses.find(c => c.id === id)?.name || '';
 
-  // Extract all unique subjects / tags for cloud
-  const allSubjects = useMemo(() => {
-    const subjects = new Set();
-    contents.forEach(item => {
-      if (item.subject && item.subject.trim()) {
-        subjects.add(item.subject.trim());
-      }
-    });
-    return Array.from(subjects);
-  }, [contents]);
-
   // Overall Learning Stats
   const totalCount = contents.length;
   const completedCount = contents.filter(c => completedItems.includes(c.id)).length;
   const bookmarkedCount = contents.filter(c => bookmarks.includes(c.id)).length;
   const videoCount = contents.filter(c => (c.type || detectType(c.fileUrl || c.url)) === 'video').length;
   const pdfCount = contents.filter(c => (c.type || detectType(c.fileUrl || c.url)) === 'pdf').length;
+  const driveCount = contents.filter(c => (c.type || detectType(c.fileUrl || c.url)) === 'gdrive').length;
   const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   // Filtered & Sorted Content List
@@ -249,7 +221,6 @@ export default function StudentContentPage() {
           courseName.includes(q);
 
         const matchCourse = filterCourse === 'all' || item.courseId === filterCourse;
-        const matchSubject = selectedSubject === 'all' || item.subject === selectedSubject;
 
         let matchTab = true;
         if (activeTab === 'bookmarks') matchTab = bookmarks.includes(item.id);
@@ -257,7 +228,7 @@ export default function StudentContentPage() {
         else if (activeTab === 'pinned') matchTab = !!item.isPinned;
         else if (activeTab !== 'all') matchTab = type === activeTab;
 
-        return matchSearch && matchCourse && matchSubject && matchTab;
+        return matchSearch && matchCourse && matchTab;
       })
       .sort((a, b) => {
         if (sortBy === 'pinned') {
@@ -274,14 +245,13 @@ export default function StudentContentPage() {
         if (a.isPinned !== b.isPinned) return b.isPinned ? 1 : -1;
         return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
       });
-  }, [contents, search, filterCourse, selectedSubject, activeTab, sortBy, bookmarks, completedItems, courses]);
+  }, [contents, search, filterCourse, activeTab, sortBy, bookmarks, completedItems, courses]);
 
-  const hasActiveFilters = search || filterCourse !== 'all' || selectedSubject !== 'all' || activeTab !== 'all';
+  const hasActiveFilters = search || filterCourse !== 'all' || activeTab !== 'all';
 
   const resetAllFilters = () => {
     setSearch('');
     setFilterCourse('all');
-    setSelectedSubject('all');
     setActiveTab('all');
     setSortBy('newest');
   };
@@ -317,7 +287,7 @@ export default function StudentContentPage() {
               Study Materials & Resources
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
-              Explore lecture recordings, masterclass slides, downloadable cheat sheets, and coding repositories curated for your cohort.
+              Explore lecture recordings, downloadable notes, cheat sheets, and shared folders curated for your cohort.
             </p>
 
             {/* Quick Hero Stat Chips */}
@@ -390,7 +360,7 @@ export default function StudentContentPage() {
         </div>
       </div>
 
-      {/* ── Search, Course Track & Sorting Bar ── */}
+      {/* ── Search, Course Track & Category Filter Bar ── */}
       <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100/90 space-y-3">
         <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
           {/* Search Input */}
@@ -400,7 +370,7 @@ export default function StudentContentPage() {
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search by topic, keyword, course name, or tags..."
+              placeholder="Search by topic, keyword, or course name..."
               className="w-full pl-10 pr-9 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#255A84] focus:ring-2 focus:ring-[#255A84]/10 focus:outline-none transition-all"
             />
             {search && (
@@ -471,9 +441,8 @@ export default function StudentContentPage() {
             { id: 'pinned', label: '📌 Pinned', count: contents.filter(c => c.isPinned).length },
             { id: 'video', label: '🎥 Lectures', count: videoCount },
             { id: 'pdf', label: '📄 PDF Notes', count: pdfCount },
-            { id: 'slides', label: '📊 Slides' },
-            { id: 'code', label: '💻 Code Repos' },
-            { id: 'gdrive', label: '📁 Drive Folders' },
+            { id: 'gdrive', label: '📁 Drive Folders', count: driveCount },
+            { id: 'link', label: '🔗 Web Links' },
           ].map(tab => {
             const isActive = activeTab === tab.id;
             const TabIcon = tab.icon;
@@ -505,38 +474,6 @@ export default function StudentContentPage() {
             );
           })}
         </div>
-
-        {/* ── Dynamic Subject Tags Cloud ── */}
-        {allSubjects.length > 0 && (
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 border-t border-slate-100 text-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
-              <Tag size={11} /> Topic Tags:
-            </span>
-            <button
-              onClick={() => setSelectedSubject('all')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition ${
-                selectedSubject === 'all'
-                  ? 'bg-slate-800 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              All Topics
-            </button>
-            {allSubjects.map(sub => (
-              <button
-                key={sub}
-                onClick={() => setSelectedSubject(selectedSubject === sub ? 'all' : sub)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition ${
-                  selectedSubject === sub
-                    ? 'bg-[#255A84] text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                #{sub}
-              </button>
-            ))}
-          </div>
-        )}
 
         {/* Filter Reset Strip if filters active */}
         {hasActiveFilters && (
@@ -708,11 +645,6 @@ export default function StudentContentPage() {
                 {previewMedia.description && (
                   <p className="text-slate-300 text-xs line-clamp-2 leading-relaxed">{previewMedia.description}</p>
                 )}
-                {previewMedia.subject && (
-                  <span className="inline-block mt-1 text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-md">
-                    #{previewMedia.subject}
-                  </span>
-                )}
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
@@ -849,7 +781,7 @@ function StudentResourceCard({
           )}
         </div>
 
-        {/* Badges & Tags */}
+        {/* Badges */}
         <div className="flex flex-wrap items-center gap-1.5 pt-2">
           {courseName ? (
             <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-[#255A84] border border-blue-100">
@@ -858,11 +790,6 @@ function StudentResourceCard({
           ) : (
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-500">
               General
-            </span>
-          )}
-          {item.subject && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
-              #{item.subject}
             </span>
           )}
           {isCompleted && (
@@ -947,11 +874,6 @@ function StudentResourceListItem({
             {courseName && (
               <span className="text-[10px] font-bold text-[#255A84] bg-blue-50 px-2 py-0.5 rounded-md">
                 {courseName}
-              </span>
-            )}
-            {item.subject && (
-              <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
-                #{item.subject}
               </span>
             )}
             {item.isPinned && (
