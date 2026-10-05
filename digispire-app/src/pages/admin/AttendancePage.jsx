@@ -6,7 +6,7 @@ import {
 import { db } from '../../firebase';
 import {
   QrCode, Clock, History, Trash2, X, Users, Calendar, 
-  Settings, ShieldAlert, Plus, Play, UserCheck, AlertTriangle
+  Settings, ShieldAlert, Plus, Play, UserCheck, AlertTriangle, Search
 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { calculateAttendance } from '../../utils/attendanceEngine';
@@ -33,6 +33,7 @@ export default function AttendancePage() {
   const [qrImageUrl, setQrImageUrl] = useState('');
   const [timeLeft, setTimeLeft] = useState(0);
   const [records, setRecords] = useState([]);
+  const [feedSearch, setFeedSearch] = useState('');
   const [loadingFeed, setLoadingFeed] = useState(true);
   const [stats, setStats] = useState({ total: 0, today: 0 });
   const [courses, setCourses] = useState([]);
@@ -731,6 +732,19 @@ export default function AttendancePage() {
       })
     : null;
 
+  const filteredRecords = records.filter(record => {
+    if (!feedSearch.trim()) return true;
+    const q = feedSearch.toLowerCase();
+    const courseObj = courses.find(c => c.id === record.coveredCourse);
+    const courseName = courseObj?.name || '';
+    return (
+      record.name?.toLowerCase().includes(q) ||
+      record.studentId?.toLowerCase().includes(q) ||
+      record.batchId?.toLowerCase().includes(q) ||
+      courseName.toLowerCase().includes(q)
+    );
+  });
+
   return (
     <div className="space-y-5 pb-12 font-sans">
       {/* ─── Page Header with Live Broadcast Pulse ─── */}
@@ -1002,19 +1016,44 @@ export default function AttendancePage() {
 
           {/* Right Live Stream Activity Feed */}
           <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col justify-between">
-            <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between gap-2">
+            <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="p-1.5 bg-blue-50 text-[#255A84] rounded-lg shrink-0">
                   <History size={18} />
                 </div>
-                <h2 className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider truncate">
-                  Live Attendance Check-ins
-                </h2>
+                <div>
+                  <h2 className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider truncate">
+                    Live Attendance Feed
+                  </h2>
+                  <p className="text-[10px] text-slate-400 font-medium">Real-time check-in stream</p>
+                </div>
               </div>
 
-              <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[10px] sm:text-xs font-bold shrink-0">
-                Today: {stats.today}
-              </span>
+              <div className="flex items-center gap-2">
+                {/* Real-time search filter */}
+                <div className="relative flex-1 sm:w-48">
+                  <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    value={feedSearch}
+                    onChange={e => setFeedSearch(e.target.value)}
+                    placeholder="Search name / ID..."
+                    className="w-full pl-8 pr-2.5 py-1 text-[11px] bg-slate-50 border border-slate-200/80 rounded-xl focus:bg-white focus:border-[#255A84] focus:outline-none transition-all placeholder-slate-400"
+                  />
+                  {feedSearch && (
+                    <button
+                      onClick={() => setFeedSearch('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      <X size={12} />
+                    </button>
+                  )}
+                </div>
+
+                <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[10px] sm:text-xs font-bold shrink-0">
+                  Today: {stats.today}
+                </span>
+              </div>
             </div>
 
             <div className="overflow-y-auto max-h-[500px] flex-1">
@@ -1023,17 +1062,21 @@ export default function AttendancePage() {
                   <div className="animate-spin h-6 w-6 border-2 border-[#255A84] border-t-transparent rounded-full" />
                   Syncing live stream feed...
                 </div>
-              ) : records.length === 0 ? (
+              ) : filteredRecords.length === 0 ? (
                 <div className="py-16 text-center text-slate-400 space-y-2">
                   <Users size={40} className="mx-auto opacity-20 text-slate-500" />
-                  <p className="text-sm font-bold text-slate-700">No Check-in Logs Today</p>
-                  <p className="text-xs text-slate-400">Student check-ins will appear here in real-time as they scan.</p>
+                  <p className="text-sm font-bold text-slate-700">
+                    {feedSearch ? 'No matching check-ins' : 'No Check-in Logs Today'}
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    {feedSearch ? 'Try a different search query' : 'Student check-ins will appear here in real-time as they scan.'}
+                  </p>
                 </div>
               ) : (
                 <>
                   {/* MOBILE STACKED CARDS VIEW (< md) */}
                   <div className="block md:hidden divide-y divide-slate-100">
-                    {records.map(record => (
+                    {filteredRecords.map(record => (
                       <div key={record.id} className="p-4 space-y-2.5 hover:bg-slate-50/70 transition-colors">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2.5 min-w-0">
@@ -1093,7 +1136,7 @@ export default function AttendancePage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-50">
-                        {records.map(record => (
+                        {filteredRecords.map(record => (
                           <tr key={record.id} className="hover:bg-slate-50/70 transition-colors">
                             <td className="px-5 py-3.5">
                               <div className="flex items-center gap-2.5">

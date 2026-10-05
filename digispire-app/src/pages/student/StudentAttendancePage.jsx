@@ -8,23 +8,28 @@ import { db } from '../../firebase';
 import { useAuth } from '../../context/AuthContext';
 import { 
   QrCode, CheckCircle2, AlertCircle, 
-  Calendar, Briefcase, Camera, X, ArrowLeft, History
+  Calendar, Briefcase, Camera, X, ArrowLeft, History,
+  Sparkles, Flame, Clock, Award, BookOpen, Layers, CheckCheck,
+  RotateCcw, ArrowRight, ChevronRight, UserCheck, ShieldCheck, KeyRound
 } from 'lucide-react';
 import { calculateAttendance } from '../../utils/attendanceEngine';
 import AttendanceCalendar from '../../components/AttendanceCalendar';
+import { triggerHaptic } from '../../utils/haptic';
 
 export default function StudentAttendancePage() {
   const { userProfile } = useAuth();
   
   // Tab control
-  const [activeTab, setActiveTab] = useState('terminal'); // terminal, history
+  const [activeTab, setActiveTab] = useState('terminal'); // 'terminal' | 'history'
 
   // Check-in Terminal States
-  const [status, setStatus] = useState('idle'); // idle, scanning, manual, success, error, processing
+  const [mode, setMode] = useState('scan'); // 'scan' | 'manual'
+  const [status, setStatus] = useState('idle'); // 'idle' | 'scanning' | 'manual' | 'processing' | 'success' | 'error'
   const [message, setMessage] = useState('');
   const [lastAttendance, setLastAttendance] = useState(null);
+  const [todayAttendance, setTodayAttendance] = useState(null);
   const [manualCode, setManualCode] = useState('');
-  const [selectedType, setSelectedType] = useState('academic'); // academic, internship
+  const [selectedType, setSelectedType] = useState('academic'); // 'academic' | 'internship'
   const scannerRef = useRef(null);
 
   // History calculation states
@@ -43,28 +48,36 @@ export default function StudentAttendancePage() {
   const [modules, setModules] = useState([]);
   const [topics, setTopics] = useState([]);
 
-  const fetchLastCheckIn = useCallback(async () => {
+  // Fetch today's and last check-ins
+  const fetchCheckIns = useCallback(async () => {
     if (!userProfile?.studentId) return;
-    await Promise.resolve();
+    const today = new Date().toISOString().split('T')[0];
     try {
+      // Fetch latest
       const q = query(
         collection(db, 'attendance'),
         where('studentId', '==', userProfile.studentId),
         orderBy('timestamp', 'desc'),
-        limit(1)
+        limit(5)
       );
       const snap = await getDocs(q);
-      if (!snap.empty) setLastAttendance(snap.docs[0].data());
+      const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (docs.length > 0) {
+        setLastAttendance(docs[0]);
+        const todayDoc = docs.find(d => d.date === today);
+        setTodayAttendance(todayDoc || null);
+      }
     } catch {
       const snap = await getDocs(query(collection(db, 'attendance'), where('studentId', '==', userProfile.studentId)));
-      const sorted = snap.docs.map(d => d.data()).sort((a, b) => (b.timestamp?.toMillis?.() || 0) - (a.timestamp?.toMillis?.() || 0));
+      const sorted = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.timestamp?.toMillis?.() || 0) - (a.timestamp?.toMillis?.() || 0));
       if (sorted[0]) setLastAttendance(sorted[0]);
+      const todayDoc = sorted.find(d => d.date === today);
+      setTodayAttendance(todayDoc || null);
     }
   }, [userProfile]);
 
   const fetchHistoryDetails = useCallback(async () => {
     if (!userProfile?.studentId) return;
-    await Promise.resolve();
     setLoadingHistory(true);
     try {
       // 1. Fetch student logs
@@ -80,42 +93,20 @@ export default function StudentAttendancePage() {
         setMyBatchSchedule(batchSnap.data());
       }
 
-      // 3. Fetch holidays, cancelled classes, courses, modules, topics
-      try {
-        const hSnap = await getDocs(collection(db, 'holidays'));
-        setHolidays(hSnap.docs.map(d => d.data()));
-      } catch (err) {
-        console.error('Failed to fetch holidays:', err);
-      }
+      // 3. Fetch holidays, cancellations, courses, modules, topics
+      const [hSnap, canSnap, cSnap, mSnap, tSnap] = await Promise.all([
+        getDocs(collection(db, 'holidays')).catch(() => ({ docs: [] })),
+        getDocs(collection(db, 'cancelled_classes')).catch(() => ({ docs: [] })),
+        getDocs(collection(db, 'courses')).catch(() => ({ docs: [] })),
+        getDocs(collection(db, 'modules')).catch(() => ({ docs: [] })),
+        getDocs(collection(db, 'topics')).catch(() => ({ docs: [] })),
+      ]);
 
-      try {
-        const canSnap = await getDocs(collection(db, 'cancelled_classes'));
-        setCancellations(canSnap.docs.map(d => d.data()));
-      } catch (err) {
-        console.error('Failed to fetch cancellations:', err);
-      }
-
-      try {
-        const cSnap = await getDocs(collection(db, 'courses'));
-        setCourses(cSnap.docs.map(d => ({ id: d.id, ...d.data() })));
-      } catch (err) {
-        console.error('Failed to fetch courses:', err);
-      }
-
-      try {
-        const mSnap = await getDocs(collection(db, 'modules'));
-        setModules(mSnap.docs.map(d => ({ id: d.id, ...d.data() })));
-      } catch (err) {
-        console.error('Failed to fetch modules:', err);
-      }
-
-      try {
-        const tSnap = await getDocs(collection(db, 'topics'));
-        setTopics(tSnap.docs.map(d => ({ id: d.id, ...d.data() })));
-      } catch (err) {
-        console.error('Failed to fetch topics:', err);
-      }
-
+      setHolidays(hSnap.docs.map(d => d.data()));
+      setCancellations(canSnap.docs.map(d => d.data()));
+      setCourses(cSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setModules(mSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setTopics(tSnap.docs.map(d => ({ id: d.id, ...d.data() })));
     } catch (err) {
       console.error('History fetch error:', err);
     } finally {
@@ -125,11 +116,11 @@ export default function StudentAttendancePage() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      fetchLastCheckIn();
+      fetchCheckIns();
       fetchHistoryDetails();
     }, 0);
     return () => clearTimeout(timer);
-  }, [fetchLastCheckIn, fetchHistoryDetails]);
+  }, [fetchCheckIns, fetchHistoryDetails]);
 
   const submitAttendance = useCallback(async (sessionData) => {
     const today = new Date().toISOString().split('T')[0];
@@ -192,6 +183,10 @@ export default function StudentAttendancePage() {
       ...attendanceDoc,
       timestamp: { toDate: () => new Date() }
     });
+    setTodayAttendance({
+      ...attendanceDoc,
+      timestamp: { toDate: () => new Date() }
+    });
     fetchHistoryDetails();
   }, [userProfile, fetchHistoryDetails]);
 
@@ -205,6 +200,7 @@ export default function StudentAttendancePage() {
     }
 
     setStatus('processing');
+    triggerHaptic('medium');
     try {
       let data;
       try {
@@ -231,17 +227,20 @@ export default function StudentAttendancePage() {
         const courseName = courses.find(c => c.id === sessionData.coveredCourse)?.name || 'General Course';
         const moduleName = modules.find(m => m.id === sessionData.coveredModule)?.title || 'General Module';
         setStatus('success');
+        triggerHaptic('success');
         setMessage(`Successfully marked present for ${courseName} (${moduleName})!`);
       } else {
         await submitAttendance(data);
         const courseName = courses.find(c => c.id === data.coveredCourse)?.name || 'General Course';
         const moduleName = modules.find(m => m.id === data.coveredModule)?.title || 'General Module';
         setStatus('success');
+        triggerHaptic('success');
         setMessage(`Successfully marked present for ${courseName} (${moduleName})!`);
       }
     } catch (err) {
       console.error(err);
       setStatus('error');
+      triggerHaptic('heavy');
       setMessage(err.message || 'Invalid QR code. Please try again.');
     }
   }, [submitAttendance, courses, modules]);
@@ -258,7 +257,7 @@ export default function StudentAttendancePage() {
           const config = { 
             fps: 15, 
             qrbox: (viewWidth, viewHeight) => {
-              const size = Math.min(viewWidth, viewHeight) * 0.7;
+              const size = Math.min(viewWidth, viewHeight) * 0.72;
               return { width: size, height: size };
             },
             aspectRatio: 1.0
@@ -297,17 +296,17 @@ export default function StudentAttendancePage() {
     };
   }, [status, onScanSuccess]);
 
-
-
   const handleManualCheckIn = async (e) => {
     e.preventDefault();
     if (!manualCode || manualCode.trim().length !== 6) {
       setStatus('error');
       setMessage('Please enter a valid 6-character session code.');
+      triggerHaptic('heavy');
       return;
     }
 
     setStatus('processing');
+    triggerHaptic('light');
     try {
       const studentBatchIds = userProfile.batchIds || (userProfile.batchId ? [userProfile.batchId] : ['morning']);
       let sessionData = null;
@@ -346,11 +345,13 @@ export default function StudentAttendancePage() {
       const moduleName = modules.find(m => m.id === sessionData.coveredModule)?.title || 'General Module';
 
       setStatus('success');
-      setMessage(`Successfully checked in manually to ${courseName} (${moduleName}) using code ${manualCode.toUpperCase()}!`);
+      triggerHaptic('success');
+      setMessage(`Successfully checked in manually to ${courseName} (${moduleName}) with code ${manualCode.toUpperCase()}!`);
       setManualCode('');
     } catch (err) {
       console.error(err);
       setStatus('error');
+      triggerHaptic('heavy');
       setMessage(err.message || 'Verification failed. Please try again.');
     }
   };
@@ -366,293 +367,470 @@ export default function StudentAttendancePage() {
       })
     : null;
 
+  const score = calculatedHistory ? calculatedHistory.attendancePercentage : 0;
+
   return (
-    <div className="max-w-md mx-auto space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Check-in Terminal</h1>
-        <p className="text-sm text-slate-500 font-medium">Scan QR code or check your attendance history logs</p>
+    <div className="space-y-4 sm:space-y-6 pb-16 font-sans">
+      {/* ── Compact Learning Hero Banner ── */}
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#0F172A] via-[#1E3A5F] to-[#255A84] text-white p-4 sm:p-6 shadow-md shadow-[#255A84]/15 border border-white/10">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1 sm:space-y-1.5 max-w-xl">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 border border-white/15 text-[10px] font-bold text-blue-200 tracking-wider uppercase backdrop-blur-md">
+              <Sparkles size={11} className="text-amber-400" />
+              <span>Digispire Attendance Portal</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Attendance & Session Check-In
+            </h1>
+            <p className="text-xs text-slate-300 font-medium leading-relaxed">
+              Scan class QR codes, submit session pins, and monitor your attendance standing in real-time.
+            </p>
+          </div>
+
+          {/* Gamified Mini Attendance Progress Tracker */}
+          <div className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-white/15 shrink-0 min-w-[220px] md:max-w-xs space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Award size={14} className="text-amber-400" />
+                <span className="text-xs font-bold text-white tracking-wide">Overall Score</span>
+              </div>
+              <span className={`text-[11px] font-black px-2 py-0.5 rounded-md border ${
+                score >= 75 
+                  ? 'bg-emerald-400/20 text-emerald-300 border-emerald-400/30' 
+                  : score >= 60 
+                  ? 'bg-amber-400/20 text-amber-300 border-amber-400/30' 
+                  : 'bg-rose-400/20 text-rose-300 border-rose-400/30'
+              }`}>
+                {score}%
+              </span>
+            </div>
+
+            {/* Progress bar */}
+            <div className="w-full bg-slate-900/60 rounded-full h-2 overflow-hidden p-0.5 border border-white/10">
+              <div
+                className={`h-full rounded-full transition-all duration-500 shadow-sm ${
+                  score >= 75 ? 'bg-gradient-to-r from-emerald-400 to-teal-400' :
+                  score >= 60 ? 'bg-gradient-to-r from-amber-400 to-orange-400' :
+                  'bg-gradient-to-r from-rose-500 to-red-400'
+                }`}
+                style={{ width: `${Math.max(score, 5)}%` }}
+              />
+            </div>
+
+            <div className="flex items-center justify-between text-[10px] text-slate-300 font-medium">
+              <span>{todayAttendance ? 'Checked In Today ✓' : 'Session Pending'}</span>
+              <span className="text-slate-400 flex items-center gap-0.5">
+                <Flame size={11} className="text-amber-400" /> Active
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Tab Switcher */}
-      <div className="flex bg-white/50 backdrop-blur-sm p-1.5 rounded-2xl border border-slate-100 shadow-sm">
+      {/* ── Tab Switcher Strip ── */}
+      <div className="flex items-center gap-1.5 bg-white p-1.5 rounded-2xl border border-slate-200/80 shadow-xs max-w-md">
         <button
-          onClick={() => setActiveTab('terminal')}
-          className={`flex-1 py-3 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
-            activeTab === 'terminal' ? 'bg-[#255A84] text-white shadow-md shadow-[#255A84]/15' : 'text-slate-400 hover:text-slate-600'
+          onClick={() => { triggerHaptic('light'); setActiveTab('terminal'); }}
+          className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+            activeTab === 'terminal' 
+              ? 'bg-[#255A84] text-white shadow-xs' 
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
           }`}
         >
-          <QrCode size={14} /> Check In
+          <QrCode size={14} />
+          <span>Check In</span>
         </button>
         <button
-          onClick={() => { setActiveTab('history'); fetchHistoryDetails(); }}
-          className={`flex-1 py-3 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
-            activeTab === 'history' ? 'bg-[#255A84] text-white shadow-md shadow-[#255A84]/15' : 'text-slate-400 hover:text-slate-600'
+          onClick={() => { triggerHaptic('light'); setActiveTab('history'); fetchHistoryDetails(); }}
+          className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+            activeTab === 'history' 
+              ? 'bg-[#255A84] text-white shadow-xs' 
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
           }`}
         >
-          <History size={14} /> My History
+          <History size={14} />
+          <span>My History & Calendar</span>
         </button>
       </div>
 
-      {/* Terminal View */}
+      {/* ── TAB 1: CHECK IN TERMINAL ── */}
       {activeTab === 'terminal' && (
-        <div className="space-y-6 animate-in fade-in duration-300">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden relative min-h-[400px] flex flex-col transition-all duration-300">
-            {status === 'idle' && (
-              <div className="flex-1 p-10 flex flex-col items-center justify-center text-center space-y-8 animate-in fade-in zoom-in duration-300">
-                <div className="h-24 w-24 bg-blue-50 rounded-2xl flex items-center justify-center text-[#255A84] shadow-inner">
-                  <QrCode size={48} strokeWidth={1.5} />
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-slate-800">Choose Check-in Method</p>
-                  <p className="text-xs text-slate-400 mt-2 font-medium px-4 leading-relaxed">Scan the display board or type the session code manually</p>
-                </div>
-                <div className="w-full space-y-3">
-                  <button
-                    onClick={() => setStatus('scanning')}
-                    className="w-full py-4 bg-[#255A84] hover:bg-[#1a4261] text-white rounded-2xl font-bold text-sm transition shadow-xl shadow-[#255A84]/20 flex items-center justify-center gap-3 active:scale-95"
-                  >
-                    <Camera size={20} /> Launch Scanner
-                  </button>
-                  
-                  <div className="relative flex items-center justify-center py-1 w-full">
-                    <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100"></span></div>
-                    <span className="relative bg-white px-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest">or</span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 animate-in fade-in duration-200">
+          {/* Main Interactive Check-In Deck (7 Cols) */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col min-h-[420px]">
+              {/* Terminal Card Header */}
+              <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-8 w-8 rounded-xl bg-blue-50 text-[#255A84] flex items-center justify-center font-bold">
+                    <KeyRound size={16} />
                   </div>
-                  
-                  <button
-                    onClick={() => setStatus('manual')}
-                    className="w-full py-4 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/60 rounded-2xl font-bold text-sm transition flex items-center justify-center gap-3 active:scale-95"
-                  >
-                    <QrCode size={18} /> Enter Session Code
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {status === 'scanning' && (
-              <div className="relative flex-1 flex flex-col">
-                <div className="absolute inset-0 z-10 pointer-events-none flex flex-col items-center justify-center">
-                  <div className="w-[250px] h-[250px] border-2 border-white/20 rounded-2xl relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-[2px] bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.8)] animate-scan-line"></div>
-                    <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-blue-500 rounded-tl-2xl"></div>
-                    <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-blue-500 rounded-tr-2xl"></div>
-                    <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-blue-500 rounded-bl-2xl"></div>
-                    <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-blue-500 rounded-br-2xl"></div>
+                  <div>
+                    <h3 className="font-extrabold text-slate-800 text-xs sm:text-sm">Attendance Scanner Deck</h3>
+                    <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium">Scan broadcast screen or enter code</p>
                   </div>
-                  <p className="mt-8 text-white text-[11px] font-bold uppercase tracking-[0.2em] bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm">Align QR Code within frame</p>
                 </div>
 
-                <div id="qr-reader" className="flex-1 bg-black"></div>
-                
-                <button
-                  onClick={() => setStatus('idle')}
-                  className="absolute top-4 right-4 z-20 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md transition-colors"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-            )}
-
-            {status === 'manual' && (
-              <form onSubmit={handleManualCheckIn} className="flex-1 p-8 flex flex-col justify-center text-center space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                  <button 
-                    type="button" onClick={() => { setStatus('idle'); setManualCode(''); }}
-                    className="p-2 hover:bg-slate-50 rounded-xl text-slate-400 hover:text-slate-600 transition"
-                  >
-                    <ArrowLeft size={18} />
-                  </button>
-                  <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Manual Code Entry</h2>
-                  <div className="w-9"></div>
-                </div>
-
-                {userProfile?.isIntern && (
-                  <div className="flex bg-slate-100 p-1 rounded-xl w-full">
+                {/* Mode Selector */}
+                {status !== 'scanning' && status !== 'processing' && status !== 'success' && status !== 'error' && (
+                  <div className="flex items-center bg-slate-100 p-1 rounded-xl">
                     <button
-                      type="button" onClick={() => setSelectedType('academic')}
-                      className={`flex-1 py-2 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${selectedType === 'academic' ? 'bg-white text-[#255A84] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                      onClick={() => { triggerHaptic('light'); setMode('scan'); setStatus('idle'); }}
+                      className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition ${
+                        mode === 'scan' ? 'bg-white text-[#255A84] shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                      }`}
                     >
-                      Academic
+                      Camera QR
                     </button>
                     <button
-                      type="button" onClick={() => setSelectedType('internship')}
-                      className={`flex-1 py-2 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all ${selectedType === 'internship' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                      onClick={() => { triggerHaptic('light'); setMode('manual'); setStatus('manual'); }}
+                      className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition ${
+                        mode === 'manual' ? 'bg-white text-[#255A84] shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                      }`}
                     >
-                      Internship
+                      Code Entry
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Terminal Viewport */}
+              <div className="flex-1 flex flex-col justify-center p-4 sm:p-6">
+                {/* 1. IDLE / SCAN LAUNCHER */}
+                {status === 'idle' && mode === 'scan' && (
+                  <div className="text-center space-y-6 my-auto py-6">
+                    <div className="relative h-24 w-24 mx-auto rounded-3xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100/80 flex items-center justify-center text-[#255A84] shadow-sm group">
+                      <QrCode size={48} strokeWidth={1.5} className="group-hover:scale-105 transition-transform" />
+                      <div className="absolute -top-1 -right-1 h-4 w-4 bg-emerald-500 rounded-full border-2 border-white animate-ping" />
+                    </div>
+
+                    <div className="space-y-1">
+                      <h4 className="text-base font-black text-slate-800">Ready to Scan QR Code</h4>
+                      <p className="text-xs text-slate-400 max-w-xs mx-auto">
+                        Point your device camera at the classroom projector or educator's broadcast screen.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2.5 max-w-xs mx-auto">
+                      <button
+                        onClick={() => { triggerHaptic('light'); setStatus('scanning'); }}
+                        className="w-full py-3 bg-[#255A84] hover:bg-[#1a4261] text-white rounded-xl font-bold text-xs shadow-md shadow-[#255A84]/20 transition flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                      >
+                        <Camera size={16} /> Open Camera Scanner
+                      </button>
+
+                      <button
+                        onClick={() => { triggerHaptic('light'); setMode('manual'); setStatus('manual'); }}
+                        className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl font-bold text-xs border border-slate-200/80 transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
+                      >
+                        <KeyRound size={14} /> Type 6-Digit Code Instead
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. LIVE CAMERA SCANNER */}
+                {status === 'scanning' && (
+                  <div className="relative flex-1 flex flex-col items-center justify-center min-h-[320px] rounded-2xl overflow-hidden bg-slate-950">
+                    <div className="absolute inset-0 z-10 pointer-events-none flex flex-col items-center justify-center">
+                      <div className="w-[240px] h-[240px] border-2 border-white/20 rounded-2xl relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-[2px] bg-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.9)] animate-scan-line" />
+                        <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-blue-400 rounded-tl-2xl" />
+                        <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-blue-400 rounded-tr-2xl" />
+                        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-blue-400 rounded-bl-2xl" />
+                        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-blue-400 rounded-br-2xl" />
+                      </div>
+                      <p className="mt-6 text-white text-[10px] font-bold uppercase tracking-widest bg-black/60 px-3.5 py-1.5 rounded-full backdrop-blur-md border border-white/10">
+                        Align QR within frame
+                      </p>
+                    </div>
+
+                    <div id="qr-reader" className="w-full h-full bg-black flex items-center justify-center" />
+                    
+                    <button
+                      onClick={() => { triggerHaptic('light'); setStatus('idle'); }}
+                      className="absolute top-3 right-3 z-20 p-2 bg-white/15 hover:bg-white/25 text-white rounded-full backdrop-blur-md transition-colors"
+                      title="Close Scanner"
+                    >
+                      <X size={18} />
                     </button>
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest text-left">Enter 6-Character Code</label>
-                  <input 
-                    type="text" value={manualCode} onChange={e => setManualCode(e.target.value.toUpperCase())}
-                    placeholder="------" maxLength={6}
-                    className="w-full text-center text-3xl font-mono font-black tracking-[0.25em] py-4 border-2 border-slate-200 focus:border-[#255A84] focus:ring-0 rounded-2xl bg-slate-50 uppercase placeholder-slate-300 focus:outline-none transition-colors"
-                    autoFocus
-                  />
-                  <p className="text-[11px] text-slate-400 font-medium text-left">Code is case-insensitive (e.g. A9B3KD)</p>
-                </div>
+                {/* 3. MANUAL CODE FORM */}
+                {(status === 'manual' || (status === 'idle' && mode === 'manual')) && (
+                  <form onSubmit={handleManualCheckIn} className="space-y-4 my-auto max-w-sm mx-auto w-full py-4">
+                    {userProfile?.isIntern && (
+                      <div className="flex bg-slate-100 p-1 rounded-xl w-full">
+                        <button
+                          type="button"
+                          onClick={() => { triggerHaptic('light'); setSelectedType('academic'); }}
+                          className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
+                            selectedType === 'academic' ? 'bg-white text-[#255A84] shadow-xs' : 'text-slate-400 hover:text-slate-600'
+                          }`}
+                        >
+                          Academic Track
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { triggerHaptic('light'); setSelectedType('internship'); }}
+                          className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
+                            selectedType === 'internship' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'
+                          }`}
+                        >
+                          Internship Track
+                        </button>
+                      </div>
+                    )}
 
-                <button
-                  type="submit" disabled={manualCode.trim().length !== 6}
-                  className={`w-full py-4 text-white rounded-2xl font-bold text-sm transition shadow-xl flex items-center justify-center gap-3 active:scale-95 ${
-                    manualCode.trim().length !== 6
-                      ? 'bg-slate-300 cursor-not-allowed shadow-none'
-                      : selectedType === 'internship'
-                      ? 'bg-emerald-600 shadow-emerald-500/20 hover:bg-emerald-700'
-                      : 'bg-[#255A84] shadow-[#255A84]/20 hover:bg-[#1a4261]'
-                  }`}
-                >
-                  <CheckCircle2 size={18} /> Verify & Check In
-                </button>
-              </form>
-            )}
+                    <div className="space-y-2 text-center">
+                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        Enter 6-Character Session Code
+                      </label>
+                      <input 
+                        type="text"
+                        value={manualCode}
+                        onChange={e => setManualCode(e.target.value.toUpperCase())}
+                        placeholder="••••••"
+                        maxLength={6}
+                        className="w-full text-center text-2xl sm:text-3xl font-mono font-black tracking-[0.3em] py-3.5 border-2 border-slate-200 focus:border-[#255A84] rounded-2xl bg-slate-50 uppercase placeholder-slate-300 focus:outline-none focus:bg-white transition-all shadow-inner"
+                        autoFocus
+                      />
+                      <p className="text-[10px] text-slate-400 font-medium">
+                        Case-insensitive code displayed on educator's board
+                      </p>
+                    </div>
 
-            {status === 'processing' && (
-              <div className="p-16 flex-1 flex flex-col items-center justify-center gap-6">
-                <div className="h-12 w-12 border-4 border-[#255A84] border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-sm font-bold text-slate-800 uppercase tracking-widest">Validating Session...</p>
+                    <button
+                      type="submit"
+                      disabled={manualCode.trim().length !== 6}
+                      className={`w-full py-3 text-white rounded-xl font-bold text-xs transition shadow-md flex items-center justify-center gap-2 active:scale-95 cursor-pointer ${
+                        manualCode.trim().length !== 6
+                          ? 'bg-slate-300 cursor-not-allowed shadow-none'
+                          : selectedType === 'internship'
+                          ? 'bg-emerald-600 shadow-emerald-500/20 hover:bg-emerald-700'
+                          : 'bg-[#255A84] shadow-[#255A84]/20 hover:bg-[#1a4261]'
+                      }`}
+                    >
+                      <CheckCircle2 size={16} /> Verify & Check In
+                    </button>
+                  </form>
+                )}
+
+                {/* 4. PROCESSING STATE */}
+                {status === 'processing' && (
+                  <div className="py-12 flex flex-col items-center justify-center gap-4 text-center my-auto">
+                    <div className="h-10 w-10 border-3 border-[#255A84] border-t-transparent rounded-full animate-spin" />
+                    <div>
+                      <p className="text-xs font-black text-slate-800 uppercase tracking-widest">Validating Session...</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">Recording attendance in academy database</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* 5. SUCCESS / ERROR STATE */}
+                {(status === 'success' || status === 'error') && (
+                  <div className="p-6 text-center space-y-4 my-auto animate-in zoom-in-95 duration-200">
+                    <div className={`h-16 w-16 rounded-2xl mx-auto flex items-center justify-center shadow-lg ${
+                      status === 'success' ? 'bg-emerald-50 text-emerald-600 shadow-emerald-500/20' : 'bg-red-50 text-red-500 shadow-red-500/20'
+                    }`}>
+                      {status === 'success' ? <CheckCircle2 size={36} /> : <AlertCircle size={36} />}
+                    </div>
+                    <div>
+                      <h4 className={`text-lg font-black ${status === 'success' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {status === 'success' ? 'Attendance Recorded!' : 'Check-In Failed'}
+                      </h4>
+                      <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto leading-relaxed">
+                        {message}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => { setStatus('idle'); setMessage(''); }}
+                      className="px-6 py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition shadow-sm active:scale-95"
+                    >
+                      Done
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
-
-            {(status === 'success' || status === 'error') && (
-              <div className="p-10 flex-1 flex flex-col items-center justify-center text-center space-y-6 animate-in zoom-in duration-300">
-                <div className={`h-20 w-20 rounded-2xl flex items-center justify-center shadow-lg ${status === 'success' ? 'bg-emerald-50 text-emerald-500 shadow-emerald-500/20' : 'bg-red-50 text-red-500 shadow-red-500/20'}`}>
-                  {status === 'success' ? <CheckCircle2 size={40} /> : <AlertCircle size={40} />}
-                </div>
-                <div>
-                  <p className={`text-xl font-bold ${status === 'success' ? 'text-emerald-600' : 'text-red-600'}`}>
-                    {status === 'success' ? 'Success!' : 'Failed'}
-                  </p>
-                  <p className="text-xs text-slate-500 mt-2 font-medium px-4 leading-relaxed">{message}</p>
-                </div>
-                <button
-                  onClick={() => { setStatus('idle'); setMessage(''); }}
-                  className="w-full py-4 bg-slate-800 text-white rounded-2xl font-bold text-sm hover:bg-black transition shadow-xl active:scale-95"
-                >
-                  Return Home
-                </button>
-              </div>
-            )}
+            </div>
           </div>
 
-          {/* Last Attendance Status Banner */}
-          {lastAttendance && (
-            <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 flex items-center justify-between animate-in fade-in duration-500">
-              <div className="flex items-center gap-4">
-                <div className="h-10 w-10 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
-                  <CheckCircle2 size={20} />
+          {/* Right Insights Deck (5 Cols) */}
+          <div className="lg:col-span-5 space-y-4">
+            {/* Today's Live Status Card */}
+            <div className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+              todayAttendance
+                ? 'bg-gradient-to-br from-emerald-500/10 via-emerald-50/40 to-teal-50/20 border-emerald-200/90 shadow-xs'
+                : 'bg-white border-slate-200/80 shadow-xs'
+            }`}>
+              <div className="flex items-center justify-between gap-2 border-b pb-3 border-slate-100">
+                <div className="flex items-center gap-2">
+                  <div className={`h-7 w-7 rounded-lg flex items-center justify-center font-bold ${
+                    todayAttendance ? 'bg-emerald-600 text-white' : 'bg-amber-100 text-amber-700'
+                  }`}>
+                    {todayAttendance ? <CheckCheck size={15} /> : <Clock size={15} />}
+                  </div>
+                  <h4 className="font-extrabold text-slate-800 text-xs sm:text-sm">Today's Status</h4>
                 </div>
-                <div>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Last Marked Present</p>
-                  <p className="text-xs font-bold text-slate-700 mt-0.5">
-                    {lastAttendance.type === 'internship' ? 'Internship Session' : 'Academic Session'}
-                  </p>
-                  {lastAttendance.coveredCourse && (
-                    <p className="text-[10px] text-slate-500 mt-1 font-semibold">
-                      {courses.find(c => c.id === lastAttendance.coveredCourse)?.name || 'Unknown Course'}
-                      {lastAttendance.coveredModule && ` • ${modules.find(m => m.id === lastAttendance.coveredModule)?.title || 'Unknown Module'}`}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-[11px] font-bold text-slate-500">{lastAttendance.date}</p>
-                <p className="text-[11px] text-slate-400 mt-0.5">
-                  {lastAttendance.timestamp?.toDate ? lastAttendance.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
-                </p>
-              </div>
-            </div>
-          )}
 
-          {/* Info Cards */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-              <div className="h-8 w-8 bg-blue-50 text-[#255A84] rounded-xl flex items-center justify-center mb-3">
-                <Calendar size={16} />
+                <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                  todayAttendance 
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
+                    : 'bg-amber-50 text-amber-700 border-amber-200'
+                }`}>
+                  {todayAttendance ? 'Marked Present' : 'Not Checked In'}
+                </span>
               </div>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">My Batches</p>
-              <p className="text-sm font-bold text-slate-800 capitalize">
-                {studentBatches.join(', ')}
-              </p>
+
+              <div className="pt-3 space-y-2">
+                {todayAttendance ? (
+                  <>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-slate-400 font-semibold text-[11px]">Timestamp</span>
+                      <span className="font-mono font-bold text-slate-700 text-xs">
+                        {todayAttendance.timestamp?.toDate ? todayAttendance.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Today'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-slate-400 font-semibold text-[11px]">Track</span>
+                      <span className="font-bold text-[#255A84] capitalize">
+                        {todayAttendance.type || 'Academic'}
+                      </span>
+                    </div>
+
+                    {todayAttendance.coveredCourse && (
+                      <div className="p-2.5 bg-white rounded-xl border border-emerald-100 text-xs space-y-1">
+                        <p className="font-bold text-slate-800 text-[11px]">
+                          {courses.find(c => c.id === todayAttendance.coveredCourse)?.name || todayAttendance.coveredCourse}
+                        </p>
+                        {todayAttendance.coveredModule && (
+                          <p className="text-[10px] text-slate-500">
+                            {modules.find(m => m.id === todayAttendance.coveredModule)?.title || todayAttendance.coveredModule}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-3 space-y-1 text-slate-400">
+                    <p className="text-xs font-semibold text-slate-600">No Check-In Recorded for Today</p>
+                    <p className="text-[11px] text-slate-400">Use the camera scanner or enter session code when class starts.</p>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-              <div className={`h-8 w-8 rounded-xl flex items-center justify-center mb-3 ${userProfile?.isIntern ? 'bg-emerald-50 text-emerald-500' : 'bg-slate-50 text-slate-300'}`}>
-                <Briefcase size={16} />
+
+            {/* Batch Timetable & Info */}
+            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="h-7 w-7 rounded-lg bg-blue-50 text-[#255A84] flex items-center justify-center">
+                    <Calendar size={15} />
+                  </div>
+                  <h4 className="font-extrabold text-slate-800 text-xs sm:text-sm">My Cohort Batch</h4>
+                </div>
+
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#255A84] bg-blue-50 px-2 py-0.5 rounded-md">
+                  {studentBatches[0] || 'Morning'}
+                </span>
               </div>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Internship</p>
-              <p className={`text-sm font-bold ${userProfile?.isIntern ? 'text-emerald-600' : 'text-slate-400'}`}>
-                {userProfile?.isIntern ? 'Enrolled' : 'Not Active'}
+
+              <div className="space-y-2 text-xs">
+                {myBatchSchedule && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400 font-medium text-[11px]">Scheduled Hours</span>
+                      <span className="font-bold text-slate-700">{myBatchSchedule.startTime || '09:00'} - {myBatchSchedule.endTime || '11:00'}</span>
+                    </div>
+
+                    {myBatchSchedule.educator && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-400 font-medium text-[11px]">Educator</span>
+                        <span className="font-bold text-slate-700">{myBatchSchedule.educator}</span>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 font-medium text-[11px]">Internship Program</span>
+                  <span className={`font-bold ${userProfile?.isIntern ? 'text-emerald-600' : 'text-slate-400'}`}>
+                    {userProfile?.isIntern ? 'Active Track' : 'Not Enrolled'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Tips */}
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/60 text-xs text-slate-500 space-y-1">
+              <p className="font-bold text-slate-700 flex items-center gap-1.5 text-[11px]">
+                <ShieldCheck size={14} className="text-[#255A84]" /> Attendance Policy Tip
+              </p>
+              <p className="text-[10.5px] leading-relaxed text-slate-500">
+                Maintain at least <strong>75% attendance</strong> to stay in good academic standing and remain eligible for cohort certifications.
               </p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Personal History Tab */}
+      {/* ── TAB 2: ATTENDANCE HISTORY & CALENDAR ── */}
       {activeTab === 'history' && (
-        <div className="space-y-6 animate-in fade-in duration-300 max-w-2xl mx-auto">
+        <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200">
           {loadingHistory ? (
-            <div className="py-20 flex flex-col items-center justify-center gap-3 bg-white rounded-2xl border border-slate-100">
-              <div className="animate-spin h-6 w-6 border-2 border-[#255A84] border-t-transparent rounded-full" />
-              <p className="text-xs text-slate-400 font-semibold">Generating your attendance analysis...</p>
+            <div className="py-20 flex flex-col items-center justify-center gap-3 bg-white rounded-2xl border border-slate-100 shadow-xs">
+              <div className="animate-spin h-7 w-7 border-3 border-[#255A84] border-t-transparent rounded-full" />
+              <p className="text-xs text-slate-400 font-bold">Calculating attendance metrics...</p>
             </div>
           ) : !myBatchSchedule ? (
-            <div className="p-8 bg-white border border-slate-100 rounded-2xl text-center text-slate-400">
-              <AlertCircle size={32} className="mx-auto mb-2 text-rose-500" />
-              <p className="text-xs font-bold">Your batch schedule settings are not initialized. Please ask your educator.</p>
+            <div className="p-8 bg-white border border-slate-200/80 rounded-2xl text-center text-slate-400 space-y-2 shadow-xs">
+              <AlertCircle size={32} className="mx-auto text-rose-500" />
+              <p className="text-xs font-bold text-slate-700">Batch schedule settings are not initialized.</p>
+              <p className="text-[11px] text-slate-400">Please reach out to your instructor to assign your batch schedule.</p>
             </div>
           ) : calculatedHistory ? (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Batch Selector if multiple batches exist */}
               {studentBatches.length > 1 && (
-                <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex items-center justify-between gap-4">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Batch Calendar</span>
-                  <select
-                    value={activeBatchId}
-                    onChange={(e) => setSelectedBatchId(e.target.value)}
-                    className="select-premium py-1.5 px-3 text-xs uppercase font-bold tracking-widest max-w-[150px] bg-slate-50 border border-slate-100 rounded-lg cursor-pointer font-semibold"
-                  >
+                <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 shadow-xs flex items-center justify-between gap-3">
+                  <span className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">Select Cohort Track</span>
+                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
                     {studentBatches.map(bId => (
-                      <option key={bId} value={bId}>{bId === 'internship' ? 'Internship Batch' : bId}</option>
+                      <button
+                        key={bId}
+                        onClick={() => setSelectedBatchId(bId)}
+                        className={`px-3 py-1 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                          activeBatchId === bId
+                            ? 'bg-[#255A84] text-white shadow-xs'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        }`}
+                      >
+                        {bId === 'internship' ? 'Internship Track' : `${bId} Batch`}
+                      </button>
                     ))}
-                  </select>
+                  </div>
                 </div>
               )}
 
-              {/* Analytics summary banner */}
-              <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">My Attendance Score</p>
-                  <p className="text-xs text-slate-500 mt-1 font-semibold">Calculated since: {userProfile.joiningDate || 'Enrollment'}</p>
+              {/* Top Statistics Cards Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs text-center space-y-0.5">
+                  <p className="text-xl sm:text-2xl font-black text-emerald-600">{calculatedHistory.presentClasses}</p>
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Present Days</p>
                 </div>
-                <div className="text-right">
-                  <span className={`text-4xl font-black ${
-                    calculatedHistory.attendancePercentage >= 75 ? 'text-emerald-500' :
-                    calculatedHistory.attendancePercentage >= 50 ? 'text-[#F48B1F]' : 'text-rose-500'
-                  }`}>{calculatedHistory.attendancePercentage}%</span>
+                <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs text-center space-y-0.5">
+                  <p className="text-xl sm:text-2xl font-black text-slate-800">{calculatedHistory.eligibleClasses}</p>
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Scheduled Days</p>
                 </div>
-              </div>
-
-              {/* Statistics Grid */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-slate-50 rounded-2xl text-center">
-                  <p className="text-slate-700 font-bold text-lg">{calculatedHistory.presentClasses}</p>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Present Days</p>
+                <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs text-center space-y-0.5">
+                  <p className="text-xl sm:text-2xl font-black text-amber-600">{calculatedHistory.leaveClasses}</p>
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Approved Leaves</p>
                 </div>
-                <div className="p-4 bg-slate-50 rounded-2xl text-center">
-                  <p className="text-slate-700 font-bold text-lg">{calculatedHistory.eligibleClasses}</p>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Scheduled Classes</p>
-                </div>
-                <div className="p-4 bg-slate-50 rounded-2xl text-center">
-                  <p className="text-slate-700 font-bold text-lg">{calculatedHistory.leaveClasses}</p>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Approved Leaves</p>
-                </div>
-                <div className="p-4 bg-slate-50 rounded-2xl text-center">
-                  <p className="text-slate-700 font-bold text-lg">{calculatedHistory.holidaysCount}</p>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Academy Holidays</p>
+                <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs text-center space-y-0.5">
+                  <p className="text-xl sm:text-2xl font-black text-blue-600">{calculatedHistory.holidaysCount}</p>
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Holidays</p>
                 </div>
               </div>
 
@@ -668,6 +846,65 @@ export default function StudentAttendancePage() {
                 modules={modules}
                 topics={topics}
               />
+
+              {/* Check-In History Logs Timeline */}
+              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="h-7 w-7 rounded-lg bg-blue-50 text-[#255A84] flex items-center justify-center font-bold">
+                      <History size={15} />
+                    </div>
+                    <h3 className="font-extrabold text-slate-800 text-xs sm:text-sm uppercase tracking-wider">
+                      Recent Check-In Records
+                    </h3>
+                  </div>
+                  <span className="text-[11px] font-bold text-slate-400">
+                    Total: {myLogs.length} logs
+                  </span>
+                </div>
+
+                {myLogs.length === 0 ? (
+                  <div className="p-8 text-center text-slate-400 text-xs font-semibold">
+                    No attendance records found yet.
+                  </div>
+                ) : (
+                  <div className="divide-y divide-slate-100 max-h-80 overflow-y-auto">
+                    {myLogs
+                      .sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0))
+                      .map((log, idx) => (
+                        <div key={idx} className="p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="h-8 w-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 font-bold border border-emerald-200/60">
+                              <CheckCircle2 size={16} />
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className="font-bold text-slate-800 text-xs truncate">
+                                  {courses.find(c => c.id === log.coveredCourse)?.name || 'General Class Session'}
+                                </p>
+                                <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">
+                                  {log.type || 'academic'}
+                                </span>
+                              </div>
+                              {log.coveredModule && (
+                                <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                                  {modules.find(m => m.id === log.coveredModule)?.title || log.coveredModule}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="text-right shrink-0">
+                            <p className="text-xs font-mono font-bold text-slate-700">{log.date}</p>
+                            <p className="text-[10px] text-slate-400 font-mono">
+                              {log.timestamp?.toDate ? log.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recorded'}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
             </div>
           ) : null}
         </div>
