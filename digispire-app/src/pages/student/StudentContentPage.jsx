@@ -5,7 +5,8 @@ import {
   FileText, Globe, ExternalLink, Search, BookOpen, Star, Video,
   Copy, Check, Play, Maximize2, Pin, X, CheckCircle2, Circle,
   Sparkles, Award, Layers, CheckCheck,
-  Flame, LayoutGrid, ListFilter, RotateCcw, FolderGit2
+  Flame, LayoutGrid, ListFilter, RotateCcw, FolderGit2,
+  Bookmark, ArrowUpRight, FileCode, HardDrive
 } from 'lucide-react';
 import { triggerHaptic } from '../../utils/haptic';
 
@@ -31,20 +32,10 @@ function typeLabel(type) {
 
 function typeBadgeStyle(type) {
   const map = {
-    pdf: 'bg-rose-50 text-rose-700 border-rose-200/70',
-    gdrive: 'bg-sky-50 text-sky-700 border-sky-200/70',
-    video: 'bg-purple-50 text-purple-700 border-purple-200/70',
-    link: 'bg-blue-50 text-blue-700 border-blue-200/70',
-  };
-  return map[type] || map.link;
-}
-
-function typeIconBox(type) {
-  const map = {
-    pdf: 'text-rose-600 bg-rose-50/80 border-rose-200/60',
-    gdrive: 'text-sky-600 bg-sky-50/80 border-sky-200/60',
-    video: 'text-purple-600 bg-purple-50/80 border-purple-200/60',
-    link: 'text-[#255A84] bg-blue-50/80 border-blue-200/60',
+    pdf: 'bg-rose-50 text-rose-700 border-rose-200/80',
+    gdrive: 'bg-sky-50 text-sky-700 border-sky-200/80',
+    video: 'bg-purple-50 text-purple-700 border-purple-200/80',
+    link: 'bg-blue-50 text-blue-700 border-blue-200/80',
   };
   return map[type] || map.link;
 }
@@ -54,6 +45,15 @@ function TypeIcon({ type, size = 18 }) {
   if (type === 'gdrive') return <FolderGit2 size={size} className="text-sky-600" />;
   if (type === 'video') return <Video size={size} className="text-purple-600" />;
   return <Globe size={size} className="text-[#255A84]" />;
+}
+
+function getDomain(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname.replace('www.', '');
+  } catch {
+    return 'Web Link';
+  }
 }
 
 // Convert video / drive URLs into embeddable preview URLs
@@ -628,7 +628,7 @@ export default function StudentContentPage() {
   );
 }
 
-// ── Compact Mobile-Optimized Resource Card Component ──
+// ── Bespoke Type-Specific Resource Card Component ──
 function StudentResourceCard({
   item, bookmarks, completedItems, onBookmark, onToggleCompleted,
   onLogClick, onCopyLink, copiedId, onPreview, courseName
@@ -638,117 +638,222 @@ function StudentResourceCard({
   const isCompleted = completedItems.includes(item.id);
   const youtubeThumb = getYoutubeThumbnail(item.fileUrl || item.url);
   const hasEmbed = getEmbedUrl(item.fileUrl || item.url);
+  const domain = getDomain(item.fileUrl || item.url);
+
+  const handleLaunch = (e) => {
+    if (e) e.stopPropagation();
+    onLogClick && onLogClick(item.id);
+    if (hasEmbed) {
+      onPreview(item);
+    } else if (item.fileUrl || item.url) {
+      window.open(item.fileUrl || item.url, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   return (
-    <div className={`bg-white rounded-2xl border transition-all duration-200 flex flex-col overflow-hidden group hover:border-[#255A84]/40 hover:shadow-md ${
+    <div className={`bg-white rounded-2xl border transition-all duration-200 flex flex-col justify-between overflow-hidden group hover:border-[#255A84]/40 hover:shadow-lg ${
       isCompleted
-        ? 'border-emerald-200/90 bg-emerald-500/[0.015]'
+        ? 'border-emerald-300/80 bg-emerald-500/[0.015]'
         : item.isPinned
         ? 'border-amber-300 shadow-2xs'
         : 'border-slate-200/90 shadow-2xs'
     }`}>
-      {/* Pinned Ribbon Badge */}
+      {/* Pinned Ribbon Top Accent */}
       {item.isPinned && (
-        <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[8px] sm:text-[9px] font-black px-2.5 py-0.5 flex items-center justify-center gap-1 uppercase tracking-widest shadow-2xs">
-          <Pin size={9} fill="white" />
-          Featured Note
+        <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-black px-3 py-0.5 flex items-center justify-between uppercase tracking-wider shadow-2xs">
+          <span className="flex items-center gap-1">
+            <Pin size={10} fill="white" /> Featured Note
+          </span>
+          {courseName && <span className="text-[8px] font-bold text-amber-100 uppercase truncate max-w-[140px]">{courseName}</span>}
         </div>
       )}
 
-      {/* Video Media Area */}
-      {youtubeThumb ? (
+      {/* ── CARD TOP SECTION / VISUAL LAUNCHPAD ── */}
+      {type === 'video' ? (
+        /* 🎥 Video 16:9 Player Preview */
         <div
-          onClick={() => { onLogClick(item.id); onPreview(item); }}
-          className="relative aspect-video bg-slate-900 overflow-hidden cursor-pointer group/thumb"
+          onClick={handleLaunch}
+          className="relative aspect-video w-full bg-slate-950 overflow-hidden cursor-pointer group/thumb select-none"
         >
-          <img
-            src={youtubeThumb}
-            alt={item.title}
-            className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300 opacity-90"
-          />
+          {youtubeThumb ? (
+            <img
+              src={youtubeThumb}
+              alt={item.title}
+              className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300 opacity-90"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-indigo-950 via-slate-900 to-purple-950 flex items-center justify-center">
+              <Video size={40} className="text-purple-400/20" />
+            </div>
+          )}
+          
           <div className="absolute inset-0 bg-slate-950/30 group-hover/thumb:bg-slate-950/15 transition-colors flex items-center justify-center">
-            <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-purple-600/90 backdrop-blur-md text-white flex items-center justify-center shadow-lg group-hover/thumb:scale-110 transition-transform">
+            <div className="h-11 w-11 rounded-full bg-red-600 text-white flex items-center justify-center shadow-xl group-hover/thumb:scale-110 group-hover/thumb:bg-red-500 transition-all">
               <Play size={18} fill="white" className="ml-0.5" />
             </div>
           </div>
-          <span className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/80 backdrop-blur-md text-white text-[9px] font-extrabold rounded-md flex items-center gap-1">
-            <Video size={10} className="text-purple-400" /> Watch Video
-          </span>
-        </div>
-      ) : (
-        /* Document / Drive Header */
-        <div className="p-3.5 sm:p-4 pb-0 flex items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2">
-            <div className={`h-9 w-9 rounded-xl flex items-center justify-center border shrink-0 ${typeIconBox(type)}`}>
-              <TypeIcon type={type} size={17} />
-            </div>
-            <span className={`text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full border ${typeBadgeStyle(type)}`}>
-              {typeLabel(type)}
+
+          <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+            <span className="px-2 py-0.5 bg-black/70 backdrop-blur-md text-white text-[10px] font-bold rounded-md border border-white/10 flex items-center gap-1 shadow-xs">
+              <Video size={10} className="text-purple-400" /> Lecture
             </span>
           </div>
 
           <button
-            onClick={() => onBookmark(item.id)}
-            className={`p-1.5 rounded-lg transition ${
-              isBookmarked ? 'bg-[#F48B1F]/10 text-[#F48B1F]' : 'text-slate-300 hover:text-[#F48B1F] hover:bg-amber-50/50'
+            onClick={(e) => { e.stopPropagation(); onBookmark(item.id); }}
+            className={`absolute top-2.5 right-2.5 p-1.5 rounded-lg backdrop-blur-md transition shadow-xs ${
+              isBookmarked ? 'bg-[#F48B1F] text-white' : 'bg-black/60 text-white/80 hover:text-white hover:bg-black/80'
             }`}
-            title={isBookmarked ? 'Remove Bookmark' : 'Save to Bookmarks'}
+            title={isBookmarked ? 'Saved to Bookmarks' : 'Bookmark'}
           >
-            <Star size={15} fill={isBookmarked ? '#F48B1F' : 'none'} strokeWidth={isBookmarked ? 1.5 : 2} />
+            <Star size={13} fill={isBookmarked ? 'white' : 'none'} />
           </button>
+
+          <span className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/80 backdrop-blur-md text-slate-200 text-[9px] font-mono font-bold rounded">
+            Watch in App
+          </span>
+        </div>
+      ) : (
+        /* 📄 PDF / 📁 Drive / 🔗 Link Header & Tactile Preview Tile */
+        <div className="p-3.5 sm:p-4 pb-0 space-y-3">
+          {/* Top Bar with Type & Bookmark */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border flex items-center gap-1 shrink-0 ${
+                type === 'pdf' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+                type === 'gdrive' ? 'bg-sky-50 text-sky-700 border-sky-200' :
+                'bg-blue-50 text-[#255A84] border-blue-200'
+              }`}>
+                <TypeIcon type={type} size={11} />
+                <span>{typeLabel(type)}</span>
+              </span>
+
+              {courseName && !item.isPinned && (
+                <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md truncate max-w-[130px]">
+                  {courseName}
+                </span>
+              )}
+            </div>
+
+            <button
+              onClick={() => onBookmark(item.id)}
+              className={`p-1.5 rounded-lg transition shrink-0 ${
+                isBookmarked 
+                  ? 'bg-amber-50 text-[#F48B1F] border border-amber-200' 
+                  : 'text-slate-400 hover:text-[#F48B1F] hover:bg-slate-100 border border-transparent'
+              }`}
+              title={isBookmarked ? 'Saved to Bookmarks' : 'Bookmark'}
+            >
+              <Star size={14} fill={isBookmarked ? '#F48B1F' : 'none'} />
+            </button>
+          </div>
+
+          {/* Dedicated Tactile Card Preview Module */}
+          <div
+            onClick={handleLaunch}
+            className={`p-2.5 rounded-xl border flex items-center justify-between gap-2.5 cursor-pointer transition-all group/tile select-none ${
+              type === 'pdf'
+                ? 'bg-gradient-to-r from-rose-500/8 via-rose-50/40 to-amber-50/20 border-rose-200/80 hover:border-rose-300 hover:bg-rose-50/60'
+                : type === 'gdrive'
+                ? 'bg-gradient-to-r from-sky-500/8 via-blue-50/40 to-indigo-50/20 border-sky-200/80 hover:border-sky-300 hover:bg-sky-50/60'
+                : 'bg-gradient-to-r from-blue-500/8 via-slate-50 to-indigo-50/20 border-slate-200/80 hover:border-blue-300 hover:bg-blue-50/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              {type === 'pdf' ? (
+                <div className="h-9 w-8 bg-rose-600 text-white rounded-lg shadow-2xs flex flex-col items-center justify-center shrink-0 group-hover/tile:scale-105 transition-transform">
+                  <span className="text-[7.5px] font-black tracking-tighter leading-none">PDF</span>
+                  <FileText size={10} className="mt-0.5 opacity-90" />
+                </div>
+              ) : type === 'gdrive' ? (
+                <div className="h-9 w-9 bg-sky-500 text-white rounded-xl shadow-2xs flex items-center justify-center shrink-0 group-hover/tile:scale-105 transition-transform">
+                  <FolderGit2 size={16} />
+                </div>
+              ) : (
+                <div className="h-9 w-9 bg-[#255A84] text-white rounded-xl shadow-2xs flex items-center justify-center shrink-0 group-hover/tile:scale-105 transition-transform">
+                  <Globe size={16} />
+                </div>
+              )}
+
+              <div className="min-w-0">
+                <p className={`text-[11px] font-black truncate leading-tight ${
+                  type === 'pdf' ? 'text-rose-900' :
+                  type === 'gdrive' ? 'text-sky-900' :
+                  'text-[#255A84]'
+                }`}>
+                  {type === 'pdf' ? 'Printable Study Material' :
+                   type === 'gdrive' ? 'Cloud Drive Repository' :
+                   domain}
+                </p>
+                <p className="text-[10px] text-slate-500 truncate mt-0.5">
+                  {type === 'pdf' ? 'Tap to preview document' :
+                   type === 'gdrive' ? 'Assignments & cohort assets' :
+                   'External documentation reference'}
+                </p>
+              </div>
+            </div>
+
+            <div className={`h-6 w-6 rounded-lg flex items-center justify-center shrink-0 shadow-2xs transition-colors ${
+              type === 'pdf' ? 'bg-white text-rose-600 group-hover/tile:bg-rose-600 group-hover/tile:text-white' :
+              type === 'gdrive' ? 'bg-white text-sky-600 group-hover/tile:bg-sky-500 group-hover/tile:text-white' :
+              'bg-white text-[#255A84] group-hover/tile:bg-[#255A84] group-hover/tile:text-white'
+            }`}>
+              <ArrowUpRight size={13} />
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Card Content Body */}
-      <div className="p-3.5 sm:p-4 space-y-1 flex-1">
-        {courseName && (
-          <p className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider text-[#255A84] truncate">
+      {/* ── CARD CONTENT BODY ── */}
+      <div className="p-3.5 sm:p-4 space-y-1.5 flex-1">
+        {type === 'video' && courseName && !item.isPinned && (
+          <span className="inline-block text-[9px] font-extrabold uppercase tracking-wider text-[#255A84] bg-blue-50 px-2 py-0.5 rounded">
             {courseName}
-          </p>
+          </span>
         )}
-        <a
-          href={item.fileUrl || item.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => onLogClick && onLogClick(item.id)}
-          className="font-bold text-slate-800 text-xs sm:text-sm leading-snug group-hover:text-[#255A84] transition-colors line-clamp-2 block"
+
+        <h3
+          onClick={handleLaunch}
+          className="font-bold text-slate-900 text-xs sm:text-sm leading-snug group-hover:text-[#255A84] transition-colors line-clamp-2 cursor-pointer"
         >
           {item.title}
-        </a>
+        </h3>
+
         {item.description && (
-          <p className="text-[11px] sm:text-xs text-slate-500 line-clamp-2 leading-relaxed pt-0.5">
+          <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
             {item.description}
           </p>
         )}
+
         {item.subject && (
-          <div className="pt-1">
-            <span className="inline-block text-[10px] font-medium px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">
+          <div className="pt-0.5">
+            <span className="inline-block text-[9px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
               #{item.subject}
             </span>
           </div>
         )}
       </div>
 
-      {/* Card Footer Actions */}
-      <div className="px-3.5 sm:px-4 py-2.5 sm:py-3 border-t border-slate-100 bg-slate-50/70 flex items-center justify-between gap-1.5 text-xs mt-auto">
+      {/* ── CARD FOOTER ACTIONS ── */}
+      <div className="px-3.5 sm:px-4 py-2.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between gap-1.5 text-xs mt-auto">
         {/* Mark Done Button */}
         <button
           onClick={() => onToggleCompleted(item.id, item.title)}
-          className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition border ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold transition border ${
             isCompleted
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-              : 'bg-white text-slate-500 border-slate-200 hover:text-emerald-600 hover:border-emerald-200'
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+              : 'bg-white text-slate-500 border-slate-200 hover:text-emerald-700 hover:border-emerald-300'
           }`}
-          title={isCompleted ? 'Completed (Click to uncheck)' : 'Mark as Studied'}
+          title={isCompleted ? 'Completed (Click to unmark)' : 'Mark as Studied'}
         >
-          {isCompleted ? <CheckCircle2 size={13} className="text-emerald-600" /> : <Circle size={13} />}
+          {isCompleted ? <CheckCircle2 size={13} className="text-emerald-600 fill-emerald-100" /> : <Circle size={13} />}
           <span>{isCompleted ? 'Done' : 'Mark Done'}</span>
         </button>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={(e) => onCopyLink(item, e)}
-            title="Copy Link"
+            title="Copy Resource Link"
             className={`p-1.5 rounded-lg border transition ${
               copiedId === item.id 
                 ? 'bg-emerald-50 text-emerald-600 border-emerald-200' 
@@ -758,24 +863,23 @@ function StudentResourceCard({
             {copiedId === item.id ? <Check size={13} /> : <Copy size={13} />}
           </button>
 
-          {hasEmbed ? (
-            <button
-              onClick={() => { onLogClick(item.id); onPreview(item); }}
-              className="px-2.5 sm:px-3 py-1 bg-[#255A84] hover:bg-[#1a4261] text-white text-[11px] sm:text-xs font-bold rounded-lg shadow-2xs transition active:scale-95 flex items-center gap-1"
-            >
-              <Maximize2 size={11} /> Launch
-            </button>
-          ) : (
-            <a
-              href={item.fileUrl || item.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => onLogClick && onLogClick(item.id)}
-              className="px-2.5 sm:px-3 py-1 bg-[#255A84] hover:bg-[#1a4261] text-white text-[11px] sm:text-xs font-bold rounded-lg shadow-2xs transition active:scale-95 flex items-center gap-1"
-            >
-              <ExternalLink size={11} /> Open
-            </a>
-          )}
+          <button
+            onClick={handleLaunch}
+            className={`px-3 py-1 text-white text-[11px] sm:text-xs font-bold rounded-lg shadow-2xs transition active:scale-95 flex items-center gap-1 ${
+              type === 'video' ? 'bg-[#255A84] hover:bg-[#1a4261]' :
+              type === 'pdf' ? 'bg-rose-600 hover:bg-rose-700' :
+              type === 'gdrive' ? 'bg-[#255A84] hover:bg-[#1a4261]' :
+              'bg-[#255A84] hover:bg-[#1a4261]'
+            }`}
+          >
+            {type === 'video' ? (
+              <><Play size={11} fill="white" /> Watch</>
+            ) : hasEmbed ? (
+              <><Maximize2 size={11} /> Launch</>
+            ) : (
+              <><ExternalLink size={11} /> Open</>
+            )}
+          </button>
         </div>
       </div>
     </div>
@@ -792,6 +896,15 @@ function StudentResourceListItem({
   const isCompleted = completedItems.includes(item.id);
   const hasEmbed = getEmbedUrl(item.fileUrl || item.url);
 
+  const handleLaunch = () => {
+    onLogClick && onLogClick(item.id);
+    if (hasEmbed) {
+      onPreview(item);
+    } else if (item.fileUrl || item.url) {
+      window.open(item.fileUrl || item.url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <div className={`p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 hover:bg-slate-50/80 transition-colors ${
       isCompleted ? 'bg-emerald-50/20' : ''
@@ -807,13 +920,23 @@ function StudentResourceListItem({
           {isCompleted ? <CheckCircle2 size={16} /> : <Circle size={16} />}
         </button>
 
-        <div className={`h-9 w-9 rounded-xl flex items-center justify-center shrink-0 border ${typeIconBox(type)}`}>
+        <div className={`h-9 w-9 rounded-xl flex items-center justify-center shrink-0 border ${
+          type === 'pdf' ? 'text-rose-600 bg-rose-50 border-rose-200' :
+          type === 'video' ? 'text-purple-600 bg-purple-50 border-purple-200' :
+          type === 'gdrive' ? 'text-sky-600 bg-sky-50 border-sky-200' :
+          'text-[#255A84] bg-blue-50 border-blue-200'
+        }`}>
           <TypeIcon type={type} size={16} />
         </div>
 
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded-full border ${typeBadgeStyle(type)}`}>
+            <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded-full border ${
+              type === 'pdf' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+              type === 'video' ? 'bg-purple-50 text-purple-700 border-purple-200' :
+              type === 'gdrive' ? 'bg-sky-50 text-sky-700 border-sky-200' :
+              'bg-blue-50 text-blue-700 border-blue-200'
+            }`}>
               {typeLabel(type)}
             </span>
             {courseName && (
@@ -827,7 +950,12 @@ function StudentResourceListItem({
               </span>
             )}
           </div>
-          <h4 className="font-bold text-slate-800 text-xs sm:text-sm mt-0.5 truncate">{item.title}</h4>
+          <h4
+            onClick={handleLaunch}
+            className="font-bold text-slate-800 text-xs sm:text-sm mt-0.5 truncate cursor-pointer hover:text-[#255A84] transition-colors"
+          >
+            {item.title}
+          </h4>
           {item.description && <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">{item.description}</p>}
         </div>
       </div>
@@ -853,24 +981,18 @@ function StudentResourceListItem({
           {copiedId === item.id ? <Check size={13} /> : <Copy size={13} />}
         </button>
 
-        {hasEmbed ? (
-          <button
-            onClick={() => { onLogClick(item.id); onPreview(item); }}
-            className="px-2.5 py-1 bg-[#255A84] hover:bg-[#1c4566] text-white text-[11px] sm:text-xs font-bold rounded-lg shadow-2xs transition flex items-center gap-1"
-          >
-            <Maximize2 size={11} /> Preview
-          </button>
-        ) : (
-          <a
-            href={item.fileUrl || item.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => onLogClick && onLogClick(item.id)}
-            className="px-2.5 py-1 bg-[#255A84] hover:bg-[#1c4566] text-white text-[11px] sm:text-xs font-bold rounded-lg shadow-2xs transition flex items-center gap-1"
-          >
-            <ExternalLink size={11} /> Open
-          </a>
-        )}
+        <button
+          onClick={handleLaunch}
+          className="px-2.5 py-1 bg-[#255A84] hover:bg-[#1a4261] text-white text-[11px] sm:text-xs font-bold rounded-lg shadow-2xs transition flex items-center gap-1"
+        >
+          {type === 'video' ? (
+            <><Play size={11} fill="white" /> Watch</>
+          ) : hasEmbed ? (
+            <><Maximize2 size={11} /> Launch</>
+          ) : (
+            <><ExternalLink size={11} /> Open</>
+          )}
+        </button>
       </div>
     </div>
   );
