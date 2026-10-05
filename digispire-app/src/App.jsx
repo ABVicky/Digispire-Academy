@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { AdminRoute, StudentRoute } from './components/ProtectedRoute';
 import InstallPrompt from './components/InstallPrompt';
 import NetworkStatusIndicator from './components/NetworkStatusIndicator';
+import PwaUpdateReload from './components/PwaUpdateReload';
 
 import AdminLayout from './layouts/AdminLayout';
 import StudentLayout from './layouts/StudentLayout';
@@ -54,6 +55,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <NetworkStatusIndicator />
+        <PwaUpdateReload />
         <InstallPrompt />
         <Routes>
           {/* Public */}

@@ -6,7 +6,8 @@ import { doc, getDoc } from 'firebase/firestore';
 import {
   User, Phone, Mail, GraduationCap, Key,
   CheckCircle2, AlertCircle, Camera, LogOut, Loader2,
-  ShieldCheck, CreditCard, Sparkles, RotateCw, Printer, Shield, Radio
+  ShieldCheck, CreditCard, Sparkles, RotateCw, Printer, Shield, Radio,
+  Smartphone, Download, Zap
 } from 'lucide-react';
 import QRCode from 'qrcode';
 
@@ -22,6 +23,12 @@ export default function ProfilePage() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [mentor, setMentor] = useState(null);
+  const [isStandaloneApp, setIsStandaloneApp] = useState(false);
+
+  useEffect(() => {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    setIsStandaloneApp(isStandalone);
+  }, []);
 
   useEffect(() => {
     if (userProfile?.role === 'student' && userProfile?.mentorId) {
@@ -566,6 +573,55 @@ export default function ProfilePage() {
                 </button>
               </div>
             </form>
+
+            {/* PWA App Status & Installation Widget */}
+            <div className="pt-6 border-t border-slate-100 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-blue-50 text-[#255A84] flex items-center justify-center border border-blue-100">
+                  <Smartphone size={18} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Progressive Web App (PWA)</h3>
+                  <p className="text-xs text-slate-500">Standalone offline mobile & desktop experience</p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="space-y-0.5">
+                  <p className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    {isStandaloneApp ? (
+                      <>
+                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                        <span>Installed on this device</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="h-2 w-2 rounded-full bg-amber-500" />
+                        <span>Running in Web Browser</span>
+                      </>
+                    )}
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    {isStandaloneApp
+                      ? 'Running in high-performance standalone mode with full offline caching.'
+                      : 'Install DIGISPIRE for 1-tap home screen access, faster loading, and offline study materials.'}
+                  </p>
+                </div>
+
+                {!isStandaloneApp && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.dispatchEvent(new CustomEvent('ds:trigger-pwa-install'));
+                    }}
+                    className="py-2 px-3.5 bg-[#255A84] hover:bg-[#1a4261] text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shrink-0 shadow-xs active:scale-95 cursor-pointer"
+                  >
+                    <Download size={13} />
+                    <span>Install App</span>
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>
