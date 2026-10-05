@@ -355,7 +355,53 @@ export default function ContentPage() {
       </div>
 
       {/* ── Search & Filter Control Bar ── */}
-      <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+      <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+        {/* Quick Course Track Strip */}
+        {courses.length > 0 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 border-b border-slate-100">
+            <button
+              onClick={() => setFilterCourse('all')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
+                filterCourse === 'all'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/60'
+              }`}
+            >
+              <span>All Courses</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                filterCourse === 'all' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+              }`}>
+                {contents.length}
+              </span>
+            </button>
+
+            {courses.map(course => {
+              const count = contents.filter(c => c.courseId === course.id).length;
+              const isSelected = filterCourse === course.id;
+              return (
+                <button
+                  key={course.id}
+                  onClick={() => setFilterCourse(course.id)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
+                    isSelected
+                      ? 'bg-[#255A84] text-white shadow-xs'
+                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/60'
+                  }`}
+                >
+                  <span>{course.name}</span>
+                  {count > 0 && (
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                      isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+                    }`}>
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           {/* Search Input */}
           <div className="relative flex-1">
@@ -378,23 +424,11 @@ export default function ContentPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Course Selector */}
-            <select
-              value={filterCourse}
-              onChange={e => setFilterCourse(e.target.value)}
-              className="flex-1 sm:flex-initial px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all min-w-[130px] cursor-pointer"
-            >
-              <option value="all">All Courses</option>
-              {courses.map(c => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
-
             {/* Sort Selector */}
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
-              className="px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all cursor-pointer"
+              className="flex-1 sm:flex-initial px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all cursor-pointer"
             >
               <option value="newest">🕒 Newest</option>
               <option value="popular">🔥 Popular</option>
@@ -485,7 +519,7 @@ export default function ContentPage() {
           )}
         </div>
       ) : viewMode === 'cards' ? (
-        /* ── Bespoke Responsive Cards Grid ── */
+        /* ── Studio Bento Responsive Cards Grid ── */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4.5">
           {filtered.map(item => {
             const type = item.type || detectType(item.fileUrl || item.url);
@@ -505,8 +539,17 @@ export default function ContentPage() {
             return (
               <div
                 key={item.id}
-                className={`bg-white rounded-2xl border transition-all duration-200 flex flex-col justify-between overflow-hidden group hover:border-[#255A84]/40 hover:shadow-lg ${
-                  item.isPinned ? 'border-amber-300 shadow-2xs' : 'border-slate-200/90 shadow-2xs'
+                onClick={handleLaunch}
+                className={`group relative bg-white rounded-2xl border transition-all duration-200 flex flex-col justify-between overflow-hidden cursor-pointer hover:shadow-xl hover:-translate-y-0.5 select-none ${
+                  item.isPinned
+                    ? 'border-amber-300/90 shadow-2xs'
+                    : type === 'video'
+                    ? 'border-slate-200/90 hover:border-purple-300'
+                    : type === 'pdf'
+                    ? 'border-slate-200/90 hover:border-rose-300'
+                    : type === 'gdrive'
+                    ? 'border-slate-200/90 hover:border-sky-300'
+                    : 'border-slate-200/90 hover:border-blue-300'
                 }`}
               >
                 {/* Pinned Ribbon Top Accent */}
@@ -519,13 +562,10 @@ export default function ContentPage() {
                   </div>
                 )}
 
-                {/* ── CARD TOP SECTION / VISUAL LAUNCHPAD ── */}
+                {/* ── CARD HEADER / VISUAL PRESENTATION ── */}
                 {type === 'video' ? (
-                  /* 🎥 Video 16:9 Player Preview */
-                  <div
-                    onClick={handleLaunch}
-                    className="relative aspect-video w-full bg-slate-950 overflow-hidden cursor-pointer group/thumb select-none"
-                  >
+                  /* 🎥 Cinema Video Preview Header */
+                  <div className="relative aspect-video w-full bg-slate-950 overflow-hidden group/thumb">
                     {youtubeThumb ? (
                       <img
                         src={youtubeThumb}
@@ -534,24 +574,24 @@ export default function ContentPage() {
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-indigo-950 via-slate-900 to-purple-950 flex items-center justify-center">
-                        <Video size={40} className="text-purple-400/20" />
+                        <Video size={36} className="text-purple-400/30" />
                       </div>
                     )}
 
-                    <div className="absolute inset-0 bg-slate-950/30 group-hover/thumb:bg-slate-950/15 transition-colors flex items-center justify-center">
-                      <div className="h-11 w-11 rounded-full bg-red-600 text-white flex items-center justify-center shadow-xl group-hover/thumb:scale-110 group-hover/thumb:bg-red-500 transition-all">
+                    <div className="absolute inset-0 bg-slate-950/25 group-hover/thumb:bg-slate-950/10 transition-colors flex items-center justify-center">
+                      <div className="h-11 w-11 rounded-full bg-red-600 text-white flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:bg-red-500 transition-all">
                         <Play size={18} fill="white" className="ml-0.5" />
                       </div>
                     </div>
 
                     <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-                      <span className="px-2 py-0.5 bg-black/70 backdrop-blur-md text-white text-[10px] font-bold rounded-md border border-white/10 flex items-center gap-1 shadow-xs">
+                      <span className="px-2 py-0.5 bg-black/75 backdrop-blur-md text-white text-[9.5px] font-bold rounded-md border border-white/10 flex items-center gap-1 shadow-xs">
                         <Video size={10} className="text-purple-400" /> Lecture
                       </span>
                     </div>
 
                     <button
-                      onClick={(e) => togglePin(item, e)}
+                      onClick={(e) => { e.stopPropagation(); togglePin(item, e); }}
                       title={item.isPinned ? 'Unpin' : 'Pin to top'}
                       className={`absolute top-2.5 right-2.5 p-1.5 rounded-lg backdrop-blur-md transition shadow-xs ${
                         item.isPinned ? 'bg-amber-500 text-white' : 'bg-black/60 text-white/80 hover:text-white hover:bg-black/80'
@@ -565,93 +605,69 @@ export default function ContentPage() {
                     </span>
                   </div>
                 ) : (
-                  /* 📄 PDF / 📁 Drive / 🔗 Link Header & Tactile Preview Tile */
-                  <div className="p-3.5 sm:p-4 pb-0 space-y-3">
-                    {/* Top Bar with Type & Pin */}
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border flex items-center gap-1 shrink-0 ${
-                          type === 'pdf' ? 'bg-rose-50 text-rose-700 border-rose-200' :
-                          type === 'gdrive' ? 'bg-sky-50 text-sky-700 border-sky-200' :
-                          'bg-blue-50 text-[#255A84] border-blue-200'
-                        }`}>
-                          <TypeIcon type={type} size={11} />
-                          <span>{typeLabel(type)}</span>
-                        </span>
-
-                        {courseName && !item.isPinned && (
-                          <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md truncate max-w-[130px]">
-                            {courseName}
-                          </span>
-                        )}
-                      </div>
-
-                      <button
-                        onClick={(e) => togglePin(item, e)}
-                        title={item.isPinned ? 'Unpin from Top' : 'Pin to Top'}
-                        className={`p-1.5 rounded-lg transition shrink-0 ${
-                          item.isPinned 
-                            ? 'bg-amber-50 text-amber-500 border border-amber-200' 
-                            : 'text-slate-400 hover:text-amber-500 hover:bg-slate-100 border border-transparent'
-                        }`}
-                      >
-                        <Pin size={14} fill={item.isPinned ? 'currentColor' : 'none'} />
-                      </button>
-                    </div>
-
-                    {/* Dedicated Tactile Card Preview Module */}
-                    <div
-                      onClick={handleLaunch}
-                      className={`p-2.5 rounded-xl border flex items-center justify-between gap-2.5 cursor-pointer transition-all group/tile select-none ${
+                  /* 📑 PDF / 📁 Drive / 🔗 Web Link Header with Tactile Icon Gem */
+                  <div className={`p-3.5 sm:p-4 pb-1 border-b flex items-start justify-between gap-3 ${
+                    type === 'pdf' 
+                      ? 'bg-gradient-to-r from-rose-500/[0.07] via-rose-50/40 to-transparent border-rose-100/60' 
+                      : type === 'gdrive'
+                      ? 'bg-gradient-to-r from-sky-500/[0.07] via-sky-50/40 to-transparent border-sky-100/60'
+                      : 'bg-gradient-to-r from-blue-500/[0.07] via-blue-50/40 to-transparent border-blue-100/60'
+                  }`}>
+                    <div className="flex items-center gap-3 min-w-0">
+                      {/* Tactile Icon Gem */}
+                      <div className={`h-11 w-11 rounded-xl flex items-center justify-center shrink-0 shadow-2xs transition-transform group-hover:scale-105 border ${
                         type === 'pdf'
-                          ? 'bg-gradient-to-r from-rose-500/8 via-rose-50/40 to-amber-50/20 border-rose-200/80 hover:border-rose-300 hover:bg-rose-50/60'
+                          ? 'bg-rose-600 text-white border-rose-700/20 shadow-rose-200'
                           : type === 'gdrive'
-                          ? 'bg-gradient-to-r from-sky-500/8 via-blue-50/40 to-indigo-50/20 border-sky-200/80 hover:border-sky-300 hover:bg-sky-50/60'
-                          : 'bg-gradient-to-r from-blue-500/8 via-slate-50 to-indigo-50/20 border-slate-200/80 hover:border-blue-300 hover:bg-blue-50/50'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
+                          ? 'bg-sky-500 text-white border-sky-600/20 shadow-sky-200'
+                          : 'bg-[#255A84] text-white border-blue-800/20 shadow-blue-200'
+                      }`}>
                         {type === 'pdf' ? (
-                          <div className="h-9 w-8 bg-rose-600 text-white rounded-lg shadow-2xs flex flex-col items-center justify-center shrink-0 group-hover/tile:scale-105 transition-transform">
+                          <div className="flex flex-col items-center">
                             <span className="text-[7.5px] font-black tracking-tighter leading-none">PDF</span>
-                            <FileText size={10} className="mt-0.5 opacity-90" />
+                            <FileText size={12} className="mt-0.5 opacity-90" />
                           </div>
                         ) : type === 'gdrive' ? (
-                          <div className="h-9 w-9 bg-sky-500 text-white rounded-xl shadow-2xs flex items-center justify-center shrink-0 group-hover/tile:scale-105 transition-transform">
-                            <FolderGit2 size={16} />
-                          </div>
+                          <FolderGit2 size={18} />
                         ) : (
-                          <div className="h-9 w-9 bg-[#255A84] text-white rounded-xl shadow-2xs flex items-center justify-center shrink-0 group-hover/tile:scale-105 transition-transform">
-                            <Globe size={16} />
-                          </div>
+                          <Globe size={18} />
                         )}
-
-                        <div className="min-w-0">
-                          <p className={`text-[11px] font-black truncate leading-tight ${
-                            type === 'pdf' ? 'text-rose-900' :
-                            type === 'gdrive' ? 'text-sky-900' :
-                            'text-[#255A84]'
-                          }`}>
-                            {type === 'pdf' ? 'Printable Study Material' :
-                             type === 'gdrive' ? 'Cloud Drive Repository' :
-                             domain}
-                          </p>
-                          <p className="text-[10px] text-slate-500 truncate mt-0.5">
-                            {type === 'pdf' ? 'Tap to view PDF' :
-                             type === 'gdrive' ? 'Assignments & cohort assets' :
-                             'External reference link'}
-                          </p>
-                        </div>
                       </div>
 
-                      <div className={`h-6 w-6 rounded-lg flex items-center justify-center shrink-0 shadow-2xs transition-colors ${
-                        type === 'pdf' ? 'bg-white text-rose-600 group-hover/tile:bg-rose-600 group-hover/tile:text-white' :
-                        type === 'gdrive' ? 'bg-white text-sky-600 group-hover/tile:bg-sky-500 group-hover/tile:text-white' :
-                        'bg-white text-[#255A84] group-hover/tile:bg-[#255A84] group-hover/tile:text-white'
-                      }`}>
-                        <ArrowUpRight size={13} />
+                      <div className="min-w-0 space-y-0.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${
+                            type === 'pdf' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+                            type === 'gdrive' ? 'bg-sky-50 text-sky-700 border-sky-200' :
+                            'bg-blue-50 text-[#255A84] border-blue-200'
+                          }`}>
+                            {typeLabel(type)}
+                          </span>
+                          {courseName && !item.isPinned && (
+                            <span className="text-[9.5px] font-bold text-slate-500 bg-white/80 px-1.5 py-0.5 rounded border border-slate-200/60 truncate max-w-[120px]">
+                              {courseName}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-slate-400 font-medium truncate">
+                          {type === 'pdf' ? 'Printable Study Material' :
+                           type === 'gdrive' ? 'Shared Worksheets & Files' :
+                           domain}
+                        </p>
                       </div>
                     </div>
+
+                    <button
+                      onClick={(e) => { e.stopPropagation(); togglePin(item, e); }}
+                      title={item.isPinned ? 'Unpin from Top' : 'Pin to Top'}
+                      className={`p-1.5 rounded-lg transition shrink-0 ${
+                        item.isPinned 
+                          ? 'bg-amber-50 text-amber-500 border border-amber-200' 
+                          : 'text-slate-400 hover:text-amber-500 hover:bg-white/80 border border-transparent'
+                      }`}
+                    >
+                      <Pin size={14} fill={item.isPinned ? 'currentColor' : 'none'} />
+                    </button>
                   </div>
                 )}
 
@@ -663,10 +679,7 @@ export default function ContentPage() {
                     </span>
                   )}
 
-                  <h3
-                    onClick={handleLaunch}
-                    className="font-bold text-slate-900 text-xs sm:text-sm leading-snug group-hover:text-[#255A84] transition-colors line-clamp-2 cursor-pointer"
-                  >
+                  <h3 className="font-bold text-slate-800 text-xs sm:text-sm leading-snug group-hover:text-[#255A84] transition-colors line-clamp-2">
                     {item.title}
                   </h3>
 
@@ -701,7 +714,7 @@ export default function ContentPage() {
                     </button>
 
                     <button
-                      onClick={(e) => handleCopyLink(item, e)}
+                      onClick={(e) => { e.stopPropagation(); handleCopyLink(item, e); }}
                       title="Copy Link"
                       className={`p-1.5 rounded-lg border transition ${
                         copiedId === item.id 
@@ -713,7 +726,7 @@ export default function ContentPage() {
                     </button>
 
                     <button
-                      onClick={() => openEdit(item)}
+                      onClick={(e) => { e.stopPropagation(); openEdit(item); }}
                       title="Edit"
                       className="p-1.5 bg-white text-slate-400 border border-slate-200 rounded-lg hover:text-[#255A84] hover:bg-blue-50 transition"
                     >
@@ -721,7 +734,7 @@ export default function ContentPage() {
                     </button>
 
                     <button
-                      onClick={() => setDeleteConfirm(item.id)}
+                      onClick={(e) => { e.stopPropagation(); setDeleteConfirm(item.id); }}
                       title="Delete"
                       className="p-1.5 bg-white text-slate-400 border border-slate-200 rounded-lg hover:text-rose-600 hover:bg-rose-50 transition"
                     >

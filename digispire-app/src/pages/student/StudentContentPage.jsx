@@ -313,6 +313,52 @@ export default function StudentContentPage() {
 
       {/* ── Search, Course Track & Category Filter Bar ── */}
       <div className="bg-white rounded-2xl p-3 sm:p-4 shadow-xs border border-slate-200/80 space-y-3">
+        {/* Quick Course Track Strip */}
+        {courses.length > 0 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 border-b border-slate-100">
+            <button
+              onClick={() => setFilterCourse('all')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
+                filterCourse === 'all'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/60'
+              }`}
+            >
+              <span>All Courses</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                filterCourse === 'all' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+              }`}>
+                {contents.length}
+              </span>
+            </button>
+
+            {courses.map(course => {
+              const count = contents.filter(c => c.courseId === course.id).length;
+              const isSelected = filterCourse === course.id;
+              return (
+                <button
+                  key={course.id}
+                  onClick={() => setFilterCourse(course.id)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
+                    isSelected
+                      ? 'bg-[#255A84] text-white shadow-xs'
+                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/60'
+                  }`}
+                >
+                  <span>{course.name}</span>
+                  {count > 0 && (
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                      isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+                    }`}>
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           {/* Search Input */}
           <div className="relative flex-1">
@@ -335,23 +381,11 @@ export default function StudentContentPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Course Selector Dropdown */}
-            <select
-              value={filterCourse}
-              onChange={e => setFilterCourse(e.target.value)}
-              className="flex-1 sm:flex-initial px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all min-w-[130px] cursor-pointer"
-            >
-              <option value="all">All Courses</option>
-              {courses.map(c => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
-
             {/* Sort Dropdown */}
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
-              className="px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all cursor-pointer"
+              className="flex-1 sm:flex-initial px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all cursor-pointer"
             >
               <option value="newest">🕒 Newest</option>
               <option value="popular">🔥 Popular</option>
@@ -628,7 +662,7 @@ export default function StudentContentPage() {
   );
 }
 
-// ── Bespoke Type-Specific Resource Card Component ──
+// ── Studio Bento Resource Card Component ──
 function StudentResourceCard({
   item, bookmarks, completedItems, onBookmark, onToggleCompleted,
   onLogClick, onCopyLink, copiedId, onPreview, courseName
@@ -651,13 +685,22 @@ function StudentResourceCard({
   };
 
   return (
-    <div className={`bg-white rounded-2xl border transition-all duration-200 flex flex-col justify-between overflow-hidden group hover:border-[#255A84]/40 hover:shadow-lg ${
-      isCompleted
-        ? 'border-emerald-300/80 bg-emerald-500/[0.015]'
-        : item.isPinned
-        ? 'border-amber-300 shadow-2xs'
-        : 'border-slate-200/90 shadow-2xs'
-    }`}>
+    <div
+      onClick={handleLaunch}
+      className={`group relative bg-white rounded-2xl border transition-all duration-200 flex flex-col justify-between overflow-hidden cursor-pointer hover:shadow-xl hover:-translate-y-0.5 select-none ${
+        isCompleted
+          ? 'border-emerald-300/90 bg-emerald-50/[0.12]'
+          : item.isPinned
+          ? 'border-amber-300/90 shadow-2xs'
+          : type === 'video'
+          ? 'border-slate-200/90 hover:border-purple-300'
+          : type === 'pdf'
+          ? 'border-slate-200/90 hover:border-rose-300'
+          : type === 'gdrive'
+          ? 'border-slate-200/90 hover:border-sky-300'
+          : 'border-slate-200/90 hover:border-blue-300'
+      }`}
+    >
       {/* Pinned Ribbon Top Accent */}
       {item.isPinned && (
         <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-black px-3 py-0.5 flex items-center justify-between uppercase tracking-wider shadow-2xs">
@@ -668,13 +711,10 @@ function StudentResourceCard({
         </div>
       )}
 
-      {/* ── CARD TOP SECTION / VISUAL LAUNCHPAD ── */}
+      {/* ── CARD HEADER / VISUAL PRESENTATION ── */}
       {type === 'video' ? (
-        /* 🎥 Video 16:9 Player Preview */
-        <div
-          onClick={handleLaunch}
-          className="relative aspect-video w-full bg-slate-950 overflow-hidden cursor-pointer group/thumb select-none"
-        >
+        /* 🎥 Cinema Video Preview Header */
+        <div className="relative aspect-video w-full bg-slate-950 overflow-hidden group/thumb">
           {youtubeThumb ? (
             <img
               src={youtubeThumb}
@@ -683,18 +723,19 @@ function StudentResourceCard({
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-indigo-950 via-slate-900 to-purple-950 flex items-center justify-center">
-              <Video size={40} className="text-purple-400/20" />
+              <Video size={36} className="text-purple-400/30" />
             </div>
           )}
-          
-          <div className="absolute inset-0 bg-slate-950/30 group-hover/thumb:bg-slate-950/15 transition-colors flex items-center justify-center">
-            <div className="h-11 w-11 rounded-full bg-red-600 text-white flex items-center justify-center shadow-xl group-hover/thumb:scale-110 group-hover/thumb:bg-red-500 transition-all">
+
+          {/* Glowing Play Trigger */}
+          <div className="absolute inset-0 bg-slate-950/25 group-hover/thumb:bg-slate-950/10 transition-colors flex items-center justify-center">
+            <div className="h-11 w-11 rounded-full bg-red-600 text-white flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:bg-red-500 transition-all">
               <Play size={18} fill="white" className="ml-0.5" />
             </div>
           </div>
 
           <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-            <span className="px-2 py-0.5 bg-black/70 backdrop-blur-md text-white text-[10px] font-bold rounded-md border border-white/10 flex items-center gap-1 shadow-xs">
+            <span className="px-2 py-0.5 bg-black/75 backdrop-blur-md text-white text-[9.5px] font-bold rounded-md border border-white/10 flex items-center gap-1 shadow-xs">
               <Video size={10} className="text-purple-400" /> Lecture
             </span>
           </div>
@@ -710,97 +751,73 @@ function StudentResourceCard({
           </button>
 
           <span className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/80 backdrop-blur-md text-slate-200 text-[9px] font-mono font-bold rounded">
-            Watch in App
+            Watch in Studio
           </span>
         </div>
       ) : (
-        /* 📄 PDF / 📁 Drive / 🔗 Link Header & Tactile Preview Tile */
-        <div className="p-3.5 sm:p-4 pb-0 space-y-3">
-          {/* Top Bar with Type & Bookmark */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border flex items-center gap-1 shrink-0 ${
-                type === 'pdf' ? 'bg-rose-50 text-rose-700 border-rose-200' :
-                type === 'gdrive' ? 'bg-sky-50 text-sky-700 border-sky-200' :
-                'bg-blue-50 text-[#255A84] border-blue-200'
-              }`}>
-                <TypeIcon type={type} size={11} />
-                <span>{typeLabel(type)}</span>
-              </span>
-
-              {courseName && !item.isPinned && (
-                <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md truncate max-w-[130px]">
-                  {courseName}
-                </span>
-              )}
-            </div>
-
-            <button
-              onClick={() => onBookmark(item.id)}
-              className={`p-1.5 rounded-lg transition shrink-0 ${
-                isBookmarked 
-                  ? 'bg-amber-50 text-[#F48B1F] border border-amber-200' 
-                  : 'text-slate-400 hover:text-[#F48B1F] hover:bg-slate-100 border border-transparent'
-              }`}
-              title={isBookmarked ? 'Saved to Bookmarks' : 'Bookmark'}
-            >
-              <Star size={14} fill={isBookmarked ? '#F48B1F' : 'none'} />
-            </button>
-          </div>
-
-          {/* Dedicated Tactile Card Preview Module */}
-          <div
-            onClick={handleLaunch}
-            className={`p-2.5 rounded-xl border flex items-center justify-between gap-2.5 cursor-pointer transition-all group/tile select-none ${
+        /* 📑 PDF / 📁 Drive / 🔗 Web Link Header with Tactile Icon Gem */
+        <div className={`p-3.5 sm:p-4 pb-1 border-b flex items-start justify-between gap-3 ${
+          type === 'pdf' 
+            ? 'bg-gradient-to-r from-rose-500/[0.07] via-rose-50/40 to-transparent border-rose-100/60' 
+            : type === 'gdrive'
+            ? 'bg-gradient-to-r from-sky-500/[0.07] via-sky-50/40 to-transparent border-sky-100/60'
+            : 'bg-gradient-to-r from-blue-500/[0.07] via-blue-50/40 to-transparent border-blue-100/60'
+        }`}>
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Tactile Icon Gem */}
+            <div className={`h-11 w-11 rounded-xl flex items-center justify-center shrink-0 shadow-2xs transition-transform group-hover:scale-105 border ${
               type === 'pdf'
-                ? 'bg-gradient-to-r from-rose-500/8 via-rose-50/40 to-amber-50/20 border-rose-200/80 hover:border-rose-300 hover:bg-rose-50/60'
+                ? 'bg-rose-600 text-white border-rose-700/20 shadow-rose-200'
                 : type === 'gdrive'
-                ? 'bg-gradient-to-r from-sky-500/8 via-blue-50/40 to-indigo-50/20 border-sky-200/80 hover:border-sky-300 hover:bg-sky-50/60'
-                : 'bg-gradient-to-r from-blue-500/8 via-slate-50 to-indigo-50/20 border-slate-200/80 hover:border-blue-300 hover:bg-blue-50/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
+                ? 'bg-sky-500 text-white border-sky-600/20 shadow-sky-200'
+                : 'bg-[#255A84] text-white border-blue-800/20 shadow-blue-200'
+            }`}>
               {type === 'pdf' ? (
-                <div className="h-9 w-8 bg-rose-600 text-white rounded-lg shadow-2xs flex flex-col items-center justify-center shrink-0 group-hover/tile:scale-105 transition-transform">
+                <div className="flex flex-col items-center">
                   <span className="text-[7.5px] font-black tracking-tighter leading-none">PDF</span>
-                  <FileText size={10} className="mt-0.5 opacity-90" />
+                  <FileText size={12} className="mt-0.5 opacity-90" />
                 </div>
               ) : type === 'gdrive' ? (
-                <div className="h-9 w-9 bg-sky-500 text-white rounded-xl shadow-2xs flex items-center justify-center shrink-0 group-hover/tile:scale-105 transition-transform">
-                  <FolderGit2 size={16} />
-                </div>
+                <FolderGit2 size={18} />
               ) : (
-                <div className="h-9 w-9 bg-[#255A84] text-white rounded-xl shadow-2xs flex items-center justify-center shrink-0 group-hover/tile:scale-105 transition-transform">
-                  <Globe size={16} />
-                </div>
+                <Globe size={18} />
               )}
-
-              <div className="min-w-0">
-                <p className={`text-[11px] font-black truncate leading-tight ${
-                  type === 'pdf' ? 'text-rose-900' :
-                  type === 'gdrive' ? 'text-sky-900' :
-                  'text-[#255A84]'
-                }`}>
-                  {type === 'pdf' ? 'Printable Study Material' :
-                   type === 'gdrive' ? 'Cloud Drive Repository' :
-                   domain}
-                </p>
-                <p className="text-[10px] text-slate-500 truncate mt-0.5">
-                  {type === 'pdf' ? 'Tap to preview document' :
-                   type === 'gdrive' ? 'Assignments & cohort assets' :
-                   'External documentation reference'}
-                </p>
-              </div>
             </div>
 
-            <div className={`h-6 w-6 rounded-lg flex items-center justify-center shrink-0 shadow-2xs transition-colors ${
-              type === 'pdf' ? 'bg-white text-rose-600 group-hover/tile:bg-rose-600 group-hover/tile:text-white' :
-              type === 'gdrive' ? 'bg-white text-sky-600 group-hover/tile:bg-sky-500 group-hover/tile:text-white' :
-              'bg-white text-[#255A84] group-hover/tile:bg-[#255A84] group-hover/tile:text-white'
-            }`}>
-              <ArrowUpRight size={13} />
+            <div className="min-w-0 space-y-0.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${
+                  type === 'pdf' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+                  type === 'gdrive' ? 'bg-sky-50 text-sky-700 border-sky-200' :
+                  'bg-blue-50 text-[#255A84] border-blue-200'
+                }`}>
+                  {typeLabel(type)}
+                </span>
+                {courseName && !item.isPinned && (
+                  <span className="text-[9.5px] font-bold text-slate-500 bg-white/80 px-1.5 py-0.5 rounded border border-slate-200/60 truncate max-w-[120px]">
+                    {courseName}
+                  </span>
+                )}
+              </div>
+              <p className="text-[10px] text-slate-400 font-medium truncate">
+                {type === 'pdf' ? 'Printable Study Material' :
+                 type === 'gdrive' ? 'Shared Worksheets & Files' :
+                 domain}
+              </p>
             </div>
           </div>
+
+          <button
+            onClick={(e) => { e.stopPropagation(); onBookmark(item.id); }}
+            className={`p-1.5 rounded-lg transition shrink-0 ${
+              isBookmarked 
+                ? 'bg-amber-50 text-[#F48B1F] border border-amber-200' 
+                : 'text-slate-400 hover:text-[#F48B1F] hover:bg-white/80 border border-transparent'
+            }`}
+            title={isBookmarked ? 'Saved to Bookmarks' : 'Bookmark'}
+          >
+            <Star size={14} fill={isBookmarked ? '#F48B1F' : 'none'} />
+          </button>
         </div>
       )}
 
@@ -812,10 +829,7 @@ function StudentResourceCard({
           </span>
         )}
 
-        <h3
-          onClick={handleLaunch}
-          className="font-bold text-slate-900 text-xs sm:text-sm leading-snug group-hover:text-[#255A84] transition-colors line-clamp-2 cursor-pointer"
-        >
+        <h3 className="font-bold text-slate-900 text-xs sm:text-sm leading-snug group-hover:text-[#255A84] transition-colors line-clamp-2">
           {item.title}
         </h3>
 
@@ -836,12 +850,12 @@ function StudentResourceCard({
 
       {/* ── CARD FOOTER ACTIONS ── */}
       <div className="px-3.5 sm:px-4 py-2.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between gap-1.5 text-xs mt-auto">
-        {/* Mark Done Button */}
+        {/* Mark Done Toggle Button */}
         <button
-          onClick={() => onToggleCompleted(item.id, item.title)}
+          onClick={(e) => { e.stopPropagation(); onToggleCompleted(item.id, item.title); }}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold transition border ${
             isCompleted
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-300 shadow-2xs'
               : 'bg-white text-slate-500 border-slate-200 hover:text-emerald-700 hover:border-emerald-300'
           }`}
           title={isCompleted ? 'Completed (Click to unmark)' : 'Mark as Studied'}
@@ -852,7 +866,7 @@ function StudentResourceCard({
 
         <div className="flex items-center gap-1.5">
           <button
-            onClick={(e) => onCopyLink(item, e)}
+            onClick={(e) => { e.stopPropagation(); onCopyLink(item, e); }}
             title="Copy Resource Link"
             className={`p-1.5 rounded-lg border transition ${
               copiedId === item.id 
