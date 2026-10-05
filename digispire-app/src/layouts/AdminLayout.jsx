@@ -117,7 +117,7 @@ export default function AdminLayout() {
       )}
 
       {/* ── Formal Institutional Sidebar ── */}
-      <aside className={`fixed inset-y-0 left-0 w-72 bg-white z-50 transform transition-transform duration-200 ease-in-out md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} border-r border-slate-200 flex flex-col`}>
+      <aside className={`fixed inset-y-0 left-0 w-72 bg-white z-50 transform transition-transform duration-200 ease-in-out md:sticky md:top-0 md:h-screen md:shrink-0 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} border-r border-slate-200 flex flex-col`}>
         <div className="flex flex-col h-full p-4.5">
           {/* Official Institution Banner */}
           <div className="flex items-center justify-between pb-4 mb-3 border-b border-slate-100">

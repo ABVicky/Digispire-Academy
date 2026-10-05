@@ -8,7 +8,7 @@ import {
   ExternalLink, Search, BookOpen, Video,
   Eye, Copy, Check, LayoutGrid, Table as TableIcon,
   RotateCcw, Sparkles, Pin, Play, Maximize2,
-  FolderGit2, CheckCircle2, ArrowUpRight
+  FolderGit2
 } from 'lucide-react';
 import { triggerHaptic } from '../../utils/haptic';
 
@@ -26,33 +26,33 @@ function typeLabel(type) {
   const map = {
     pdf: 'PDF Document',
     gdrive: 'Drive Folder',
-    video: 'Video Masterclass',
+    video: 'Video Lecture',
     link: 'Web Resource'
   };
-  return map[type] || 'Resource Link';
+  return map[type] || 'Resource';
 }
 
 function typeBadgeStyle(type) {
   const map = {
-    pdf: 'bg-rose-50 text-rose-700 border-rose-200/80',
-    gdrive: 'bg-sky-50 text-sky-700 border-sky-200/80',
-    video: 'bg-purple-50 text-purple-700 border-purple-200/80',
-    link: 'bg-blue-50 text-blue-700 border-blue-200/80',
+    pdf: 'bg-rose-50 text-rose-700 border-rose-200/70',
+    gdrive: 'bg-sky-50 text-sky-700 border-sky-200/70',
+    video: 'bg-purple-50 text-purple-700 border-purple-200/70',
+    link: 'bg-blue-50 text-blue-700 border-blue-200/70',
   };
   return map[type] || map.link;
 }
 
 function typeIconBox(type) {
   const map = {
-    pdf: 'text-rose-600 bg-rose-50 border-rose-100/80',
-    gdrive: 'text-sky-600 bg-sky-50 border-sky-100/80',
-    video: 'text-purple-600 bg-purple-50 border-purple-100/80',
-    link: 'text-[#255A84] bg-blue-50 border-blue-100/80',
+    pdf: 'text-rose-600 bg-rose-50/80 border-rose-200/60',
+    gdrive: 'text-sky-600 bg-sky-50/80 border-sky-200/60',
+    video: 'text-purple-600 bg-purple-50/80 border-purple-200/60',
+    link: 'text-[#255A84] bg-blue-50/80 border-blue-200/60',
   };
   return map[type] || map.link;
 }
 
-function TypeIcon({ type, size = 20 }) {
+function TypeIcon({ type, size = 18 }) {
   if (type === 'pdf') return <FileText size={size} className="text-rose-600" />;
   if (type === 'gdrive') return <FolderGit2 size={size} className="text-sky-600" />;
   if (type === 'video') return <Video size={size} className="text-purple-600" />;
@@ -301,79 +301,79 @@ export default function ContentPage() {
   };
 
   return (
-    <div className="space-y-6 pb-16 font-sans">
+    <div className="space-y-4 sm:space-y-6 pb-16 font-sans">
       {/* ── Executive Top Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#255A84] via-[#1f4b6e] to-[#0F172A] text-white flex items-center justify-center shadow-lg shadow-[#255A84]/20 border border-white/10">
-            <BookOpen size={22} className="text-blue-200" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-gradient-to-br from-[#255A84] via-[#1f4b6e] to-[#0F172A] text-white flex items-center justify-center shadow-md shadow-[#255A84]/20 border border-white/10 shrink-0">
+            <BookOpen size={20} className="text-blue-200" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">
+              <h1 className="text-lg sm:text-2xl font-black text-slate-800 tracking-tight">
                 Study Material & Media Hub
               </h1>
-              <span className="hidden sm:inline-flex text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-[#255A84] border border-blue-100">
-                Admin Console
+              <span className="hidden sm:inline-flex text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-[#255A84] border border-blue-100">
+                Admin
               </span>
             </div>
-            <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Publish lecture masterclasses, PDF notes, drive folders, and monitor student engagement
+            <p className="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5">
+              Publish video lectures, PDF notes, drive folders, and monitor student engagement
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-2 self-start sm:self-center shrink-0">
           {/* View Switcher */}
           <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 border border-slate-200/60">
             <button
               onClick={() => setViewMode('cards')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 viewMode === 'cards' ? 'bg-white text-[#255A84] shadow-xs' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              <LayoutGrid size={14} />
+              <LayoutGrid size={13} />
               <span>Cards</span>
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 viewMode === 'table' ? 'bg-white text-[#255A84] shadow-xs' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              <TableIcon size={14} />
+              <TableIcon size={13} />
               <span>Table</span>
             </button>
           </div>
 
           <button
             onClick={openAdd}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#255A84] to-[#1c4566] hover:from-[#1c4566] hover:to-[#14334c] text-white text-xs font-black rounded-xl shadow-md shadow-[#255A84]/20 transition-all active:scale-95"
+            className="flex items-center justify-center gap-1.5 px-3.5 py-2 bg-[#255A84] hover:bg-[#1c4566] text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95"
           >
-            <Plus size={16} /> Publish Material
+            <Plus size={15} /> Publish Material
           </button>
         </div>
       </div>
 
       {/* ── Search & Filter Control Bar ── */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
+      <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           {/* Search Input */}
           <div className="relative flex-1">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search materials by title, topic, or course track..."
-              className="w-full pl-10 pr-9 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all"
+              placeholder="Search materials by title, topic, or course..."
+              className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all"
             />
             {search && (
               <button
                 onClick={() => setSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
               >
-                <X size={14} />
+                <X size={13} />
               </button>
             )}
           </div>
@@ -383,9 +383,9 @@ export default function ContentPage() {
             <select
               value={filterCourse}
               onChange={e => setFilterCourse(e.target.value)}
-              className="px-3.5 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all min-w-[150px] cursor-pointer"
+              className="flex-1 sm:flex-initial px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all min-w-[130px] cursor-pointer"
             >
-              <option value="all">All Course Tracks</option>
+              <option value="all">All Courses</option>
               {courses.map(c => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
@@ -395,34 +395,34 @@ export default function ContentPage() {
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
-              className="px-3.5 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all cursor-pointer"
+              className="px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all cursor-pointer"
             >
-              <option value="newest">🕒 Newest First</option>
-              <option value="popular">🔥 Most Popular</option>
-              <option value="title">🔤 Title (A - Z)</option>
-              <option value="pinned">📌 Pinned First</option>
+              <option value="newest">🕒 Newest</option>
+              <option value="popular">🔥 Popular</option>
+              <option value="title">🔤 Title</option>
+              <option value="pinned">📌 Pinned</option>
             </select>
           </div>
         </div>
 
         {/* ── Category Filter Pills ── */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
           {[
-            { id: 'all', label: `All Items`, count: totalResources },
+            { id: 'all', label: `All`, count: totalResources },
             { id: 'pinned', label: `📌 Pinned`, count: pinnedCount },
-            { id: 'video', label: `🎥 Video Lectures`, count: videoCount },
+            { id: 'video', label: `🎥 Videos`, count: videoCount },
             { id: 'pdf', label: `📄 PDF Notes`, count: docsCount },
             { id: 'gdrive', label: `📁 Drive Folders`, count: driveCount },
-            { id: 'link', label: `🔗 Web Links` },
+            { id: 'link', label: `🔗 Links` },
           ].map(tab => {
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${
                   isActive
-                    ? 'bg-[#255A84] text-white shadow-md shadow-[#255A84]/15'
+                    ? 'bg-[#255A84] text-white shadow-xs'
                     : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-100'
                 }`}
               >
@@ -441,14 +441,14 @@ export default function ContentPage() {
 
         {hasActiveFilters && (
           <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
-            <span className="text-slate-500 font-medium">
-              Showing <strong className="text-slate-800">{filtered.length}</strong> matching items
+            <span className="text-slate-500 font-medium text-[11px]">
+              Showing <strong className="text-slate-800">{filtered.length}</strong> resources
             </span>
             <button
               onClick={handleResetFilters}
-              className="text-[#255A84] font-bold hover:underline flex items-center gap-1"
+              className="text-[#255A84] font-bold hover:underline flex items-center gap-1 text-[11px]"
             >
-              <RotateCcw size={12} /> Reset Filters
+              <RotateCcw size={11} /> Reset Filters
             </button>
           </div>
         )}
@@ -456,38 +456,38 @@ export default function ContentPage() {
 
       {/* ── Main Content Area ── */}
       {loading ? (
-        <div className="bg-white rounded-3xl p-16 border border-slate-100 text-center flex flex-col items-center justify-center gap-3 shadow-xs">
-          <div className="animate-spin rounded-full h-9 w-9 border-4 border-[#255A84] border-t-transparent" />
+        <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center flex flex-col items-center justify-center gap-3 shadow-xs">
+          <div className="animate-spin rounded-full h-8 w-8 border-3 border-[#255A84] border-t-transparent" />
           <p className="text-xs text-slate-400 font-bold">Loading media library...</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-3xl p-16 border border-slate-100 text-center text-slate-400 text-xs font-semibold space-y-3 shadow-xs">
-          <div className="h-16 w-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2">
-            <BookOpen size={32} />
+        <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center text-slate-400 text-xs font-semibold space-y-2.5 shadow-xs">
+          <div className="h-12 w-12 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-1">
+            <BookOpen size={24} />
           </div>
-          <h3 className="text-base font-extrabold text-slate-700">No Matching Resources Found</h3>
+          <h3 className="text-sm sm:text-base font-extrabold text-slate-700">No Resources Found</h3>
           <p className="text-slate-500 max-w-sm mx-auto">
-            {hasActiveFilters ? 'Try adjusting your search query or active filter tags.' : 'Click "Publish Material" to upload or link curriculum resources.'}
+            {hasActiveFilters ? 'Try adjusting your search query or filter.' : 'Click "Publish Material" to add your first resource.'}
           </p>
           {hasActiveFilters ? (
             <button
               onClick={handleResetFilters}
-              className="px-4 py-2 bg-[#255A84] text-white text-xs font-bold rounded-xl shadow-md inline-flex items-center gap-1.5"
+              className="px-3.5 py-1.5 bg-[#255A84] text-white text-xs font-bold rounded-xl shadow-xs inline-flex items-center gap-1.5"
             >
-              <RotateCcw size={13} /> Reset Filters
+              <RotateCcw size={12} /> Reset Filters
             </button>
           ) : (
             <button
               onClick={openAdd}
-              className="px-4 py-2 bg-[#255A84] text-white text-xs font-bold rounded-xl shadow-md inline-flex items-center gap-1.5"
+              className="px-3.5 py-1.5 bg-[#255A84] text-white text-xs font-bold rounded-xl shadow-xs inline-flex items-center gap-1.5"
             >
-              <Plus size={14} /> Add First Resource
+              <Plus size={13} /> Add Resource
             </button>
           )}
         </div>
       ) : viewMode === 'cards' ? (
-        /* ── PREMIUM CARD GRID VIEW ── */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        /* ── Compact Responsive Cards Grid ── */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4.5">
           {filtered.map(item => {
             const type = item.type || detectType(item.fileUrl || item.url);
             const courseName = getCourseName(item.courseId);
@@ -497,15 +497,15 @@ export default function ContentPage() {
             return (
               <div
                 key={item.id}
-                className={`bg-white rounded-3xl border transition-all duration-300 flex flex-col justify-between overflow-hidden group relative hover:-translate-y-1 hover:shadow-xl ${
-                  item.isPinned ? 'border-amber-300/90 shadow-md shadow-amber-500/5' : 'border-slate-200/80 shadow-xs hover:border-[#255A84]/40'
+                className={`bg-white rounded-2xl border transition-all duration-200 flex flex-col overflow-hidden group hover:border-[#255A84]/40 hover:shadow-md ${
+                  item.isPinned ? 'border-amber-300 shadow-2xs' : 'border-slate-200/90 shadow-2xs'
                 }`}
               >
                 {/* Pinned Ribbon Badge */}
                 {item.isPinned && (
-                  <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-black px-3 py-0.5 flex items-center justify-center gap-1 uppercase tracking-widest shadow-xs">
-                    <Pin size={10} fill="white" />
-                    Pinned Cohort Note
+                  <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[8px] sm:text-[9px] font-black px-2.5 py-0.5 flex items-center justify-center gap-1 uppercase tracking-widest shadow-2xs">
+                    <Pin size={9} fill="white" />
+                    Pinned Note
                   </div>
                 )}
 
@@ -518,119 +518,118 @@ export default function ContentPage() {
                     <img
                       src={youtubeThumb}
                       alt={item.title}
-                      className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-500 opacity-90"
+                      className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300 opacity-90"
                     />
                     <div className="absolute inset-0 bg-slate-950/30 group-hover/thumb:bg-slate-950/15 transition-colors flex items-center justify-center">
-                      <div className="h-12 w-12 rounded-2xl bg-purple-600/90 backdrop-blur-md text-white flex items-center justify-center shadow-lg group-hover/thumb:scale-110 transition-transform">
-                        <Play size={20} fill="white" className="ml-0.5" />
+                      <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-purple-600/90 backdrop-blur-md text-white flex items-center justify-center shadow-lg group-hover/thumb:scale-110 transition-transform">
+                        <Play size={18} fill="white" className="ml-0.5" />
                       </div>
                     </div>
-                    <span className="absolute bottom-2.5 right-2.5 px-2.5 py-1 bg-black/80 backdrop-blur-md text-white text-[9px] font-extrabold rounded-lg flex items-center gap-1.5 shadow-sm">
-                      <Video size={11} className="text-purple-400" /> Video Lecture
+                    <span className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/80 backdrop-blur-md text-white text-[9px] font-extrabold rounded-md flex items-center gap-1">
+                      <Video size={10} className="text-purple-400" /> Video Lecture
                     </span>
                   </div>
                 ) : (
-                  /* Modern Document / Drive Header */
-                  <div className="p-5 pb-0 flex items-start justify-between gap-3">
-                    <div className={`h-12 w-12 rounded-2xl flex items-center justify-center shadow-xs border shrink-0 ${typeIconBox(type)}`}>
-                      <TypeIcon type={type} size={22} />
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${typeBadgeStyle(type)}`}>
+                  /* Document / Drive Header */
+                  <div className="p-3.5 sm:p-4 pb-0 flex items-center justify-between gap-2.5">
+                    <div className="flex items-center gap-2">
+                      <div className={`h-9 w-9 rounded-xl flex items-center justify-center border shrink-0 ${typeIconBox(type)}`}>
+                        <TypeIcon type={type} size={17} />
+                      </div>
+                      <span className={`text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full border ${typeBadgeStyle(type)}`}>
                         {typeLabel(type)}
                       </span>
-                      <button
-                        onClick={(e) => togglePin(item, e)}
-                        title={item.isPinned ? 'Unpin resource' : 'Pin to top'}
-                        className={`p-1.5 rounded-xl transition ${
-                          item.isPinned ? 'text-amber-500 bg-amber-50' : 'text-slate-300 hover:text-amber-500 hover:bg-slate-100'
-                        }`}
-                      >
-                        <Pin size={15} fill={item.isPinned ? 'currentColor' : 'none'} />
-                      </button>
                     </div>
+
+                    <button
+                      onClick={(e) => togglePin(item, e)}
+                      title={item.isPinned ? 'Unpin resource' : 'Pin to top'}
+                      className={`p-1.5 rounded-lg transition ${
+                        item.isPinned ? 'text-amber-500 bg-amber-50' : 'text-slate-300 hover:text-amber-500 hover:bg-slate-100'
+                      }`}
+                    >
+                      <Pin size={14} fill={item.isPinned ? 'currentColor' : 'none'} />
+                    </button>
                   </div>
                 )}
 
                 {/* Card Body */}
-                <div className="p-5 space-y-2 flex-1 flex flex-col justify-between">
-                  <div>
-                    {courseName && (
-                      <p className="text-[10px] font-black uppercase tracking-wider text-[#255A84] mb-1">
-                        {courseName}
-                      </p>
-                    )}
-                    <h3 className="font-extrabold text-slate-800 text-sm leading-snug group-hover:text-[#255A84] transition-colors line-clamp-2">
-                      {item.title}
-                    </h3>
-                    {item.description && (
-                      <p className="text-xs text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">
-                        {item.description}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Metadata Chips */}
-                  <div className="flex flex-wrap items-center gap-1.5 pt-2">
-                    {item.subject && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
+                <div className="p-3.5 sm:p-4 space-y-1 flex-1">
+                  {courseName && (
+                    <p className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider text-[#255A84] truncate">
+                      {courseName}
+                    </p>
+                  )}
+                  <h3 className="font-bold text-slate-800 text-xs sm:text-sm leading-snug group-hover:text-[#255A84] transition-colors line-clamp-2">
+                    {item.title}
+                  </h3>
+                  {item.description && (
+                    <p className="text-[11px] sm:text-xs text-slate-500 line-clamp-2 leading-relaxed pt-0.5">
+                      {item.description}
+                    </p>
+                  )}
+                  {item.subject && (
+                    <div className="pt-1">
+                      <span className="inline-block text-[10px] font-medium px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">
                         #{item.subject}
                       </span>
-                    )}
-                    <span className="ml-auto text-[10px] font-bold text-slate-400 flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
-                      <Eye size={11} /> {item.clicks || 0} views
-                    </span>
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Actions Footer */}
-                <div className="px-5 py-3.5 border-t border-slate-100 bg-slate-50/70 flex items-center justify-between gap-2 text-xs">
-                  {hasEmbed ? (
-                    <button
-                      onClick={() => setPreviewMedia(item)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#255A84] hover:bg-[#1a4261] text-white font-bold rounded-xl transition active:scale-95 shadow-xs"
-                    >
-                      <Maximize2 size={13} /> Preview
-                    </button>
-                  ) : (
-                    <a
-                      href={item.fileUrl || item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white border border-slate-200/80 text-[#255A84] font-bold rounded-xl hover:bg-[#255A84] hover:text-white hover:border-[#255A84] transition active:scale-95 shadow-2xs"
-                    >
-                      <ExternalLink size={13} /> Open Link
-                    </a>
-                  )}
+                <div className="px-3.5 sm:px-4 py-2.5 sm:py-3 border-t border-slate-100 bg-slate-50/70 flex items-center justify-between gap-1.5 text-xs mt-auto">
+                  <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1">
+                    <Eye size={11} /> {item.clicks || 0} views
+                  </span>
 
                   <div className="flex items-center gap-1">
+                    {hasEmbed ? (
+                      <button
+                        onClick={() => setPreviewMedia(item)}
+                        className="p-1.5 text-slate-500 hover:text-[#255A84] hover:bg-blue-50 rounded-lg transition"
+                        title="Preview"
+                      >
+                        <Maximize2 size={13} />
+                      </button>
+                    ) : (
+                      <a
+                        href={item.fileUrl || item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1.5 text-slate-500 hover:text-[#255A84] hover:bg-blue-50 rounded-lg transition"
+                        title="Open Link"
+                      >
+                        <ExternalLink size={13} />
+                      </a>
+                    )}
+
                     <button
                       onClick={(e) => handleCopyLink(item, e)}
-                      title="Copy Link to Clipboard"
-                      className={`p-2 rounded-xl border transition ${
+                      title="Copy Link"
+                      className={`p-1.5 rounded-lg border transition ${
                         copiedId === item.id 
                           ? 'bg-emerald-50 text-emerald-600 border-emerald-200' 
-                          : 'bg-white text-slate-400 border-slate-200/80 hover:text-slate-800 hover:bg-slate-100'
+                          : 'bg-white text-slate-400 border-slate-200 hover:text-slate-700 hover:bg-slate-100'
                       }`}
                     >
-                      {copiedId === item.id ? <Check size={14} /> : <Copy size={14} />}
+                      {copiedId === item.id ? <Check size={13} /> : <Copy size={13} />}
                     </button>
 
                     <button
                       onClick={() => openEdit(item)}
-                      title="Edit Resource"
-                      className="p-2 bg-white text-slate-400 border border-slate-200/80 rounded-xl hover:text-[#255A84] hover:bg-blue-50 hover:border-blue-200 transition"
+                      title="Edit"
+                      className="p-1.5 bg-white text-slate-400 border border-slate-200 rounded-lg hover:text-[#255A84] hover:bg-blue-50 transition"
                     >
-                      <Pencil size={14} />
+                      <Pencil size={13} />
                     </button>
 
                     <button
                       onClick={() => setDeleteConfirm(item.id)}
-                      title="Delete Resource"
-                      className="p-2 bg-white text-slate-400 border border-slate-200/80 rounded-xl hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition"
+                      title="Delete"
+                      className="p-1.5 bg-white text-slate-400 border border-slate-200 rounded-lg hover:text-rose-600 hover:bg-rose-50 transition"
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={13} />
                     </button>
                   </div>
                 </div>
@@ -640,16 +639,16 @@ export default function ContentPage() {
         </div>
       ) : (
         /* ── TABLE VIEW ── */
-        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[800px]">
+            <table className="w-full text-left border-collapse min-w-[700px]">
               <thead>
                 <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-                  <th className="px-5 py-3.5">Resource Title</th>
-                  <th className="px-4 py-3.5">Type & Track</th>
-                  <th className="px-4 py-3.5">Topic Tag</th>
-                  <th className="px-4 py-3.5">Engagement</th>
-                  <th className="px-4 py-3.5 text-right">Actions</th>
+                  <th className="px-4 py-3">Resource Title</th>
+                  <th className="px-3 py-3">Type & Track</th>
+                  <th className="px-3 py-3">Topic Tag</th>
+                  <th className="px-3 py-3">Views</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
@@ -659,96 +658,96 @@ export default function ContentPage() {
 
                   return (
                     <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-center gap-3">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2.5">
                           <button
                             onClick={(e) => togglePin(item, e)}
                             title={item.isPinned ? 'Pinned' : 'Click to pin'}
-                            className={`p-1 rounded-md transition ${item.isPinned ? 'text-amber-500' : 'text-slate-300 hover:text-amber-400'}`}
+                            className={`p-0.5 rounded transition ${item.isPinned ? 'text-amber-500' : 'text-slate-300 hover:text-amber-400'}`}
                           >
-                            <Pin size={14} fill={item.isPinned ? 'currentColor' : 'none'} />
+                            <Pin size={13} fill={item.isPinned ? 'currentColor' : 'none'} />
                           </button>
 
-                          <div className={`h-9 w-9 rounded-xl flex items-center justify-center shrink-0 border ${typeIconBox(type)}`}>
-                            <TypeIcon type={type} size={16} />
+                          <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 border ${typeIconBox(type)}`}>
+                            <TypeIcon type={type} size={15} />
                           </div>
                           <div className="min-w-0 max-w-xs">
-                            <p className="font-bold text-slate-800 truncate">{item.title}</p>
+                            <p className="font-bold text-slate-800 truncate text-xs">{item.title}</p>
                             {item.description && (
-                              <p className="text-[11px] text-slate-400 truncate mt-0.5">{item.description}</p>
+                              <p className="text-[10px] text-slate-400 truncate mt-0.5">{item.description}</p>
                             )}
                           </div>
                         </div>
                       </td>
 
-                      <td className="px-4 py-3.5">
-                        <div className="space-y-1">
-                          <span className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-black border ${typeBadgeStyle(type)}`}>
+                      <td className="px-3 py-3">
+                        <div className="space-y-0.5">
+                          <span className={`inline-block px-1.5 py-0.2 rounded-full text-[8px] font-black border ${typeBadgeStyle(type)}`}>
                             {typeLabel(type)}
                           </span>
                           {courseName && (
-                            <p className="text-[11px] font-bold text-[#255A84] truncate max-w-[140px]">{courseName}</p>
+                            <p className="text-[10px] font-bold text-[#255A84] truncate max-w-[120px]">{courseName}</p>
                           )}
                         </div>
                       </td>
 
-                      <td className="px-4 py-3.5">
+                      <td className="px-3 py-3">
                         {item.subject ? (
-                          <span className="font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">
+                          <span className="font-medium text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded text-[11px]">
                             #{item.subject}
                           </span>
                         ) : (
-                          <span className="text-slate-300 italic">None</span>
+                          <span className="text-slate-300 italic text-[11px]">None</span>
                         )}
                       </td>
 
-                      <td className="px-4 py-3.5">
-                        <span className="font-bold text-slate-700 flex items-center gap-1">
-                          <Eye size={12} className="text-slate-400" />
-                          {item.clicks || 0} views
+                      <td className="px-3 py-3">
+                        <span className="font-bold text-slate-700 flex items-center gap-1 text-[11px]">
+                          <Eye size={11} className="text-slate-400" />
+                          {item.clicks || 0}
                         </span>
                       </td>
 
-                      <td className="px-4 py-3.5 text-right">
+                      <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
                           {getEmbedUrl(item.fileUrl || item.url) && (
                             <button
                               onClick={() => setPreviewMedia(item)}
-                              className="p-1.5 text-slate-500 hover:text-[#255A84] hover:bg-blue-50 rounded-lg transition"
-                              title="Preview Media"
+                              className="p-1 text-slate-400 hover:text-[#255A84] hover:bg-blue-50 rounded-lg transition"
+                              title="Preview"
                             >
-                              <Maximize2 size={14} />
+                              <Maximize2 size={13} />
                             </button>
                           )}
                           <a
                             href={item.fileUrl || item.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 text-slate-500 hover:text-[#255A84] hover:bg-blue-50 rounded-lg transition"
+                            className="p-1 text-slate-400 hover:text-[#255A84] hover:bg-blue-50 rounded-lg transition"
                             title="Open Link"
                           >
-                            <ExternalLink size={14} />
+                            <ExternalLink size={13} />
                           </a>
                           <button
                             onClick={(e) => handleCopyLink(item, e)}
-                            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition"
+                            className="p-1 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition"
                             title="Copy Link"
                           >
-                            {copiedId === item.id ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                            {copiedId === item.id ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
                           </button>
                           <button
                             onClick={() => openEdit(item)}
-                            className="p-1.5 text-slate-500 hover:text-[#255A84] hover:bg-blue-50 rounded-lg transition"
+                            className="p-1 text-slate-400 hover:text-[#255A84] hover:bg-blue-50 rounded-lg transition"
                             title="Edit"
                           >
-                            <Pencil size={14} />
+                            <Pencil size={13} />
                           </button>
                           <button
                             onClick={() => setDeleteConfirm(item.id)}
-                            className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                            className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
                             title="Delete"
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={13} />
                           </button>
                         </div>
                       </td>
@@ -764,25 +763,25 @@ export default function ContentPage() {
       {/* ── Interactive In-App Media Preview Modal ── */}
       {previewMedia && (
         <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-          <div className="bg-slate-900 rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-hidden flex flex-col border border-slate-800 shadow-2xl text-white font-sans">
+          <div className="bg-slate-900 rounded-2xl sm:rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-hidden flex flex-col border border-slate-800 shadow-2xl text-white font-sans">
             {/* Modal Header */}
-            <div className="px-5 sm:px-6 py-4 border-b border-slate-800 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="h-9 w-9 rounded-xl bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700">
-                  <TypeIcon type={previewMedia.type || detectType(previewMedia.fileUrl || previewMedia.url)} size={18} />
+            <div className="px-4 sm:px-6 py-3.5 border-b border-slate-800 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="h-8 w-8 rounded-lg bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700">
+                  <TypeIcon type={previewMedia.type || detectType(previewMedia.fileUrl || previewMedia.url)} size={16} />
                 </div>
                 <div className="min-w-0">
                   <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${typeBadgeStyle(previewMedia.type || detectType(previewMedia.fileUrl || previewMedia.url))}`}>
                     {typeLabel(previewMedia.type || detectType(previewMedia.fileUrl || previewMedia.url))}
                   </span>
-                  <h3 className="font-bold text-sm text-slate-100 truncate mt-0.5">{previewMedia.title}</h3>
+                  <h3 className="font-bold text-xs sm:text-sm text-slate-100 truncate mt-0.5">{previewMedia.title}</h3>
                 </div>
               </div>
               <button
                 onClick={() => setPreviewMedia(null)}
-                className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition"
+                className="p-1.5 sm:p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
@@ -798,32 +797,32 @@ export default function ContentPage() {
                 />
               ) : (
                 <div className="p-8 text-center text-slate-400 text-xs font-semibold space-y-3">
-                  <div className="h-12 w-12 rounded-2xl bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
-                    <ExternalLink size={24} />
+                  <div className="h-10 w-10 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
+                    <ExternalLink size={20} />
                   </div>
                   <p>In-app embed preview is not available for this link type.</p>
                   <a
                     href={previewMedia.fileUrl || previewMedia.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#255A84] hover:bg-[#1c4566] text-white font-bold rounded-xl transition"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#255A84] hover:bg-[#1c4566] text-white font-bold rounded-xl transition"
                   >
-                    <ExternalLink size={14} /> Open in New Window
+                    <ExternalLink size={13} /> Open in New Window
                   </a>
                 </div>
               )}
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 sm:p-5 bg-slate-900 border-t border-slate-800 flex items-center justify-between text-xs gap-3">
+            <div className="p-3.5 sm:p-4 bg-slate-900 border-t border-slate-800 flex items-center justify-between text-xs gap-3">
               <p className="text-slate-300 text-xs truncate max-w-md">{previewMedia.description || 'No description provided.'}</p>
               <a
                 href={previewMedia.fileUrl || previewMedia.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 bg-[#255A84] hover:bg-[#1c4566] text-white font-bold rounded-xl transition flex items-center gap-1.5 shrink-0"
+                className="px-3.5 py-1.5 bg-[#255A84] hover:bg-[#1c4566] text-white font-bold rounded-xl transition flex items-center gap-1.5 shrink-0"
               >
-                <ExternalLink size={14} /> Open Link Externally
+                <ExternalLink size={13} /> Open Link Externally
               </a>
             </div>
           </div>
@@ -833,26 +832,26 @@ export default function ContentPage() {
       {/* ── Add / Edit Material Modal ── */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-hidden flex flex-col border border-slate-200 font-sans">
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-hidden flex flex-col border border-slate-200 font-sans">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/60">
-              <div className="flex items-center gap-2.5">
-                <span className="p-2 bg-[#255A84]/10 text-[#255A84] rounded-xl">
-                  <Sparkles size={18} />
+            <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 bg-slate-50/60">
+              <div className="flex items-center gap-2">
+                <span className="p-1.5 bg-[#255A84]/10 text-[#255A84] rounded-lg">
+                  <Sparkles size={16} />
                 </span>
                 <div>
-                  <h2 className="font-extrabold text-slate-800 text-base">
+                  <h2 className="font-extrabold text-slate-800 text-sm sm:text-base">
                     {editingId ? 'Edit Study Material' : 'Publish Study Material'}
                   </h2>
-                  <p className="text-[11px] text-slate-400 font-medium">Link video lectures, drive folders, or PDF notes</p>
+                  <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium">Link video lectures, drive folders, or PDF notes</p>
                 </div>
               </div>
               <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600 transition p-1 rounded-lg">
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="p-6 space-y-4 overflow-y-auto flex-1">
+            <form onSubmit={handleSave} className="p-5 sm:p-6 space-y-3.5 sm:space-y-4 overflow-y-auto flex-1">
               {/* Resource Title */}
               <div>
                 <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
@@ -862,7 +861,7 @@ export default function ContentPage() {
                   required
                   value={form.title}
                   onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all"
                   placeholder="e.g. Master React Hooks & Context API Deep Dive"
                 />
               </div>
@@ -877,7 +876,7 @@ export default function ContentPage() {
                   type="url"
                   value={form.url}
                   onChange={e => { setForm(f => ({ ...f, url: e.target.value })); setUrlError(''); }}
-                  className={`w-full px-3.5 py-2.5 bg-slate-50 border rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none transition-all ${
+                  className={`w-full px-3 py-2 bg-slate-50 border rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none transition-all ${
                     urlError ? 'border-rose-300 focus:border-rose-500' : 'border-slate-200/80 focus:border-[#255A84]'
                   }`}
                   placeholder="https://youtube.com/..., https://drive.google.com/..."
@@ -886,17 +885,16 @@ export default function ContentPage() {
 
                 {/* Auto-Detection Badge Preview */}
                 {form.url && isValidUrl(form.url) && (
-                  <div className="mt-2.5 p-3 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2.5">
-                      <div className={`h-8 w-8 rounded-xl flex items-center justify-center border ${typeIconBox(detectType(form.url))}`}>
-                        <TypeIcon type={detectType(form.url)} size={16} />
+                  <div className="mt-2 p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <div className={`h-7 w-7 rounded-lg flex items-center justify-center border ${typeIconBox(detectType(form.url))}`}>
+                        <TypeIcon type={detectType(form.url)} size={14} />
                       </div>
                       <div>
-                        <span className="font-extrabold text-slate-800">{typeLabel(detectType(form.url))}</span>
-                        <p className="text-[10px] text-slate-400">Intelligently categorized for students</p>
+                        <span className="font-bold text-slate-800 text-[11px]">{typeLabel(detectType(form.url))}</span>
                       </div>
                     </div>
-                    <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-md border border-emerald-200">
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded border border-emerald-200">
                       Auto-Detected
                     </span>
                   </div>
@@ -912,9 +910,9 @@ export default function ContentPage() {
                   <select
                     value={form.courseId}
                     onChange={e => setForm(f => ({ ...f, courseId: e.target.value }))}
-                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all cursor-pointer"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all cursor-pointer"
                   >
-                    <option value="">All Course Tracks (General)</option>
+                    <option value="">All Courses (General)</option>
                     {courses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                 </div>
@@ -926,7 +924,7 @@ export default function ContentPage() {
                   <input
                     value={form.subject}
                     onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all"
                     placeholder="e.g. React, Python, Notes"
                   />
                 </div>
@@ -940,14 +938,14 @@ export default function ContentPage() {
                 <textarea
                   value={form.description}
                   onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all resize-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all resize-none"
                   rows={2}
                   placeholder="Summary of topics covered, prerequisites, or notes..."
                 />
               </div>
 
               {/* Pin Checkbox */}
-              <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-amber-500/5 border border-amber-500/20">
+              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-amber-500/5 border border-amber-500/20">
                 <input
                   type="checkbox"
                   id="isPinnedCheck"
@@ -956,25 +954,25 @@ export default function ContentPage() {
                   className="h-4 w-4 rounded border-amber-300 text-amber-500 focus:ring-amber-400"
                 />
                 <label htmlFor="isPinnedCheck" className="text-xs font-bold text-slate-700 flex items-center gap-1.5 cursor-pointer">
-                  <Pin size={14} className="text-amber-500" /> Pin this resource to the top for student cohorts
+                  <Pin size={13} className="text-amber-500" /> Pin this resource to top of list
                 </label>
               </div>
 
               {/* Footer Actions */}
-              <div className="flex gap-3 pt-3 border-t border-slate-100">
+              <div className="flex gap-2.5 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50 transition"
+                  className="flex-1 py-2 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 py-2.5 bg-gradient-to-r from-[#255A84] to-[#1c4566] hover:from-[#1c4566] hover:to-[#14334c] text-white rounded-xl text-xs font-black transition shadow-md disabled:opacity-60"
+                  className="flex-1 py-2 bg-[#255A84] hover:bg-[#1a4261] text-white rounded-xl text-xs font-bold transition shadow-xs disabled:opacity-60"
                 >
-                  {saving ? 'Publishing...' : editingId ? 'Update Material' : 'Publish to Cohort'}
+                  {saving ? 'Publishing...' : editingId ? 'Update Material' : 'Publish Material'}
                 </button>
               </div>
             </form>
@@ -985,26 +983,26 @@ export default function ContentPage() {
       {/* ── Delete Confirmation Dialog ── */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 text-center border border-slate-100 font-sans">
-            <div className="h-14 w-14 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-3.5">
-              <Trash2 size={24} />
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-sm p-5 sm:p-6 text-center border border-slate-100 font-sans">
+            <div className="h-12 w-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <Trash2 size={22} />
             </div>
-            <h2 className="font-black text-slate-800 text-base mb-1">Delete Study Material?</h2>
-            <p className="text-xs text-slate-500 mb-5 leading-relaxed">
-              This action will remove the link from the student resources library. Students will no longer see this item.
+            <h2 className="font-bold text-slate-800 text-base mb-1">Delete Study Material?</h2>
+            <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+              This action will remove the link from the student resources library.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-2.5">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50 transition"
+                className="flex-1 py-2 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50 transition"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDelete(deleteConfirm)}
-                className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black transition shadow-md"
+                className="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-xs"
               >
-                Delete Material
+                Delete
               </button>
             </div>
           </div>
