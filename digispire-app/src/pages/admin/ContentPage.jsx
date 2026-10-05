@@ -8,7 +8,7 @@ import {
   ExternalLink, Search, BookOpen, Video,
   Eye, Copy, Check, LayoutGrid, Table as TableIcon,
   RotateCcw, Sparkles, Pin, Play, Maximize2,
-  Layers, FolderGit2, CheckCircle2, TrendingUp
+  FolderGit2, CheckCircle2, ArrowUpRight
 } from 'lucide-react';
 import { triggerHaptic } from '../../utils/haptic';
 
@@ -25,7 +25,7 @@ function detectType(url) {
 function typeLabel(type) {
   const map = {
     pdf: 'PDF Document',
-    gdrive: 'Google Drive Folder',
+    gdrive: 'Drive Folder',
     video: 'Video Masterclass',
     link: 'Web Resource'
   };
@@ -42,27 +42,17 @@ function typeBadgeStyle(type) {
   return map[type] || map.link;
 }
 
-function typeIconColor(type) {
+function typeIconBox(type) {
   const map = {
-    pdf: 'text-rose-600 bg-rose-50 border-rose-100',
-    gdrive: 'text-sky-600 bg-sky-50 border-sky-100',
-    video: 'text-purple-600 bg-purple-50 border-purple-100',
-    link: 'text-[#255A84] bg-blue-50 border-blue-100',
+    pdf: 'text-rose-600 bg-rose-50 border-rose-100/80',
+    gdrive: 'text-sky-600 bg-sky-50 border-sky-100/80',
+    video: 'text-purple-600 bg-purple-50 border-purple-100/80',
+    link: 'text-[#255A84] bg-blue-50 border-blue-100/80',
   };
   return map[type] || map.link;
 }
 
-function typeHeaderGradient(type) {
-  const map = {
-    pdf: 'from-rose-500/10 via-rose-500/5 to-transparent text-rose-600',
-    gdrive: 'from-sky-500/10 via-sky-500/5 to-transparent text-sky-600',
-    video: 'from-purple-500/10 via-purple-500/5 to-transparent text-purple-600',
-    link: 'from-blue-500/10 via-blue-500/5 to-transparent text-blue-600',
-  };
-  return map[type] || map.link;
-}
-
-function TypeIcon({ type, size = 18 }) {
+function TypeIcon({ type, size = 20 }) {
   if (type === 'pdf') return <FileText size={size} className="text-rose-600" />;
   if (type === 'gdrive') return <FolderGit2 size={size} className="text-sky-600" />;
   if (type === 'video') return <Video size={size} className="text-purple-600" />;
@@ -256,13 +246,12 @@ export default function ContentPage() {
 
   const getCourseName = id => courses.find(c => c.id === id)?.name || '';
 
-  // Executive Metrics
+  // Counts for pills
   const totalResources = contents.length;
   const pinnedCount = contents.filter(c => c.isPinned).length;
   const docsCount = contents.filter(c => (c.type || detectType(c.fileUrl || c.url)) === 'pdf').length;
   const videoCount = contents.filter(c => (c.type || detectType(c.fileUrl || c.url)) === 'video').length;
   const driveCount = contents.filter(c => (c.type || detectType(c.fileUrl || c.url)) === 'gdrive').length;
-  const totalViews = contents.reduce((acc, c) => acc + (c.clicks || 0), 0);
 
   // Filtered & Sorted List
   const filtered = useMemo(() => {
@@ -363,59 +352,6 @@ export default function ContentPage() {
           >
             <Plus size={16} /> Publish Material
           </button>
-        </div>
-      </div>
-
-      {/* ── Stat Overview Strip ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5">
-        <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80 flex items-center gap-3.5 hover:shadow-md transition">
-          <div className="h-11 w-11 rounded-2xl bg-blue-50 text-[#255A84] flex items-center justify-center shrink-0 border border-blue-100">
-            <Layers size={20} />
-          </div>
-          <div>
-            <p className="text-2xl font-black text-slate-800 leading-none">{totalResources}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Total Published</p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80 flex items-center gap-3.5 hover:shadow-md transition">
-          <div className="h-11 w-11 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100">
-            <Video size={20} />
-          </div>
-          <div>
-            <p className="text-2xl font-black text-slate-800 leading-none">{videoCount}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Video Lectures</p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80 flex items-center gap-3.5 hover:shadow-md transition">
-          <div className="h-11 w-11 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-100">
-            <FileText size={20} />
-          </div>
-          <div>
-            <p className="text-2xl font-black text-slate-800 leading-none">{docsCount}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">PDF Notes</p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80 flex items-center gap-3.5 hover:shadow-md transition">
-          <div className="h-11 w-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
-            <Pin size={20} />
-          </div>
-          <div>
-            <p className="text-2xl font-black text-slate-800 leading-none">{pinnedCount}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Pinned Cohort Notes</p>
-          </div>
-        </div>
-
-        <div className="col-span-2 lg:col-span-1 bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80 flex items-center gap-3.5 hover:shadow-md transition">
-          <div className="h-11 w-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
-            <TrendingUp size={20} />
-          </div>
-          <div>
-            <p className="text-2xl font-black text-slate-800 leading-none">{totalViews}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Student Clicks</p>
-          </div>
         </div>
       </div>
 
@@ -550,7 +486,7 @@ export default function ContentPage() {
           )}
         </div>
       ) : viewMode === 'cards' ? (
-        /* ── CARD GRID VIEW ── */
+        /* ── PREMIUM CARD GRID VIEW ── */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map(item => {
             const type = item.type || detectType(item.fileUrl || item.url);
@@ -562,7 +498,7 @@ export default function ContentPage() {
               <div
                 key={item.id}
                 className={`bg-white rounded-3xl border transition-all duration-300 flex flex-col justify-between overflow-hidden group relative hover:-translate-y-1 hover:shadow-xl ${
-                  item.isPinned ? 'border-amber-300/90 shadow-md shadow-amber-500/5' : 'border-slate-200/80 shadow-xs hover:border-[#255A84]/30'
+                  item.isPinned ? 'border-amber-300/90 shadow-md shadow-amber-500/5' : 'border-slate-200/80 shadow-xs hover:border-[#255A84]/40'
                 }`}
               >
                 {/* Pinned Ribbon Badge */}
@@ -573,7 +509,7 @@ export default function ContentPage() {
                   </div>
                 )}
 
-                {/* Video Thumbnail / Banner Preview */}
+                {/* Video Media Area */}
                 {youtubeThumb ? (
                   <div
                     onClick={() => setPreviewMedia(item)}
@@ -584,41 +520,47 @@ export default function ContentPage() {
                       alt={item.title}
                       className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-500 opacity-90"
                     />
-                    <div className="absolute inset-0 bg-slate-900/30 group-hover/thumb:bg-slate-900/10 transition-colors flex items-center justify-center">
-                      <div className="h-12 w-12 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-lg group-hover/thumb:scale-110 transition-transform">
+                    <div className="absolute inset-0 bg-slate-950/30 group-hover/thumb:bg-slate-950/15 transition-colors flex items-center justify-center">
+                      <div className="h-12 w-12 rounded-2xl bg-purple-600/90 backdrop-blur-md text-white flex items-center justify-center shadow-lg group-hover/thumb:scale-110 transition-transform">
                         <Play size={20} fill="white" className="ml-0.5" />
                       </div>
                     </div>
-                    <span className="absolute bottom-2 right-2 px-2.5 py-0.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-extrabold rounded-md flex items-center gap-1">
-                      <Video size={10} /> Watch Video
+                    <span className="absolute bottom-2.5 right-2.5 px-2.5 py-1 bg-black/80 backdrop-blur-md text-white text-[9px] font-extrabold rounded-lg flex items-center gap-1.5 shadow-sm">
+                      <Video size={11} className="text-purple-400" /> Video Lecture
                     </span>
                   </div>
                 ) : (
-                  <div className={`p-4 bg-gradient-to-r ${typeHeaderGradient(type)} border-b border-slate-100 flex items-center justify-between`}>
-                    <div className="flex items-center gap-2.5">
-                      <div className={`h-9 w-9 rounded-2xl flex items-center justify-center shadow-xs border ${typeIconColor(type)}`}>
-                        <TypeIcon type={type} size={17} />
-                      </div>
+                  /* Modern Document / Drive Header */
+                  <div className="p-5 pb-0 flex items-start justify-between gap-3">
+                    <div className={`h-12 w-12 rounded-2xl flex items-center justify-center shadow-xs border shrink-0 ${typeIconBox(type)}`}>
+                      <TypeIcon type={type} size={22} />
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
                       <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${typeBadgeStyle(type)}`}>
                         {typeLabel(type)}
                       </span>
+                      <button
+                        onClick={(e) => togglePin(item, e)}
+                        title={item.isPinned ? 'Unpin resource' : 'Pin to top'}
+                        className={`p-1.5 rounded-xl transition ${
+                          item.isPinned ? 'text-amber-500 bg-amber-50' : 'text-slate-300 hover:text-amber-500 hover:bg-slate-100'
+                        }`}
+                      >
+                        <Pin size={15} fill={item.isPinned ? 'currentColor' : 'none'} />
+                      </button>
                     </div>
-
-                    <button
-                      onClick={(e) => togglePin(item, e)}
-                      title={item.isPinned ? 'Unpin resource' : 'Pin to top'}
-                      className={`p-1.5 rounded-xl transition ${
-                        item.isPinned ? 'text-amber-500 bg-amber-50' : 'text-slate-300 hover:text-amber-500 hover:bg-white/80'
-                      }`}
-                    >
-                      <Pin size={15} fill={item.isPinned ? 'currentColor' : 'none'} />
-                    </button>
                   </div>
                 )}
 
                 {/* Card Body */}
-                <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
+                <div className="p-5 space-y-2 flex-1 flex flex-col justify-between">
                   <div>
+                    {courseName && (
+                      <p className="text-[10px] font-black uppercase tracking-wider text-[#255A84] mb-1">
+                        {courseName}
+                      </p>
+                    )}
                     <h3 className="font-extrabold text-slate-800 text-sm leading-snug group-hover:text-[#255A84] transition-colors line-clamp-2">
                       {item.title}
                     </h3>
@@ -629,34 +571,25 @@ export default function ContentPage() {
                     )}
                   </div>
 
-                  {/* Badges */}
+                  {/* Metadata Chips */}
                   <div className="flex flex-wrap items-center gap-1.5 pt-2">
-                    {courseName ? (
-                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-[#255A84] border border-blue-100">
-                        {courseName}
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-500">
-                        General
-                      </span>
-                    )}
                     {item.subject && (
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
                         #{item.subject}
                       </span>
                     )}
-                    <span className="ml-auto text-[10px] font-bold text-slate-400 flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded-md">
+                    <span className="ml-auto text-[10px] font-bold text-slate-400 flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
                       <Eye size={11} /> {item.clicks || 0} views
                     </span>
                   </div>
                 </div>
 
                 {/* Actions Footer */}
-                <div className="px-5 py-3.5 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between gap-2 text-xs">
+                <div className="px-5 py-3.5 border-t border-slate-100 bg-slate-50/70 flex items-center justify-between gap-2 text-xs">
                   {hasEmbed ? (
                     <button
                       onClick={() => setPreviewMedia(item)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#255A84] text-white font-bold rounded-xl hover:bg-[#1a4261] transition active:scale-95 shadow-xs"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#255A84] hover:bg-[#1a4261] text-white font-bold rounded-xl transition active:scale-95 shadow-xs"
                     >
                       <Maximize2 size={13} /> Preview
                     </button>
@@ -665,39 +598,41 @@ export default function ContentPage() {
                       href={item.fileUrl || item.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white border border-slate-200/80 text-[#255A84] font-bold rounded-xl hover:bg-[#255A84] hover:text-white hover:border-[#255A84] transition active:scale-95"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white border border-slate-200/80 text-[#255A84] font-bold rounded-xl hover:bg-[#255A84] hover:text-white hover:border-[#255A84] transition active:scale-95 shadow-2xs"
                     >
-                      <ExternalLink size={13} /> Open
+                      <ExternalLink size={13} /> Open Link
                     </a>
                   )}
 
-                  <button
-                    onClick={(e) => handleCopyLink(item, e)}
-                    title="Copy Link to Clipboard"
-                    className={`p-2 rounded-xl border transition ${
-                      copiedId === item.id 
-                        ? 'bg-emerald-50 text-emerald-600 border-emerald-200' 
-                        : 'bg-white text-slate-500 border-slate-200/80 hover:text-slate-800 hover:bg-slate-100'
-                    }`}
-                  >
-                    {copiedId === item.id ? <Check size={14} /> : <Copy size={14} />}
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={(e) => handleCopyLink(item, e)}
+                      title="Copy Link to Clipboard"
+                      className={`p-2 rounded-xl border transition ${
+                        copiedId === item.id 
+                          ? 'bg-emerald-50 text-emerald-600 border-emerald-200' 
+                          : 'bg-white text-slate-400 border-slate-200/80 hover:text-slate-800 hover:bg-slate-100'
+                      }`}
+                    >
+                      {copiedId === item.id ? <Check size={14} /> : <Copy size={14} />}
+                    </button>
 
-                  <button
-                    onClick={() => openEdit(item)}
-                    title="Edit Resource"
-                    className="p-2 bg-white text-slate-500 border border-slate-200/80 rounded-xl hover:text-[#255A84] hover:bg-blue-50 hover:border-blue-200 transition"
-                  >
-                    <Pencil size={14} />
-                  </button>
+                    <button
+                      onClick={() => openEdit(item)}
+                      title="Edit Resource"
+                      className="p-2 bg-white text-slate-400 border border-slate-200/80 rounded-xl hover:text-[#255A84] hover:bg-blue-50 hover:border-blue-200 transition"
+                    >
+                      <Pencil size={14} />
+                    </button>
 
-                  <button
-                    onClick={() => setDeleteConfirm(item.id)}
-                    title="Delete Resource"
-                    className="p-2 bg-white text-slate-500 border border-slate-200/80 rounded-xl hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                    <button
+                      onClick={() => setDeleteConfirm(item.id)}
+                      title="Delete Resource"
+                      className="p-2 bg-white text-slate-400 border border-slate-200/80 rounded-xl hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -734,7 +669,7 @@ export default function ContentPage() {
                             <Pin size={14} fill={item.isPinned ? 'currentColor' : 'none'} />
                           </button>
 
-                          <div className={`h-9 w-9 rounded-xl flex items-center justify-center shrink-0 border ${typeIconColor(type)}`}>
+                          <div className={`h-9 w-9 rounded-xl flex items-center justify-center shrink-0 border ${typeIconBox(type)}`}>
                             <TypeIcon type={type} size={16} />
                           </div>
                           <div className="min-w-0 max-w-xs">
@@ -953,7 +888,7 @@ export default function ContentPage() {
                 {form.url && isValidUrl(form.url) && (
                   <div className="mt-2.5 p-3 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2.5">
-                      <div className={`h-8 w-8 rounded-xl flex items-center justify-center border ${typeIconColor(detectType(form.url))}`}>
+                      <div className={`h-8 w-8 rounded-xl flex items-center justify-center border ${typeIconBox(detectType(form.url))}`}>
                         <TypeIcon type={detectType(form.url)} size={16} />
                       </div>
                       <div>

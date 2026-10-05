@@ -24,7 +24,7 @@ function typeLabel(type) {
     pdf: 'PDF Guide & Notes',
     gdrive: 'Drive Folder & Assets',
     video: 'Video Masterclass',
-    link: 'Web Resource'
+    link: 'Web Reference'
   };
   return map[type] || 'Resource Link';
 }
@@ -39,27 +39,17 @@ function typeBadgeStyle(type) {
   return map[type] || map.link;
 }
 
-function typeIconColor(type) {
+function typeIconBox(type) {
   const map = {
-    pdf: 'text-rose-600 bg-rose-50 border-rose-100',
-    gdrive: 'text-sky-600 bg-sky-50 border-sky-100',
-    video: 'text-purple-600 bg-purple-50 border-purple-100',
-    link: 'text-[#255A84] bg-blue-50 border-blue-100',
+    pdf: 'text-rose-600 bg-rose-50 border-rose-100/80',
+    gdrive: 'text-sky-600 bg-sky-50 border-sky-100/80',
+    video: 'text-purple-600 bg-purple-50 border-purple-100/80',
+    link: 'text-[#255A84] bg-blue-50 border-blue-100/80',
   };
   return map[type] || map.link;
 }
 
-function typeHeaderGradient(type) {
-  const map = {
-    pdf: 'from-rose-500/10 via-rose-500/5 to-transparent text-rose-600',
-    gdrive: 'from-sky-500/10 via-sky-500/5 to-transparent text-sky-600',
-    video: 'from-purple-500/10 via-purple-500/5 to-transparent text-purple-600',
-    link: 'from-blue-500/10 via-blue-500/5 to-transparent text-blue-600',
-  };
-  return map[type] || map.link;
-}
-
-function TypeIcon({ type, size = 18 }) {
+function TypeIcon({ type, size = 20 }) {
   if (type === 'pdf') return <FileText size={size} className="text-rose-600" />;
   if (type === 'gdrive') return <FolderGit2 size={size} className="text-sky-600" />;
   if (type === 'video') return <Video size={size} className="text-purple-600" />;
@@ -532,7 +522,7 @@ export default function StudentContentPage() {
           )}
         </div>
       ) : viewMode === 'grid' ? (
-        /* ── Modern Grid Layout ── */
+        /* ── MODERN LUXURY CARD GRID ── */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map(item => (
             <StudentResourceCard
@@ -695,7 +685,7 @@ function StudentResourceCard({
         ? 'border-emerald-200/80 shadow-xs bg-emerald-500/[0.01]'
         : item.isPinned
         ? 'border-amber-300/90 shadow-md shadow-amber-500/5'
-        : 'border-slate-200/80 shadow-xs hover:border-[#255A84]/30'
+        : 'border-slate-200/80 shadow-xs hover:border-[#255A84]/40'
     }`}>
       {/* Pinned Ribbon Badge */}
       {item.isPinned && (
@@ -705,7 +695,7 @@ function StudentResourceCard({
         </div>
       )}
 
-      {/* Video Thumbnail / Banner Preview */}
+      {/* Video Media Area */}
       {youtubeThumb ? (
         <div
           onClick={() => { onLogClick(item.id); onPreview(item); }}
@@ -716,37 +706,26 @@ function StudentResourceCard({
             alt={item.title}
             className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-500 opacity-90"
           />
-          <div className="absolute inset-0 bg-slate-900/30 group-hover/thumb:bg-slate-900/10 transition-colors flex items-center justify-center">
-            <div className="h-12 w-12 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-lg group-hover/thumb:scale-110 transition-transform">
+          <div className="absolute inset-0 bg-slate-950/30 group-hover/thumb:bg-slate-950/15 transition-colors flex items-center justify-center">
+            <div className="h-12 w-12 rounded-2xl bg-purple-600/90 backdrop-blur-md text-white flex items-center justify-center shadow-lg group-hover/thumb:scale-110 transition-transform">
               <Play size={20} fill="white" className="ml-0.5" />
             </div>
           </div>
-          <span className="absolute bottom-2 right-2 px-2.5 py-0.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-extrabold rounded-md flex items-center gap-1">
-            <Video size={10} /> Watch Masterclass
+          <span className="absolute bottom-2.5 right-2.5 px-2.5 py-1 bg-black/80 backdrop-blur-md text-white text-[9px] font-extrabold rounded-lg flex items-center gap-1.5 shadow-sm">
+            <Video size={11} className="text-purple-400" /> Watch Masterclass
           </span>
         </div>
       ) : (
-        <div className={`p-4 bg-gradient-to-r ${typeHeaderGradient(type)} border-b border-slate-100 flex items-center justify-between`}>
-          <div className="flex items-center gap-2.5">
-            <div className={`h-9 w-9 rounded-2xl flex items-center justify-center shadow-xs border ${typeIconColor(type)}`}>
-              <TypeIcon type={type} size={17} />
-            </div>
+        /* Modern Document / Drive Header */
+        <div className="p-5 pb-0 flex items-start justify-between gap-3">
+          <div className={`h-12 w-12 rounded-2xl flex items-center justify-center shadow-xs border shrink-0 ${typeIconBox(type)}`}>
+            <TypeIcon type={type} size={22} />
+          </div>
+
+          <div className="flex items-center gap-1.5">
             <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${typeBadgeStyle(type)}`}>
               {typeLabel(type)}
             </span>
-          </div>
-
-          <div className="flex items-center gap-1">
-            {/* Completion Checkmark */}
-            <button
-              onClick={() => onToggleCompleted(item.id, item.title)}
-              className={`p-1.5 rounded-xl transition ${
-                isCompleted ? 'text-emerald-600 bg-emerald-50' : 'text-slate-300 hover:text-emerald-600 hover:bg-emerald-50/50'
-              }`}
-              title={isCompleted ? 'Completed (Click to uncheck)' : 'Mark as Studied'}
-            >
-              {isCompleted ? <CheckCircle2 size={16} /> : <Circle size={16} />}
-            </button>
 
             {/* Bookmark Star */}
             <button
@@ -763,8 +742,13 @@ function StudentResourceCard({
       )}
 
       {/* Card Content Body */}
-      <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
+      <div className="p-5 space-y-2 flex-1 flex flex-col justify-between">
         <div>
+          {courseName && (
+            <p className="text-[10px] font-black uppercase tracking-wider text-[#255A84] mb-1">
+              {courseName}
+            </p>
+          )}
           <a
             href={item.fileUrl || item.url}
             target="_blank"
@@ -781,15 +765,11 @@ function StudentResourceCard({
           )}
         </div>
 
-        {/* Badges */}
+        {/* Badges & Tags */}
         <div className="flex flex-wrap items-center gap-1.5 pt-2">
-          {courseName ? (
-            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-[#255A84] border border-blue-100">
-              {courseName}
-            </span>
-          ) : (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-500">
-              General
+          {item.subject && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
+              #{item.subject}
             </span>
           )}
           {isCompleted && (
@@ -801,37 +781,53 @@ function StudentResourceCard({
       </div>
 
       {/* Card Footer Actions */}
-      <div className="px-5 py-3.5 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between gap-2 text-xs">
-        {hasEmbed ? (
-          <button
-            onClick={() => { onLogClick(item.id); onPreview(item); }}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#255A84] text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 hover:bg-[#1a4261]"
-          >
-            <Maximize2 size={13} /> Launch Preview
-          </button>
-        ) : (
-          <a
-            href={item.fileUrl || item.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => onLogClick && onLogClick(item.id)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#255A84] hover:bg-[#1a4261] text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95"
-          >
-            <ExternalLink size={13} /> Open Resource
-          </a>
-        )}
-
+      <div className="px-5 py-3.5 border-t border-slate-100 bg-slate-50/70 flex items-center justify-between gap-2 text-xs">
+        {/* Completion Checkmark Button */}
         <button
-          onClick={(e) => onCopyLink(item, e)}
-          title="Copy Link"
-          className={`p-2 rounded-xl border transition ${
-            copiedId === item.id 
-              ? 'bg-emerald-50 text-emerald-600 border-emerald-200' 
-              : 'bg-white text-slate-500 border-slate-200/80 hover:text-slate-800 hover:bg-slate-100'
+          onClick={() => onToggleCompleted(item.id, item.title)}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
+            isCompleted
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+              : 'bg-white text-slate-500 border-slate-200/80 hover:text-emerald-600 hover:border-emerald-200'
           }`}
+          title={isCompleted ? 'Completed (Click to uncheck)' : 'Mark as Studied'}
         >
-          {copiedId === item.id ? <Check size={14} /> : <Copy size={14} />}
+          {isCompleted ? <CheckCircle2 size={14} className="text-emerald-600" /> : <Circle size={14} />}
+          <span>{isCompleted ? 'Done' : 'Mark Done'}</span>
         </button>
+
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={(e) => onCopyLink(item, e)}
+            title="Copy Link"
+            className={`p-2 rounded-xl border transition ${
+              copiedId === item.id 
+                ? 'bg-emerald-50 text-emerald-600 border-emerald-200' 
+                : 'bg-white text-slate-400 border-slate-200/80 hover:text-slate-800 hover:bg-slate-100'
+            }`}
+          >
+            {copiedId === item.id ? <Check size={14} /> : <Copy size={14} />}
+          </button>
+
+          {hasEmbed ? (
+            <button
+              onClick={() => { onLogClick(item.id); onPreview(item); }}
+              className="px-3.5 py-1.5 bg-[#255A84] hover:bg-[#1a4261] text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 flex items-center gap-1.5"
+            >
+              <Maximize2 size={13} /> Launch
+            </button>
+          ) : (
+            <a
+              href={item.fileUrl || item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => onLogClick && onLogClick(item.id)}
+              className="px-3.5 py-1.5 bg-[#255A84] hover:bg-[#1a4261] text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 flex items-center gap-1.5"
+            >
+              <ExternalLink size={13} /> Open
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -862,8 +858,8 @@ function StudentResourceListItem({
           {isCompleted ? <CheckCircle2 size={18} /> : <Circle size={18} />}
         </button>
 
-        <div className={`h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 border ${typeIconColor(type)}`}>
-          <TypeIcon type={type} size={18} />
+        <div className={`h-11 w-11 rounded-2xl flex items-center justify-center shrink-0 border ${typeIconBox(type)}`}>
+          <TypeIcon type={type} size={20} />
         </div>
 
         <div className="min-w-0">
@@ -901,7 +897,7 @@ function StudentResourceListItem({
         <button
           onClick={(e) => onCopyLink(item, e)}
           className={`p-2 rounded-xl border transition ${
-            copiedId === item.id ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-white text-slate-500 border-slate-200/80 hover:text-slate-800'
+            copiedId === item.id ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-white text-slate-400 border-slate-200/80 hover:text-slate-800'
           }`}
           title="Copy Link"
         >
