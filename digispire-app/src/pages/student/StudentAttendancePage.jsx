@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { 
   collection, addDoc, serverTimestamp, query, where, getDocs, 
@@ -357,15 +357,16 @@ export default function StudentAttendancePage() {
   };
 
   // Run dynamic calculation for student history tab
-  const calculatedHistory = (userProfile && myBatchSchedule)
-    ? calculateAttendance({
-        student: userProfile,
-        attendanceLogs: myLogs,
-        batchSchedule: myBatchSchedule,
-        holidays,
-        cancelledClasses: cancellations
-      })
-    : null;
+  const calculatedHistory = useMemo(() => {
+    if (!userProfile || !myBatchSchedule) return null;
+    return calculateAttendance({
+      student: userProfile,
+      attendanceLogs: myLogs,
+      batchSchedule: myBatchSchedule,
+      holidays,
+      cancelledClasses: cancellations
+    });
+  }, [userProfile, myBatchSchedule, myLogs, holidays, cancellations]);
 
   const score = calculatedHistory ? calculatedHistory.attendancePercentage : 0;
 

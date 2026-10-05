@@ -70,14 +70,14 @@ export default function StudentDashboard() {
         }
         
         const [attSnap, batchesSnap, holidaysSnap, cancellationsSnap, annSnap] = await Promise.all([
-          getDocs(collection(db, 'attendance')),
+          getDocs(query(collection(db, 'attendance'), where('studentId', '==', userProfile.studentId))),
           getDocs(collection(db, 'batches')),
           getDocs(collection(db, 'holidays')),
           getDocs(collection(db, 'cancelled_classes')),
           getDocs(collection(db, 'announcements'))
         ]);
 
-        const myAtt = attSnap.docs.map(d => d.data()).filter(d => d.studentId === userProfile.studentId);
+        const myAtt = attSnap.docs.map(d => d.data());
         const allBatches = batchesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         const holidays = holidaysSnap.docs.map(d => d.data());
         const cancellations = cancellationsSnap.docs.map(d => d.data());

@@ -187,14 +187,33 @@ export default function StudentContentPage() {
 
   const getCourseName = (id) => courses.find(c => c.id === id)?.name || '';
 
-  // Overall Learning Stats
-  const totalCount = contents.length;
-  const completedCount = contents.filter(c => completedItems.includes(c.id)).length;
-  const bookmarkedCount = contents.filter(c => bookmarks.includes(c.id)).length;
-  const videoCount = contents.filter(c => (c.type || detectType(c.fileUrl || c.url)) === 'video').length;
-  const pdfCount = contents.filter(c => (c.type || detectType(c.fileUrl || c.url)) === 'pdf').length;
-  const driveCount = contents.filter(c => (c.type || detectType(c.fileUrl || c.url)) === 'gdrive').length;
-  const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+  // Overall Learning Stats (Single pass memoized)
+  const { totalCount, completedCount, bookmarkedCount, videoCount, pdfCount, driveCount, progressPercent } = useMemo(() => {
+    const total = contents.length;
+    let completed = 0;
+    let bookmarked = 0;
+    let video = 0;
+    let pdf = 0;
+    let drive = 0;
+    for (const c of contents) {
+      if (completedItems.includes(c.id)) completed++;
+      if (bookmarks.includes(c.id)) bookmarked++;
+      const t = c.type || detectType(c.fileUrl || c.url);
+      if (t === 'video') video++;
+      else if (t === 'pdf') pdf++;
+      else if (t === 'gdrive') drive++;
+    }
+    const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return {
+      totalCount: total,
+      completedCount: completed,
+      bookmarkedCount: bookmarked,
+      videoCount: video,
+      pdfCount: pdf,
+      driveCount: drive,
+      progressPercent: percent
+    };
+  }, [contents, completedItems, bookmarks]);
 
   // Filtered & Sorted Content List
   const filtered = useMemo(() => {

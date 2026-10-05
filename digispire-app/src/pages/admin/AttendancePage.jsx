@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   collection, addDoc, getDocs, query, where, orderBy, limit, serverTimestamp,
   doc, setDoc, deleteDoc, onSnapshot, updateDoc, arrayUnion, arrayRemove, getDoc
@@ -717,33 +717,38 @@ export default function AttendancePage() {
   const studentBatchIds = selectedStudent?.batchIds || (selectedStudent?.batchId ? [selectedStudent.batchId] : ['morning']);
   const activeInspectBatchId = selectedInspectBatchId || (inspectTrack === 'internship' ? 'internship' : studentBatchIds[0] || 'morning');
   const selectedBatchObj = batches.find(b => b.id === activeInspectBatchId);
-  const filteredStudentLogs = studentLogs.filter(log => 
-    (log.type || 'academic') === inspectTrack &&
-    (inspectTrack === 'internship' ? true : log.batchId === activeInspectBatchId)
-  );
-
-  const inspectedCalc = (selectedStudent && selectedBatchObj)
-    ? calculateAttendance({
-        student: selectedStudent,
-        attendanceLogs: filteredStudentLogs,
-        batchSchedule: selectedBatchObj,
-        holidays,
-        cancelledClasses: cancellations
-      })
-    : null;
-
-  const filteredRecords = records.filter(record => {
-    if (!feedSearch.trim()) return true;
-    const q = feedSearch.toLowerCase();
-    const courseObj = courses.find(c => c.id === record.coveredCourse);
-    const courseName = courseObj?.name || '';
-    return (
-      record.name?.toLowerCase().includes(q) ||
-      record.studentId?.toLowerCase().includes(q) ||
-      record.batchId?.toLowerCase().includes(q) ||
-      courseName.toLowerCase().includes(q)
+  const filteredStudentLogs = useMemo(() => {
+    return studentLogs.filter(log => 
+      (log.type || 'academic') === inspectTrack &&
+      (inspectTrack === 'internship' ? true : log.batchId === activeInspectBatchId)
     );
-  });
+  }, [studentLogs, inspectTrack, activeInspectBatchId]);
+
+  const inspectedCalc = useMemo(() => {
+    if (!selectedStudent || !selectedBatchObj) return null;
+    return calculateAttendance({
+      student: selectedStudent,
+      attendanceLogs: filteredStudentLogs,
+      batchSchedule: selectedBatchObj,
+      holidays,
+      cancelledClasses: cancellations
+    });
+  }, [selectedStudent, selectedBatchObj, filteredStudentLogs, holidays, cancellations]);
+
+  const filteredRecords = useMemo(() => {
+    if (!feedSearch.trim()) return records;
+    const q = feedSearch.toLowerCase();
+    return records.filter(record => {
+      const courseObj = courses.find(c => c.id === record.coveredCourse);
+      const courseName = courseObj?.name || '';
+      return (
+        record.name?.toLowerCase().includes(q) ||
+        record.studentId?.toLowerCase().includes(q) ||
+        record.batchId?.toLowerCase().includes(q) ||
+        courseName.toLowerCase().includes(q)
+      );
+    });
+  }, [records, feedSearch, courses]);
 
   return (
     <div className="space-y-5 pb-12 font-sans">
