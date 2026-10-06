@@ -1,12 +1,13 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, updateDoc, arrayUnion, arrayRemove, addDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import {
   Users, Search, Download, GraduationCap, X,
   CheckCircle2, AlertTriangle, TrendingUp, ChevronRight,
   Award, Check, LayoutGrid, Table as TableIcon,
-  RotateCcw, ArrowUpRight
+  RotateCcw, ArrowUpRight, Loader2, Sparkles, CheckCheck
 } from 'lucide-react';
+import { triggerHaptic } from '../../utils/haptic';
 import { downloadCSV } from '../../utils/csvExport';
 
 // Helper to calculate days elapsed since student joined
@@ -79,9 +80,11 @@ export default function CourseCompletionReportPage() {
   const [selectedMentorId, setSelectedMentorId] = useState('all');
   const [selectedPacing, setSelectedPacing] = useState('all');
 
-  // Modal State
-  const [inspectStudent, setInspectStudent] = useState(null);
+  // Modal & Interactive Completion State
+  const [inspectStudentId, setInspectStudentId] = useState(null);
   const [activeModalTab, setActiveModalTab] = useState('modules'); // 'modules' or 'pacing'
+  const [updatingTarget, setUpdatingTarget] = useState(null); // 'module-${id}' | 'topic-${id}' | 'all-course'
+  const [actionToast, setActionToast] = useState(null); // { type, message }
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -240,6 +243,164 @@ export default function CourseCompletionReportPage() {
       return matchesSearch && matchesCourse && matchesBatch && matchesMentor && matchesPacing;
     });
   }, [enrichedStudents, search, selectedCourseId, selectedBatchId, selectedMentorId, selectedPacing]);
+
+  // Current student being inspected (reactively calculated from enrichedStudents)
+  const currentInspectStudent = useMemo(() => {
+    if (!inspectStudentId) return null;
+    return enrichedStudents.find(s => s.id === inspectStudentId) || null;
+  }, [enrichedStudents, inspectStudentId]);
+
+  // Handler: Toggle individual topic completion for a student
+  const handleToggleTopic = async (topicId, studentUid, currentCompleted) => {
+    if (!topicId || !studentUid) return;
+    setUpdatingTarget(`topic-${topicId}`);
+    try {
+      const topicRef = doc(db, 'topics', topicId);
+      if (currentCompleted) {
+        await updateDoc(topicRef, {
+          completedStudents: arrayRemove(studentUid)
+        });
+        setTopics(prev => prev.map(t => t.id === topicId ? {
+          ...t,
+          completedStudents: (t.completedStudents || []).filter(uid => uid !== studentUid)
+        } : t));
+        triggerHaptic('light');
+        setActionToast({ type: 'info', message: 'Topic uncompleted' });
+      } else {
+        await updateDoc(topicRef, {
+          completedStudents: arrayUnion(studentUid)
+        });
+        setTopics(prev => prev.map(t => t.id === topicId ? {
+          ...t,
+          completedStudents: (t.completedStudents || []).includes(studentUid)
+            ? (t.completedStudents || [])
+            : [...(t.completedStudents || []), studentUid]
+        } : t));
+        triggerHaptic('success');
+        setActionToast({ type: 'success', message: 'Topic marked complete!' });
+      }
+      setTimeout(() => setActionToast(null), 2500);
+    } catch (err) {
+      console.error('Failed to toggle topic completion:', err);
+      setActionToast({ type: 'error', message: 'Error updating topic status' });
+      setTimeout(() => setActionToast(null), 3000);
+    } finally {
+      setUpdatingTarget(null);
+    }
+  };
+
+  // Handler: Mark entire module complete / reset module for a student
+  const handleToggleModule = async (moduleId, studentUid, isModuleCompleted) => {
+    if (!moduleId || !studentUid) return;
+    setUpdatingTarget(`module-${moduleId}`);
+    try {
+      const moduleTopics = topics.filter(t => t.moduleId === moduleId);
+      
+      if (moduleTopics.length === 0) {
+        // If module has no topics created yet, create a default topic to represent the module
+        const newTopicRef = await addDoc(collection(db, 'topics'), {
+          title: 'Core Module Syllabus',
+          moduleId: moduleId,
+          completedStudents: isModuleCompleted ? [] : [studentUid]
+        });
+        setTopics(prev => [...prev, {
+          id: newTopicRef.id,
+          title: 'Core Module Syllabus',
+          moduleId: moduleId,
+          completedStudents: isModuleCompleted ? [] : [studentUid]
+        }]);
+        triggerHaptic('success');
+      } else {
+        if (isModuleCompleted) {
+          // Unmark all topics
+          await Promise.all(moduleTopics.map(t =>
+            updateDoc(doc(db, 'topics', t.id), {
+              completedStudents: arrayRemove(studentUid)
+            })
+          ));
+          setTopics(prev => prev.map(t => t.moduleId === moduleId ? {
+            ...t,
+            completedStudents: (t.completedStudents || []).filter(uid => uid !== studentUid)
+          } : t));
+          triggerHaptic('light');
+          setActionToast({ type: 'info', message: 'Module marked incomplete' });
+        } else {
+          // Mark all topics complete
+          await Promise.all(moduleTopics.map(t =>
+            updateDoc(doc(db, 'topics', t.id), {
+              completedStudents: arrayUnion(studentUid)
+            })
+          ));
+          setTopics(prev => prev.map(t => t.moduleId === moduleId ? {
+            ...t,
+            completedStudents: (t.completedStudents || []).includes(studentUid)
+              ? (t.completedStudents || [])
+              : [...(t.completedStudents || []), studentUid]
+          } : t));
+          triggerHaptic('success');
+          setActionToast({ type: 'success', message: 'Module marked 100% complete!' });
+        }
+      }
+      setTimeout(() => setActionToast(null), 2500);
+    } catch (err) {
+      console.error('Failed to toggle module completion:', err);
+      setActionToast({ type: 'error', message: 'Failed to update module status' });
+      setTimeout(() => setActionToast(null), 3000);
+    } finally {
+      setUpdatingTarget(null);
+    }
+  };
+
+  // Handler: Mark all modules of a course as complete / reset all
+  const handleMarkAllCourseModules = async (studentUid, courseId, markComplete = true) => {
+    if (!studentUid) return;
+    setUpdatingTarget('all-course');
+    try {
+      const relevantCourseModules = modules.filter(m => !courseId || m.courseId === courseId);
+      const relevantModuleIds = relevantCourseModules.map(m => m.id);
+      const courseTopics = topics.filter(t => relevantModuleIds.includes(t.moduleId));
+
+      if (courseTopics.length === 0) {
+        alert('No topics found under this course curriculum to update.');
+        return;
+      }
+
+      if (markComplete) {
+        await Promise.all(courseTopics.map(t =>
+          updateDoc(doc(db, 'topics', t.id), {
+            completedStudents: arrayUnion(studentUid)
+          })
+        ));
+        setTopics(prev => prev.map(t => relevantModuleIds.includes(t.moduleId) ? {
+          ...t,
+          completedStudents: (t.completedStudents || []).includes(studentUid)
+            ? (t.completedStudents || [])
+            : [...(t.completedStudents || []), studentUid]
+        } : t));
+        triggerHaptic('success');
+        setActionToast({ type: 'success', message: 'All course modules marked as 100% finished!' });
+      } else {
+        await Promise.all(courseTopics.map(t =>
+          updateDoc(doc(db, 'topics', t.id), {
+            completedStudents: arrayRemove(studentUid)
+          })
+        ));
+        setTopics(prev => prev.map(t => relevantModuleIds.includes(t.moduleId) ? {
+          ...t,
+          completedStudents: (t.completedStudents || []).filter(uid => uid !== studentUid)
+        } : t));
+        triggerHaptic('light');
+        setActionToast({ type: 'info', message: 'Course progress reset to 0%' });
+      }
+      setTimeout(() => setActionToast(null), 3000);
+    } catch (err) {
+      console.error('Failed to update all course modules:', err);
+      setActionToast({ type: 'error', message: 'Failed to update course progress' });
+      setTimeout(() => setActionToast(null), 3000);
+    } finally {
+      setUpdatingTarget(null);
+    }
+  };
 
   // Executive summary counts
   const totalStudentsCount = filteredStudents.length;
@@ -593,12 +754,12 @@ export default function CourseCompletionReportPage() {
                 {/* Inspect Button */}
                 <button
                   onClick={() => {
-                    setInspectStudent(student);
+                    setInspectStudentId(student.id);
                     setActiveModalTab('modules');
                   }}
-                  className="w-full py-2 bg-slate-100 hover:bg-[#255A84] text-slate-700 hover:text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 active:scale-98"
+                  className="w-full py-2 bg-slate-100 hover:bg-[#255A84] text-slate-700 hover:text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 active:scale-98 cursor-pointer"
                 >
-                  Inspect Detailed Progress
+                  <span>Manage & Inspect Progress</span>
                   <ArrowUpRight size={14} />
                 </button>
               </div>
@@ -695,12 +856,12 @@ export default function CourseCompletionReportPage() {
                       <td className="px-4 py-4 text-right">
                         <button
                           onClick={() => {
-                            setInspectStudent(student);
+                            setInspectStudentId(student.id);
                             setActiveModalTab('modules');
                           }}
-                          className="px-3 py-1.5 bg-slate-100 hover:bg-[#255A84] hover:text-white text-slate-700 text-xs font-bold rounded-xl transition-all inline-flex items-center gap-1"
+                          className="px-3 py-1.5 bg-slate-100 hover:bg-[#255A84] hover:text-white text-slate-700 text-xs font-bold rounded-xl transition-all inline-flex items-center gap-1 cursor-pointer"
                         >
-                          Inspect
+                          <span>Manage</span>
                           <ChevronRight size={13} />
                         </button>
                       </td>
@@ -713,50 +874,100 @@ export default function CourseCompletionReportPage() {
         </div>
       )}
 
-      {/* ── Student Inspection Dialog ── */}
-      {inspectStudent && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border border-slate-100 font-sans">
+      {/* ── Student Inspection & Completion Management Dialog ── */}
+      {currentInspectStudent && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-hidden flex flex-col shadow-2xl border border-slate-100 font-sans">
             {/* Header */}
-            <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-              <div className="flex items-center gap-3">
+            <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#255A84] to-[#1a4261] text-white font-bold text-base flex items-center justify-center shadow-md overflow-hidden shrink-0">
-                  {inspectStudent.photoURL ? (
-                    <img src={inspectStudent.photoURL} alt={inspectStudent.name} className="h-full w-full object-cover" />
+                  {currentInspectStudent.photoURL ? (
+                    <img src={currentInspectStudent.photoURL} alt={currentInspectStudent.name} className="h-full w-full object-cover" />
                   ) : (
-                    <span>{inspectStudent.name?.charAt(0)}</span>
+                    <span>{currentInspectStudent.name?.charAt(0)}</span>
                   )}
                 </div>
-                <div>
-                  <h2 className="font-bold text-slate-800 text-base">{inspectStudent.name}</h2>
-                  <p className="text-xs text-slate-400 font-semibold font-mono">
-                    {inspectStudent.studentId || 'No ID'} • {inspectStudent.courseName}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-bold text-slate-900 text-base truncate">{currentInspectStudent.name}</h2>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${currentInspectStudent.pacing.badgeClass}`}>
+                      {currentInspectStudent.actualProgress}%
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 font-semibold font-mono truncate mt-0.5">
+                    {currentInspectStudent.studentId || 'No ID'} • {currentInspectStudent.courseName}
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setInspectStudent(null)}
-                className="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-200/50 transition"
-              >
-                <X size={20} />
-              </button>
+
+              {/* Fast Batch Actions */}
+              <div className="flex items-center gap-2 self-end sm:self-center">
+                <button
+                  type="button"
+                  disabled={updatingTarget === 'all-course'}
+                  onClick={() => handleMarkAllCourseModules(currentInspectStudent.uid || currentInspectStudent.id, currentInspectStudent.courseId, true)}
+                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-60"
+                  title="Mark all course modules & topics as 100% finished"
+                >
+                  {updatingTarget === 'all-course' ? (
+                    <Loader2 size={13} className="animate-spin" />
+                  ) : (
+                    <Sparkles size={13} />
+                  )}
+                  <span>Mark All 100%</span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={updatingTarget === 'all-course'}
+                  onClick={() => {
+                    if (window.confirm("Are you sure you want to reset all course module completions for this student?")) {
+                      handleMarkAllCourseModules(currentInspectStudent.uid || currentInspectStudent.id, currentInspectStudent.courseId, false);
+                    }
+                  }}
+                  className="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer disabled:opacity-60"
+                  title="Reset all progress to 0%"
+                >
+                  <RotateCcw size={12} />
+                  <span>Reset</span>
+                </button>
+
+                <button
+                  onClick={() => setInspectStudentId(null)}
+                  className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-200/60 transition cursor-pointer ml-1"
+                >
+                  <X size={20} />
+                </button>
+              </div>
             </div>
+
+            {/* Toast Notification Banner */}
+            {actionToast && (
+              <div className={`mx-6 mt-3 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-150 ${
+                actionToast.type === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' :
+                actionToast.type === 'error' ? 'bg-rose-50 text-rose-800 border border-rose-200' : 'bg-blue-50 text-blue-800 border border-blue-200'
+              }`}>
+                <CheckCircle2 size={15} className="shrink-0" />
+                <span>{actionToast.message}</span>
+              </div>
+            )}
 
             {/* Modal Tabs */}
             <div className="px-6 border-b border-slate-100 bg-white flex gap-4 text-xs font-bold">
               <button
                 onClick={() => setActiveModalTab('modules')}
-                className={`py-3 border-b-2 transition-all ${
+                className={`py-3 border-b-2 transition-all cursor-pointer ${
                   activeModalTab === 'modules'
                     ? 'border-[#255A84] text-[#255A84]'
                     : 'border-transparent text-slate-400 hover:text-slate-600'
                 }`}
               >
-                Module-by-Module Progress ({inspectStudent.completedModulesCount}/{inspectStudent.totalModulesCount})
+                Module-by-Module Progress ({currentInspectStudent.completedModulesCount}/{currentInspectStudent.totalModulesCount})
               </button>
               <button
                 onClick={() => setActiveModalTab('pacing')}
-                className={`py-3 border-b-2 transition-all ${
+                className={`py-3 border-b-2 transition-all cursor-pointer ${
                   activeModalTab === 'pacing'
                     ? 'border-[#255A84] text-[#255A84]'
                     : 'border-transparent text-slate-400 hover:text-slate-600'
@@ -767,59 +978,128 @@ export default function CourseCompletionReportPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 overflow-y-auto space-y-5 flex-1">
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-4 flex-1">
               {activeModalTab === 'modules' ? (
-                /* Module Breakdown Tab */
+                /* Module Breakdown Tab with Interactive Marking */
                 <div className="space-y-4">
-                  {inspectStudent.moduleStats.length === 0 ? (
-                    <p className="text-xs text-slate-400 italic">No modules defined for this course track.</p>
+                  <div className="bg-sky-50/70 border border-sky-200/60 rounded-xl p-3 text-xs text-sky-900 flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-bold">Educator Course Module Controls</p>
+                      <p className="text-[11px] text-sky-700 mt-0.5">
+                        Click <strong>&quot;Mark Module Complete&quot;</strong> to complete all topics within a module at once, or click individual topic pills below to toggle specific topics.
+                      </p>
+                    </div>
+                  </div>
+
+                  {currentInspectStudent.moduleStats.length === 0 ? (
+                    <p className="text-xs text-slate-400 italic text-center py-8">No modules defined for this course track.</p>
                   ) : (
-                    inspectStudent.moduleStats.map((mod, idx) => (
-                      <div key={mod.id || idx} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="h-6 w-6 rounded-lg bg-white border border-slate-200 text-[#255A84] font-bold text-xs flex items-center justify-center">
-                              {idx + 1}
-                            </span>
-                            <span className="font-bold text-slate-800 text-xs">{mod.title}</span>
-                          </div>
-                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
-                            mod.status === 'completed' ? 'bg-emerald-100 text-emerald-800' :
-                            mod.status === 'in_progress' ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-600'
-                          }`}>
-                            {mod.completedTopics}/{mod.totalTopics} Topics ({mod.percent}%)
-                          </span>
-                        </div>
+                    currentInspectStudent.moduleStats.map((mod, idx) => {
+                      const isModUpdating = updatingTarget === `module-${mod.id}`;
+                      const isCompleted = mod.status === 'completed' || mod.percent === 100;
+                      const studentUid = currentInspectStudent.uid || currentInspectStudent.id;
 
-                        {/* Progress Bar */}
-                        <div className="h-2 w-full bg-slate-200/60 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all ${
-                              mod.percent === 100 ? 'bg-emerald-500' : 'bg-[#255A84]'
-                            }`}
-                            style={{ width: `${mod.percent}%` }}
-                          />
-                        </div>
-
-                        {/* Topics Checkbox Grid */}
-                        {mod.topics.length > 0 && (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-200/50">
-                            {mod.topics.map((top) => (
-                              <div key={top.id} className="flex items-center gap-2 text-xs">
-                                <div className={`h-4 w-4 rounded-md flex items-center justify-center shrink-0 border ${
-                                  top.isCompleted ? 'bg-emerald-500 border-emerald-600 text-white' : 'bg-white border-slate-300 text-transparent'
-                                }`}>
-                                  <Check size={11} strokeWidth={3} />
-                                </div>
-                                <span className={`truncate ${top.isCompleted ? 'font-semibold text-slate-800' : 'text-slate-400'}`}>
-                                  {top.title}
-                                </span>
+                      return (
+                        <div
+                          key={mod.id || idx}
+                          className="bg-slate-50/90 p-4 sm:p-5 rounded-2xl border border-slate-200/80 space-y-3.5 transition-all hover:border-slate-300 shadow-2xs"
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span className="h-7 w-7 rounded-xl bg-white border border-slate-200 text-[#255A84] font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                                {idx + 1}
+                              </span>
+                              <div className="min-w-0">
+                                <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">{mod.title}</h4>
+                                <p className="text-[10px] text-slate-500 font-semibold mt-0.5">
+                                  {mod.completedTopics} of {mod.totalTopics} topics completed ({mod.percent}%)
+                                </p>
                               </div>
-                            ))}
+                            </div>
+
+                            {/* Mark Module Complete / Undo Toggle */}
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button
+                                type="button"
+                                disabled={isModUpdating}
+                                onClick={() => handleToggleModule(mod.id, studentUid, isCompleted)}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer disabled:opacity-60 ${
+                                  isCompleted
+                                    ? 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300'
+                                    : 'bg-[#255A84] hover:bg-[#1c4566] text-white border border-[#255A84]'
+                                }`}
+                              >
+                                {isModUpdating ? (
+                                  <Loader2 size={13} className="animate-spin" />
+                                ) : isCompleted ? (
+                                  <>
+                                    <CheckCheck size={14} className="text-emerald-700" />
+                                    <span>Completed</span>
+                                    <RotateCcw size={11} className="text-emerald-600 hover:text-emerald-950 ml-0.5" title="Undo complete" />
+                                  </>
+                                ) : (
+                                  <>
+                                    <CheckCircle2 size={14} />
+                                    <span>Mark Module Complete</span>
+                                  </>
+                                )}
+                              </button>
+                            </div>
                           </div>
-                        )}
-                      </div>
-                    ))
+
+                          {/* Progress Bar */}
+                          <div className="h-2 w-full bg-slate-200/80 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-300 ${
+                                isCompleted ? 'bg-emerald-500' : 'bg-[#255A84]'
+                              }`}
+                              style={{ width: `${mod.percent}%` }}
+                            />
+                          </div>
+
+                          {/* Individual Topic Pills */}
+                          {mod.topics.length > 0 && (
+                            <div className="pt-2 border-t border-slate-200/60 space-y-1.5">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                Topics ({mod.completedTopics}/{mod.totalTopics}) · Click to toggle
+                              </p>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {mod.topics.map((top) => {
+                                  const isTopicUpdating = updatingTarget === `topic-${top.id}`;
+                                  return (
+                                    <button
+                                      type="button"
+                                      key={top.id}
+                                      disabled={isTopicUpdating}
+                                      onClick={() => handleToggleTopic(top.id, studentUid, top.isCompleted)}
+                                      className={`flex items-center gap-2 p-2 rounded-xl text-xs text-left transition-all border cursor-pointer active:scale-98 ${
+                                        top.isCompleted
+                                          ? 'bg-emerald-50/90 border-emerald-300/80 text-emerald-900 hover:bg-emerald-100/80 font-semibold'
+                                          : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                                      }`}
+                                      title={top.isCompleted ? 'Completed. Click to unmark.' : 'Click to mark complete.'}
+                                    >
+                                      <div className={`h-4 w-4 rounded-md flex items-center justify-center shrink-0 border transition-colors ${
+                                        top.isCompleted
+                                          ? 'bg-emerald-500 border-emerald-600 text-white'
+                                          : 'bg-white border-slate-300 text-transparent hover:border-slate-400'
+                                      }`}>
+                                        {isTopicUpdating ? (
+                                          <Loader2 size={10} className="animate-spin text-slate-500" />
+                                        ) : (
+                                          <Check size={11} strokeWidth={3} />
+                                        )}
+                                      </div>
+                                      <span className="truncate text-xs flex-1">{top.title}</span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               ) : (
@@ -829,29 +1109,29 @@ export default function CourseCompletionReportPage() {
                     <div className="flex items-center justify-between border-b border-slate-200/60 pb-3">
                       <div>
                         <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Joining Date</p>
-                        <p className="text-sm font-bold text-slate-800 mt-0.5">{inspectStudent.joiningDate || 'Not Specified'}</p>
+                        <p className="text-sm font-bold text-slate-800 mt-0.5">{currentInspectStudent.joiningDate || 'Not Specified'}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Time Active</p>
-                        <p className="text-sm font-bold text-[#F48B1F] mt-0.5">{inspectStudent.daysElapsed} Days Elapsed</p>
+                        <p className="text-sm font-bold text-[#F48B1F] mt-0.5">{currentInspectStudent.daysElapsed} Days Elapsed</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 pt-1">
                       <div className="bg-white p-3 rounded-xl border border-slate-100">
                         <p className="text-[10px] text-slate-400 font-bold uppercase">Actual Completion</p>
-                        <p className="text-xl font-extrabold text-slate-800 mt-1">{inspectStudent.actualProgress}%</p>
+                        <p className="text-xl font-extrabold text-slate-800 mt-1">{currentInspectStudent.actualProgress}%</p>
                       </div>
                       <div className="bg-white p-3 rounded-xl border border-slate-100">
                         <p className="text-[10px] text-slate-400 font-bold uppercase">Target Time Pace</p>
-                        <p className="text-xl font-extrabold text-slate-800 mt-1">{inspectStudent.expectedProgress}%</p>
+                        <p className="text-xl font-extrabold text-slate-800 mt-1">{currentInspectStudent.expectedProgress}%</p>
                       </div>
                     </div>
 
                     <div className="p-3 bg-white rounded-xl border border-slate-100 flex items-center justify-between text-xs font-semibold">
                       <span className="text-slate-600">Pacing Assessment</span>
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-extrabold border ${inspectStudent.pacing.badgeClass}`}>
-                        {inspectStudent.pacing.label}
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-extrabold border ${currentInspectStudent.pacing.badgeClass}`}>
+                        {currentInspectStudent.pacing.label}
                       </span>
                     </div>
                   </div>
@@ -860,10 +1140,13 @@ export default function CourseCompletionReportPage() {
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex justify-end">
+            <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
+              <span className="text-xs text-slate-400 font-medium">
+                Changes saved automatically to student academic record
+              </span>
               <button
-                onClick={() => setInspectStudent(null)}
-                className="px-5 py-2 bg-[#255A84] text-white text-xs font-bold rounded-xl hover:bg-[#1c4566] transition shadow-md"
+                onClick={() => setInspectStudentId(null)}
+                className="px-5 py-2 bg-[#255A84] text-white text-xs font-bold rounded-xl hover:bg-[#1c4566] transition shadow-md cursor-pointer"
               >
                 Close Inspection
               </button>
