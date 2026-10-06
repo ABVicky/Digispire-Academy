@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Lock, Phone, Mail, Eye, EyeOff, ShieldCheck, GraduationCap, Shield } from 'lucide-react';
 import AmbientBackground from '../components/AmbientBackground';
 
@@ -272,10 +272,18 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="text-center mt-6">
+        <div className="text-center mt-6 space-y-1.5">
           <p className="text-slate-500 text-[11px] font-semibold tracking-wider">
             © 2026 DIGISPIRE ACADEMY · Academic Information System
           </p>
+          <div>
+            <Link 
+              to="/privacy-policy" 
+              className="text-[11px] text-slate-400 hover:text-sky-300 underline underline-offset-2 transition-colors"
+            >
+              Privacy Policy
+            </Link>
+          </div>
         </div>
       </div>
     </div>

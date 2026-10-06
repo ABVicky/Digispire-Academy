@@ -35,6 +35,7 @@ const StudentSubmissionsPage = lazy(() => import('./pages/student/StudentSubmiss
 
 // Shared pages
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 
 // Sleek minimal page loader during route transitions
 function PageLoader() {
@@ -80,6 +81,8 @@ function App() {
           <Routes>
             {/* Public */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
 
             {/* Admin routes - wrapped with AdminLayout as parent */}
             <Route element={<AdminRoute />}>

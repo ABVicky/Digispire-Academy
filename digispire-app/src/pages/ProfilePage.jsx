@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { storage, db } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -620,6 +621,33 @@ export default function ProfilePage() {
                     <span>Install App</span>
                   </button>
                 )}
+              </div>
+            </div>
+
+            {/* Privacy Policy & Institutional Compliance */}
+            <div className="pt-6 border-t border-slate-100 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-100">
+                  <Shield size={18} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Privacy & Data Governance</h3>
+                  <p className="text-xs text-slate-500">Student data protection and hardware usage compliance</p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  DIGISPIRE adheres to academic data protection standards. Review how your camera permissions, attendance timestamps, and academic submissions are protected.
+                </p>
+
+                <Link
+                  to="/privacy-policy"
+                  className="py-2 px-3.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shrink-0 shadow-2xs active:scale-95 whitespace-nowrap"
+                >
+                  <ShieldCheck size={13} className="text-emerald-600" />
+                  <span>View Privacy Policy</span>
+                </Link>
               </div>
             </div>
           </div>

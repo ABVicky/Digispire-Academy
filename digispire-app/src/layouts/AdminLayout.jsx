@@ -213,8 +213,8 @@ export default function AdminLayout() {
             })}
           </nav>
 
-          {/* Logout */}
-          <div className="pt-3 mt-2 border-t border-slate-100">
+          {/* Logout & Footer */}
+          <div className="pt-3 mt-2 border-t border-slate-100 space-y-1">
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
@@ -222,6 +222,15 @@ export default function AdminLayout() {
               <LogOut size={14} />
               <span>Sign Out</span>
             </button>
+            <div className="text-center pt-1">
+              <NavLink 
+                to="/privacy-policy" 
+                onClick={closeSidebar}
+                className="text-[10px] text-slate-400 hover:text-slate-700 underline font-medium transition-colors"
+              >
+                Privacy Policy
+              </NavLink>
+            </div>
           </div>
         </div>
       </aside>
