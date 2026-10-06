@@ -4,32 +4,34 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Users, CalendarCheck, FileText,
   LogOut, Menu, X, GraduationCap, ChevronRight,
-  FileSpreadsheet, UserCog, History, FolderOpen, Award, Shield, Megaphone
+  FileSpreadsheet, UserCog, History, FolderOpen, Award, Megaphone
 } from 'lucide-react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import AmbientBackground from '../components/AmbientBackground';
+import { triggerHaptic } from '../utils/haptic';
 
 const navItems = [
-  { path: 'dashboard', label: 'Dashboard', shortLabel: 'Overview', icon: LayoutDashboard, category: 'Management' },
-  { path: 'announcements', label: 'Announcements', shortLabel: 'Notices', icon: Megaphone, category: 'Management' },
-  { path: 'students', label: 'Students', shortLabel: 'Students', icon: Users, category: 'Management' },
-  { path: 'staff', label: 'Teachers & Staff', shortLabel: 'Staff', icon: UserCog, category: 'Management' },
-  { path: 'attendance', label: 'Take Attendance', shortLabel: 'Attendance', icon: CalendarCheck, category: 'Management' },
-  { path: 'courses', label: 'Courses & Syllabus', shortLabel: 'Courses', icon: GraduationCap, category: 'Courses & Content' },
-  { path: 'content', label: 'Study Material', shortLabel: 'Material', icon: FileText, category: 'Courses & Content' },
-  { path: 'reports', label: 'Attendance Reports', shortLabel: 'Reports', icon: FileSpreadsheet, category: 'Submissions & Reports' },
-  { path: 'completion-reports', label: 'Completion Reports', shortLabel: 'Completions', icon: Award, category: 'Submissions & Reports' },
-  { path: 'revisions', label: 'Revision Requests', shortLabel: 'Revisions', icon: History, category: 'Submissions & Reports' },
-  { path: 'submissions', label: 'Student Assignments', shortLabel: 'Assignments', icon: FolderOpen, category: 'Submissions & Reports' },
+  { path: '/admin/dashboard', label: 'Dashboard', shortLabel: 'Overview', icon: LayoutDashboard, category: 'Management' },
+  { path: '/admin/announcements', label: 'Announcements', shortLabel: 'Notices', icon: Megaphone, category: 'Management' },
+  { path: '/admin/students', label: 'Students', shortLabel: 'Students', icon: Users, category: 'Management' },
+  { path: '/admin/staff', label: 'Teachers & Staff', shortLabel: 'Staff', icon: UserCog, category: 'Management' },
+  { path: '/admin/attendance', label: 'Take Attendance', shortLabel: 'Attendance', icon: CalendarCheck, category: 'Management' },
+  { path: '/admin/courses', label: 'Courses & Syllabus', shortLabel: 'Courses', icon: GraduationCap, category: 'Courses & Content' },
+  { path: '/admin/content', label: 'Study Material', shortLabel: 'Material', icon: FileText, category: 'Courses & Content' },
+  { path: '/admin/reports', label: 'Attendance Reports', shortLabel: 'Reports', icon: FileSpreadsheet, category: 'Submissions & Reports' },
+  { path: '/admin/completion-reports', label: 'Completion Reports', shortLabel: 'Completions', icon: Award, category: 'Submissions & Reports' },
+  { path: '/admin/revisions', label: 'Revision Requests', shortLabel: 'Revisions', icon: History, category: 'Submissions & Reports' },
+  { path: '/admin/submissions', label: 'Student Assignments', shortLabel: 'Assignments', icon: FolderOpen, category: 'Submissions & Reports' },
+  { path: '/admin/profile', label: 'Admin Profile', shortLabel: 'Profile', icon: UserCog, category: 'Management' },
 ];
 
 const bottomNavItems = [
-  navItems.find(i => i.path === 'dashboard'),
-  navItems.find(i => i.path === 'students'),
-  navItems.find(i => i.path === 'attendance'),
-  navItems.find(i => i.path === 'courses'),
-  navItems.find(i => i.path === 'reports'),
+  { path: '/admin/dashboard', shortLabel: 'Overview', icon: LayoutDashboard },
+  { path: '/admin/students', shortLabel: 'Students', icon: Users },
+  { path: '/admin/attendance', shortLabel: 'Attendance', icon: CalendarCheck },
+  { path: '/admin/courses', shortLabel: 'Courses', icon: GraduationCap },
+  { path: '/admin/reports', shortLabel: 'Reports', icon: FileSpreadsheet },
 ];
 
 export default function AdminLayout() {
@@ -83,13 +85,14 @@ export default function AdminLayout() {
             <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
           </div>
           <div>
-            <span className="font-heading font-extrabold text-slate-900 text-sm tracking-tight leading-none block">DIGISPIRE ACADEMY</span>
+            <span className="font-heading font-extrabold text-slate-900 text-sm tracking-tight leading-none block">DIGISPIRE</span>
             <span className="text-[9px] font-bold text-slate-500 tracking-wider uppercase mt-0.5 block">Admin Portal</span>
           </div>
         </div>
         <div className="flex items-center gap-1.5">
           <NavLink
             to="/admin/profile"
+            onClick={() => triggerHaptic('light')}
             className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center text-[#1E3A5F] font-bold text-xs uppercase overflow-hidden border border-slate-200"
           >
             {userProfile?.photoURL ? (
@@ -99,7 +102,10 @@ export default function AdminLayout() {
             )}
           </NavLink>
           <button
-            onClick={() => setIsSidebarOpen(true)}
+            onClick={() => {
+              triggerHaptic('light');
+              setIsSidebarOpen(true);
+            }}
             className="p-1.5 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition cursor-pointer"
             aria-label="Open navigation menu"
           >
@@ -138,7 +144,10 @@ export default function AdminLayout() {
           {/* User Dossier Card */}
           <NavLink
             to="/admin/profile"
-            onClick={closeSidebar}
+            onClick={() => {
+              triggerHaptic('light');
+              closeSidebar();
+            }}
             className="mb-4 p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200/80 rounded-xl flex items-center gap-3.5 transition-colors group shadow-2xs"
           >
             <div className="h-11 w-11 rounded-xl bg-white flex items-center justify-center text-[#1E3A5F] font-heading font-bold text-sm border border-slate-200 overflow-hidden shrink-0 shadow-2xs">
@@ -171,7 +180,10 @@ export default function AdminLayout() {
                     <NavLink
                       key={item.path}
                       to={item.path}
-                      onClick={closeSidebar}
+                      onClick={() => {
+                        triggerHaptic('light');
+                        closeSidebar();
+                      }}
                       className={({ isActive }) => `flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
                         isActive
                           ? 'bg-[#1E3A5F] text-white shadow-2xs font-bold'
@@ -182,12 +194,12 @@ export default function AdminLayout() {
                         <>
                           <item.icon size={15} className={`shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                           <span className="truncate">{item.label}</span>
-                          {item.path === 'revisions' && pendingRevisionsCount > 0 && (
+                          {item.path === '/admin/revisions' && pendingRevisionsCount > 0 && (
                             <span className="ml-auto bg-amber-600 text-white font-bold text-[9px] px-1.5 py-0.2 rounded font-mono">
                               {pendingRevisionsCount}
                             </span>
                           )}
-                          {item.path === 'submissions' && pendingSubmissionsCount > 0 && (
+                          {item.path === '/admin/submissions' && pendingSubmissionsCount > 0 && (
                             <span className="ml-auto bg-slate-700 text-white font-bold text-[9px] px-1.5 py-0.2 rounded font-mono">
                               {pendingSubmissionsCount}
                             </span>
@@ -225,11 +237,15 @@ export default function AdminLayout() {
       {/* ── Formal Mobile Bottom Navigation ── */}
       <nav className="bottom-nav md:hidden" aria-label="Primary navigation">
         {bottomNavItems.map((item) => {
-          const isActive = location.pathname.includes(`/admin/${item.path}`);
+          const isActive = location.pathname === item.path || (item.path !== '/admin/dashboard' && location.pathname.startsWith(item.path));
           return (
             <NavLink
               key={item.path}
               to={item.path}
+              onClick={() => {
+                triggerHaptic('light');
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+              }}
               className={`bottom-nav-item ${isActive ? 'active' : ''}`}
               aria-current={isActive ? 'page' : undefined}
             >

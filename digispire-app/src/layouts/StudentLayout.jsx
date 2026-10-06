@@ -8,22 +8,23 @@ import {
 } from 'lucide-react';
 import AmbientBackground from '../components/AmbientBackground';
 import AnnouncementNotificationWatcher from '../components/AnnouncementNotificationWatcher';
+import { triggerHaptic } from '../utils/haptic';
 
 const navItems = [
-  { path: 'dashboard', label: 'Dashboard', shortLabel: 'Dashboard', icon: LayoutDashboard, category: 'Main Menu' },
-  { path: 'attendance', label: 'Mark Attendance', shortLabel: 'Attendance', icon: QrCode, category: 'Main Menu' },
-  { path: 'courses', label: 'My Courses', shortLabel: 'Courses', icon: BookOpen, category: 'Courses & Learning' },
-  { path: 'content', label: 'Study Materials', shortLabel: 'Materials', icon: FileText, category: 'Courses & Learning' },
-  { path: 'submissions', label: 'Assignments', shortLabel: 'Assignments', icon: FolderUp, category: 'Courses & Learning' },
-  { path: 'profile', label: 'My Profile', shortLabel: 'Profile', icon: User, category: 'Main Menu' },
+  { path: '/student/dashboard', label: 'Dashboard', shortLabel: 'Dashboard', icon: LayoutDashboard, category: 'Main Menu' },
+  { path: '/student/attendance', label: 'Mark Attendance', shortLabel: 'Attendance', icon: QrCode, category: 'Main Menu' },
+  { path: '/student/courses', label: 'My Courses', shortLabel: 'Courses', icon: BookOpen, category: 'Courses & Learning' },
+  { path: '/student/content', label: 'Study Materials', shortLabel: 'Materials', icon: FileText, category: 'Courses & Learning' },
+  { path: '/student/submissions', label: 'Assignments', shortLabel: 'Assignments', icon: FolderUp, category: 'Courses & Learning' },
+  { path: '/student/profile', label: 'My Profile', shortLabel: 'Profile', icon: User, category: 'Main Menu' },
 ];
 
 const bottomNavItems = [
-  navItems.find(i => i.path === 'dashboard'),
-  navItems.find(i => i.path === 'attendance'),
-  navItems.find(i => i.path === 'courses'),
-  navItems.find(i => i.path === 'submissions'),
-  navItems.find(i => i.path === 'profile'),
+  { path: '/student/dashboard', shortLabel: 'Dashboard', icon: LayoutDashboard },
+  { path: '/student/attendance', shortLabel: 'Attendance', icon: QrCode },
+  { path: '/student/courses', shortLabel: 'Courses', icon: BookOpen },
+  { path: '/student/content', shortLabel: 'Materials', icon: FileText },
+  { path: '/student/profile', shortLabel: 'Profile', icon: User },
 ];
 
 export default function StudentLayout() {
@@ -46,13 +47,14 @@ export default function StudentLayout() {
             <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
           </div>
           <div>
-            <span className="font-heading font-extrabold text-slate-900 text-sm tracking-tight leading-none block">DIGISPIRE ACADEMY</span>
+            <span className="font-heading font-extrabold text-slate-900 text-sm tracking-tight leading-none block">DIGISPIRE</span>
             <span className="text-[9px] font-bold text-slate-500 tracking-wider uppercase mt-0.5 block">Student Portal</span>
           </div>
         </div>
         <div className="flex items-center gap-1.5">
           <NavLink
             to="/student/profile"
+            onClick={() => triggerHaptic('light')}
             className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center text-[#1E3A5F] font-bold text-xs uppercase overflow-hidden border border-slate-200"
           >
             {userProfile?.photoURL ? (
@@ -62,7 +64,10 @@ export default function StudentLayout() {
             )}
           </NavLink>
           <button
-            onClick={() => setIsSidebarOpen(true)}
+            onClick={() => {
+              triggerHaptic('light');
+              setIsSidebarOpen(true);
+            }}
             className="p-1.5 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition cursor-pointer"
             aria-label="Open navigation menu"
           >
@@ -100,7 +105,10 @@ export default function StudentLayout() {
           {/* Student Dossier Card */}
           <NavLink
             to="/student/profile"
-            onClick={() => setIsSidebarOpen(false)}
+            onClick={() => {
+              triggerHaptic('light');
+              setIsSidebarOpen(false);
+            }}
             className="mb-4 p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200/80 rounded-xl flex items-center gap-3.5 transition-colors group shadow-2xs"
           >
             <div className="h-11 w-11 rounded-xl bg-white flex items-center justify-center text-[#1E3A5F] font-heading font-bold text-sm border border-slate-200 overflow-hidden shrink-0 shadow-2xs">
@@ -133,7 +141,10 @@ export default function StudentLayout() {
                     <NavLink
                       key={item.path}
                       to={item.path}
-                      onClick={() => setIsSidebarOpen(false)}
+                      onClick={() => {
+                        triggerHaptic('light');
+                        setIsSidebarOpen(false);
+                      }}
                       className={({ isActive }) => `flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
                         isActive
                           ? 'bg-[#1E3A5F] text-white shadow-2xs font-bold'
@@ -176,11 +187,15 @@ export default function StudentLayout() {
       {/* ── Formal Mobile Bottom Navigation ── */}
       <nav className="bottom-nav md:hidden" aria-label="Student navigation">
         {bottomNavItems.map((item) => {
-          const isActive = location.pathname.includes(`/student/${item.path}`);
+          const isActive = location.pathname === item.path || (item.path !== '/student/dashboard' && location.pathname.startsWith(item.path));
           return (
             <NavLink
               key={item.path}
               to={item.path}
+              onClick={() => {
+                triggerHaptic('light');
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+              }}
               className={`bottom-nav-item ${isActive ? 'active' : ''}`}
               aria-current={isActive ? 'page' : undefined}
             >
