@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">DIGISPIRE</string>
+    <string name="title_activity_main">DIGISPIRE</string>
+    <string name="package_name">in.digispire.academy</string>
+    <string name="custom_url_scheme">in.digispire.academy</string>
+</resources>

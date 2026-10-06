@@ -118,7 +118,7 @@ export default function AdminLayout() {
 
       {/* ── Formal Institutional Sidebar ── */}
       <aside className={`fixed inset-y-0 left-0 w-72 bg-white z-50 transform transition-transform duration-200 ease-in-out md:sticky md:top-0 md:h-screen md:shrink-0 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} border-r border-slate-200 flex flex-col`}>
-        <div className="flex flex-col h-full p-4.5">
+        <div className="flex flex-col h-full p-4.5 pt-[max(1.25rem,calc(env(safe-area-inset-top)+0.75rem))] pb-[max(1.125rem,calc(env(safe-area-inset-bottom)+0.5rem))]">
           {/* Official Institution Banner */}
           <div className="flex items-center justify-between pb-4 mb-3 border-b border-slate-100">
             <div className="flex items-center gap-3">
@@ -139,20 +139,24 @@ export default function AdminLayout() {
           <NavLink
             to="/admin/profile"
             onClick={closeSidebar}
-            className="mb-4 p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200/80 rounded-xl flex items-center gap-3 transition-colors group"
+            className="mb-4 p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200/80 rounded-xl flex items-center gap-3.5 transition-colors group shadow-2xs"
           >
-            <div className="h-9 w-9 rounded-lg bg-white flex items-center justify-center text-[#1E3A5F] font-heading font-bold text-xs border border-slate-200 overflow-hidden shrink-0">
+            <div className="h-11 w-11 rounded-xl bg-white flex items-center justify-center text-[#1E3A5F] font-heading font-bold text-sm border border-slate-200 overflow-hidden shrink-0 shadow-2xs">
               {userProfile?.photoURL ? (
                 <img src={userProfile.photoURL} alt={userProfile.name} className="h-full w-full object-cover" />
               ) : (
-                <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1" />
+                <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1.5" />
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-slate-800 text-xs truncate group-hover:text-[#1E3A5F] transition-colors">{userProfile?.name || 'Administrator'}</p>
-              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate mt-0.5">{userProfile?.role === 'admin' ? 'Admin' : 'Teacher'}</p>
+              <p className="font-heading font-extrabold text-slate-900 text-base sm:text-lg leading-tight truncate group-hover:text-[#1E3A5F] transition-colors">
+                {userProfile?.name || 'Administrator'}
+              </p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider truncate mt-0.5">
+                {userProfile?.role === 'admin' ? 'Admin' : 'Teacher'}
+              </p>
             </div>
-            <ChevronRight size={14} className="text-slate-400 group-hover:text-slate-700 transition-transform shrink-0" />
+            <ChevronRight size={18} className="text-slate-400 group-hover:text-slate-700 transition-transform shrink-0" />
           </NavLink>
 
           {/* Nav Links */}

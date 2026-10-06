@@ -1,0 +1,30 @@
+{
+  "appId": "in.digispire.academy",
+  "appName": "DIGISPIRE",
+  "webDir": "dist",
+  "server": {
+    "url": "https://digispire.vercel.app",
+    "cleartext": false,
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  },
+  "plugins": {
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#1E3A5F",
+      "overlaysWebView": false
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_launcher",
+      "iconColor": "#1E3A5F",
+      "sound": "beep.wav"
+    },
+    "Camera": {
+      "permissions": ["camera"]
+    }
+  }
+}

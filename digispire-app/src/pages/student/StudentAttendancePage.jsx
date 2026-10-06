@@ -251,6 +251,32 @@ export default function StudentAttendancePage() {
     if (status === 'scanning') {
       const startScanner = async () => {
         try {
+          // 1. Request native Android / iOS Camera permission via Capacitor
+          if (typeof window !== 'undefined') {
+            if (window.Capacitor?.Plugins?.Camera) {
+              await window.Capacitor.Plugins.Camera.requestPermissions();
+            } else {
+              try {
+                const { Camera } = await import('@capacitor/camera');
+                if (Camera) {
+                  await Camera.requestPermissions();
+                }
+              } catch {
+                // Continue to web mediaDevices
+              }
+            }
+          }
+
+          // 2. Pre-verify camera stream in WebView
+          if (navigator?.mediaDevices?.getUserMedia) {
+            try {
+              const testStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+              testStream.getTracks().forEach(track => track.stop());
+            } catch (mediaErr) {
+              console.warn("Camera stream pre-check warning:", mediaErr);
+            }
+          }
+
           html5QrCode = new Html5Qrcode("qr-reader");
           scannerRef.current = html5QrCode;
           

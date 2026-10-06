@@ -12,7 +12,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['logo.png', 'favicon.ico', 'robots.txt'],
       manifest: {
-        name: 'DIGISPIRE Academy',
+        name: 'DIGISPIRE',
         short_name: 'DIGISPIRE',
         description: 'Official Student & Admin Academic Hub for DIGISPIRE Academy',
         theme_color: '#255A84',

@@ -5,6 +5,7 @@ import { AdminRoute, StudentRoute } from './components/ProtectedRoute';
 import InstallPrompt from './components/InstallPrompt';
 import NetworkStatusIndicator from './components/NetworkStatusIndicator';
 import PwaUpdateReload from './components/PwaUpdateReload';
+import NativeAppInitializer from './components/NativeAppInitializer';
 
 import AdminLayout from './layouts/AdminLayout';
 import StudentLayout from './layouts/StudentLayout';
@@ -71,6 +72,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <NativeAppInitializer />
         <NetworkStatusIndicator />
         <PwaUpdateReload />
         <InstallPrompt />
