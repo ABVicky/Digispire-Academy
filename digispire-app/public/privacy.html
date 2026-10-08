@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - DIGISPIRE Academy</title>
+  <meta name="description" content="Official Privacy Policy for DIGISPIRE Academy mobile application and web portal. Learn how student data, camera permissions, and academic records are protected.">
+  <link rel="icon" href="/logo.png">
+  <style>
+    :root {
+      --bg: #0F172A;
+      --card: #1E293B;
+      --card-border: #334155;
+      --text: #F1F5F9;
+      --text-muted: #94A3B8;
+      --accent: #38BDF8;
+      --accent-dark: #1E3A5F;
+      --success: #34D399;
+      --amber: #FBBF24;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #334155;
+      color: #F1F5F9;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .back-btn:hover {
+      background: #475569;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand img {
+      height: 28px;
+      width: 28px;
+      object-contain: contain;
+      background: rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 3px;
+    }
+    .brand span {
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+    }
+    .effective-date {
+      font-size: 11px;
+      font-family: monospace;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 36px 20px 60px;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(30, 58, 95, 0.6) 0%, rgba(15, 23, 42, 1) 100%);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #FFFFFF;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 14px;
+      color: #CBD5E1;
+      margin-bottom: 12px;
+    }
+    .section-card {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .grid-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .grid-item {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 13px;
+      color: #E2E8F0;
+    }
+    .grid-item strong {
+      color: #FFFFFF;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .permission-box {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+    .permission-box h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+    }
+    code {
+      background: #0F172A;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--amber);
+      border: 1px solid #334155;
+    }
+    ul {
+      margin-left: 20px;
+      margin-top: 10px;
+      font-size: 13px;
+      color: #CBD5E1;
+    }
+    li {
+      margin-bottom: 6px;
+    }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .contact-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 13px;
+    }
+    .contact-card .label {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .contact-card a {
+      color: #FFFFFF;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .contact-card a:hover {
+      text-decoration: underline;
+    }
+    footer {
+      text-align: center;
+      padding-top: 24px;
+      border-top: 1px solid var(--card-border);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    footer a {
+      color: #CBD5E1;
+      text-decoration: underline;
+      margin: 0 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <a href="/login" class="back-btn">← Back to Portal</a>
+      <div class="brand">
+        <img src="/logo.png" alt="DIGISPIRE">
+        <span>DIGISPIRE</span>
+      </div>
+    </div>
+    <span class="effective-date">Effective: October 6, 2026</span>
+  </header>
+
+  <main>
+    <div class="hero">
+      <span class="badge">Official Policy</span>
+      <h1>Privacy Policy</h1>
+      <p>
+        DIGISPIRE Academy (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) is committed to safeguarding the privacy and personal information of our students, faculty, and mobile application users. This policy outlines how our mobile application and web portal collect, use, process, and protect your information.
+      </p>
+    </div>
+
+    <!-- Section 1 -->
+    <section class="section-card">
+      <h2>1. Information We Collect</h2>
+      <p>
+        We collect personal and academic information strictly necessary to facilitate student learning, credential verification, and academic management:
+      </p>
+      <div class="grid-list">
+        <div class="grid-item">
+          <strong>Account Information</strong>
+          Student Full Name, Registered Mobile Number, Institutional Email Address, and User Role.
+        </div>
+        <div class="grid-item">
+          <strong>Academic Dossier</strong>
+          Student ID Number, Assigned Batch, Enrolled Courses, and Syllabus Progress.
+        </div>
+        <div class="grid-item">
+          <strong>Attendance Records</strong>
+          Check-in timestamps, module ID, date, and attendance verification status.
+        </div>
+        <div class="grid-item">
+          <strong>Course Submissions</strong>
+          Course assignments, project files, and faculty review feedback.
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2 -->
+    <section class="section-card">
+      <h2 style="color: var(--amber);">2. Device Hardware Permissions & Usage</h2>
+      <p>
+        Our mobile application requests specific device hardware permissions strictly to enable essential institutional learning features:
+      </p>
+
+      <div class="permission-box">
+        <h3>📷 Camera Permission (<code>CAMERA</code>)</h3>
+        <p>
+          Used exclusively for live in-app optical scanning of classroom QR codes during attendance check-in. The camera stream processes QR codes locally in real-time. <strong>We do NOT record, save, store, or transmit photos or videos from your camera</strong> without explicit user consent.
+        </p>
+      </div>
+
+      <div class="permission-box">
+        <h3>🔔 Notifications (<code>POST_NOTIFICATIONS</code>)</h3>
+        <p>
+          Used to deliver institutional broadcast announcements, schedule changes, attendance check-in confirmations, and homework deadlines. You can enable or disable notifications at any time in device settings.
+        </p>
+      </div>
+
+      <div class="permission-box">
+        <h3>📁 Storage & Files</h3>
+        <p>
+          Used only when students choose to upload coursework assignment PDFs, documents, or personal profile photos.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 3 -->
+    <section class="section-card">
+      <h2 style="color: var(--success);">3. How We Use & Protect Your Information</h2>
+      <p>
+        Your data is stored on secure cloud infrastructure (Google Firebase) with 256-bit SSL/TLS encryption in transit and AES encrypted storage at rest. We utilize role-based access control (RBAC) so that student records are only accessible by authorized academy faculty and administrators.
+      </p>
+      <p style="font-weight: 700; color: #FFFFFF;">
+        We NEVER sell, rent, monetize, or share your personal information with third-party advertisers or data brokers.
+      </p>
+    </section>
+
+    <!-- Section 4 -->
+    <section class="section-card">
+      <h2 style="color: #A78BFA;">4. Student Data Rights & Account Deletion</h2>
+      <p>
+        Under applicable data protection regulations (including the Digital Personal Data Protection Act and COPPA/GDPR principles), you have the right to:
+      </p>
+      <ul>
+        <li>Request an export of your personal academic attendance and course progress records.</li>
+        <li>Request correction of inaccurate personal or contact details.</li>
+        <li>Request complete account deletion and erasure of records upon course completion.</li>
+      </ul>
+      <p style="margin-top: 10px; font-size: 13px; color: var(--text-muted);">
+        To request data deletion or account removal, please contact our academic support desk with your Student ID at the email below.
+      </p>
+    </section>
+
+    <!-- Section 5 -->
+    <section class="section-card">
+      <h2 style="color: #FFFFFF;">5. Contact Information</h2>
+      <p>
+        If you have any questions or concerns regarding this Privacy Policy or our data handling practices, please contact us:
+      </p>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <div class="label">Email Support</div>
+          <a href="mailto:support@digispire.in">support@digispire.in</a>
+        </div>
+        <div class="contact-card">
+          <div class="label">Official Portal</div>
+          <a href="https://digispire.vercel.app" target="_blank" rel="noreferrer">digispire.vercel.app</a>
+        </div>
+        <div class="contact-card">
+          <div class="label">Institution</div>
+          <span style="color: #FFFFFF; font-weight: 600;">DIGISPIRE Academy</span>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>© 2026 DIGISPIRE Academy. All rights reserved.</p>
+      <p style="margin-top: 8px;">
+        <a href="/login">Student Login</a> · <a href="/privacy-policy">Privacy Policy</a>
+      </p>
+    </footer>
+  </main>
+
+</body>
+</html>
