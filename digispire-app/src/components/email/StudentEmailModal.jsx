@@ -24,6 +24,7 @@ export default function StudentEmailModal({ students, track, batchId, thresholds
   const [notice, setNotice] = useState('');
   const [result, setResult] = useState(null);
   const [requestId] = useState(() => newRequestId());
+  const [cc, setCc] = useState(true);
 
   const studentUids = useMemo(() => students.map(s => s.uid || s.id), [students]);
   const payload = useMemo(() => ({ type, studentUids, track, batchId, thresholds, note: debouncedNote, previewUid }), [type, studentUids, track, batchId, thresholds, debouncedNote, previewUid]);
@@ -56,7 +57,7 @@ export default function StudentEmailModal({ students, track, batchId, thresholds
     setSending(true);
     setError('');
     try {
-      const res = await callEmailApi('student.send', { ...payload, note, requestId });
+      const res = await callEmailApi('student.send', { ...payload, note, requestId, cc });
       setResult(res);
     } catch (err) {
       setError(err.message);
@@ -116,6 +117,13 @@ export default function StudentEmailModal({ students, track, batchId, thresholds
                   placeholder="e.g. Please meet me after Thursday's class so we can plan your catch-up." />
               </div>
 
+              {data?.ccAddress && (
+                <label className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 bg-white cursor-pointer">
+                  <input type="checkbox" checked={cc} onChange={e => setCc(e.target.checked)} className="rounded border-slate-300 text-[#255A84] focus:ring-[#255A84]" />
+                  <span className="text-xs font-semibold text-slate-700">CC <span className="font-bold">{data.ccAddress}</span> <span className="text-slate-400 font-medium">(a copy of each email)</span></span>
+                </label>
+              )}
+
               <div className="rounded-xl border border-slate-200 bg-white">
                 <p className="px-3 pt-3 text-[11px] font-black uppercase tracking-wider text-slate-400">Recipients — tap a name to preview their email</p>
                 <ul className="max-h-72 overflow-y-auto divide-y divide-slate-50 p-1">
@@ -157,7 +165,7 @@ export default function StudentEmailModal({ students, track, batchId, thresholds
                 subject={data?.preview?.subject}
                 html={data?.preview?.html}
                 loading={loading}
-                meta={data?.preview ? `To: ${data.preview.name} only` : ''}
+                meta={data?.preview ? `To: ${data.preview.name} only${cc && data.ccAddress ? ` · CC: ${data.ccAddress}` : ''}` : ''}
               />
             </div>
           </div>

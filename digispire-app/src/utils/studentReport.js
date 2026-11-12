@@ -26,6 +26,7 @@ export const STUDENT_EMAIL_TYPES = Object.freeze([
 
 export const EMAIL_TYPE_LABELS = Object.freeze({
   class_report: 'Class report',
+  class_missed: 'Missed class report',
   monthly_report: 'Monthly report',
   low_attendance: 'Low attendance warning',
   syllabus_due: 'Syllabus due',

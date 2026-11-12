@@ -261,7 +261,7 @@ function OutboxCard() {
   };
 
   const context = (m) => {
-    if (m.type === 'class_report') return `${m.batchName || m.batchId} · ${m.sessionDate}${m.chunkCount > 1 ? ` · part ${m.chunkIndex}/${m.chunkCount}` : ''}${m.isResend ? ' · resend' : ''}`;
+    if (m.type === 'class_report' || m.type === 'class_missed') return `${m.batchName || m.batchId} · ${m.sessionDate}${m.chunkCount > 1 ? ` · part ${m.chunkIndex}/${m.chunkCount}` : ''}${m.isResend ? ' · resend' : ''}`;
     if (m.type === 'monthly_report') return `${m.month} · ${m.studentName || ''}`;
     if (m.studentName) return `${m.studentName}${m.batchName ? ` · ${m.batchName}` : ''}`;
     return '';
@@ -311,6 +311,7 @@ function OutboxCard() {
                   <td className="px-3 py-2.5 max-w-[220px]">
                     <p className="font-semibold text-slate-700">{m.recipientCount ? `${m.recipientCount} student(s)` : (m.to || []).join(', ')}</p>
                     {m.bcc?.length ? <p className="text-[10px] text-slate-400">BCC {m.bcc.length}</p> : null}
+                    {m.cc?.length ? <p className="text-[10px] text-slate-400 truncate">CC {m.cc.join(', ')}</p> : null}
                     {m.testMode && <p className="text-[10px] text-amber-700 truncate">→ {(m.to || []).join(', ')}</p>}
                   </td>
                   <td className="px-3 py-2.5 text-slate-500">{m.createdBy?.name || '—'}</td>

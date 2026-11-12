@@ -19,6 +19,15 @@ export function staffTestAddress(user) {
   return check.email;
 }
 
+/** CC list for a send: MAIL_CC_ADDRESS unless the user unticked "CC". */
+export function ccListFor(body, config) {
+  if (body.cc === false) return [];
+  const check = checkEmail(config.ccAddress);
+  return check.ok ? [check.email] : [];
+}
+
+export const publicCcAddress = (config) => (checkEmail(config.ccAddress).ok ? config.ccAddress : '');
+
 export function sanitizeThresholds(input = {}) {
   const pick = (v, min, max) => {
     const n = Number(v);

@@ -46,3 +46,46 @@ export function classReportEmail(config, d) {
 
   return { subject, html: renderLayout({ config, title, preheader: `Topics covered and tasks for ${d.dateLabel}`, bodyHtml, footerNote }), text };
 }
+
+/**
+ * Feature 1 — "you missed today's class" email to absent / on-leave students (BCC).
+ * Same data as classReportEmail.
+ */
+export function classMissedEmail(config, d) {
+  const title = `You missed today’s class: ${d.batchName}`;
+  const subject = `You missed today’s class – ${d.batchName}, ${d.dateLabel}`;
+  const topicLines = d.topics.map(t => (t.moduleTitle ? `${t.moduleTitle} — ${t.title}` : t.title));
+  const footerNote = 'You are receiving this because you were not present in this class.';
+
+  const bodyHtml = [
+    paragraph('Hi,'),
+    paragraph('We missed you in today’s class. Here is what was covered and the tasks that were given, so you can catch up before the next class.'),
+    infoRows([
+      ['Date', d.dateLabel],
+      ['Batch', d.batchName],
+      ['Time', d.timeLabel],
+      ['Faculty', d.facultyName],
+    ]),
+    heading('What was covered'),
+    d.courseName ? muted(`Course: ${multiline(d.courseName)}`) : '',
+    topicLines.length ? bullets(topicLines) : '',
+    d.topicsNote ? box(multiline(d.topicsNote)) : '',
+    !topicLines.length && !d.topicsNote ? muted('No topics were recorded for this class.') : '',
+    heading('Tasks to complete'),
+    box(multiline(d.tasks), 'brand'),
+    paragraph('Please go through the study material for these topics. If anything is unclear, reply to this email or ask your mentor.'),
+  ].join('');
+
+  const text = renderText({
+    config, title, footerNote,
+    body: [
+      '\nHi,\n\nWe missed you in today’s class. Here is what was covered and the tasks that were given, so you can catch up before the next class.\n',
+      `Date: ${d.dateLabel}\nBatch: ${d.batchName}\nTime: ${d.timeLabel}\nFaculty: ${d.facultyName}\n`,
+      textSection('What was covered', [d.courseName ? `Course: ${d.courseName}` : '', ...textBullets(topicLines), d.topicsNote || '', !topicLines.length && !d.topicsNote ? 'No topics were recorded for this class.' : '']),
+      textSection('Tasks to complete', d.tasks),
+      '\nPlease go through the study material for these topics. If anything is unclear, reply to this email or ask your mentor.',
+    ].join(''),
+  });
+
+  return { subject, html: renderLayout({ config, title, preheader: `Catch up on ${d.dateLabel}: topics and tasks`, bodyHtml, footerNote }), text };
+}

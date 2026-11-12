@@ -45,10 +45,12 @@ export function getConfig() {
       pass: process.env.SMTP_PASS || '',
     },
     from: {
-      name: env('MAIL_FROM_NAME', 'DIGISPIRE Academy'),
+      name: env('MAIL_FROM_NAME', 'DIGISPIRE'),
       address: env('MAIL_FROM_ADDRESS'),
     },
     replyTo: env('MAIL_REPLY_TO'),
+    // Copied (CC) on emails sent from the app when "CC" is ticked.
+    ccAddress: env('MAIL_CC_ADDRESS', 'digispireacademy@gmail.com'),
     // A BCC message can never be bigger than the hourly cap, or it would never send.
     bccChunkSize: Math.min(num('MAIL_BCC_CHUNK_SIZE', 50, { min: 1, max: 500 }), Math.max(1, maxPerHour - 1)),
     maxPerHour,
@@ -65,7 +67,7 @@ export function getConfig() {
     },
     timezone: env('APP_TIMEZONE', DEFAULT_TIMEZONE),
     academy: {
-      name: env('ACADEMY_NAME', 'DIGISPIRE Academy'),
+      name: env('ACADEMY_NAME', 'DIGISPIRE'),
       logoUrl: env('ACADEMY_LOGO_URL', `${appUrl}/logo.png`),
       appUrl,
     },

@@ -3,7 +3,7 @@
  *
  *   layout.js         shared header (logo + academy name), card, footer
  *   components.js     reusable blocks (tiles, lists, notes, banners)
- *   classReport.js    Feature 1: class report group email (BCC)
+ *   classReport.js    Feature 1: class report (attended) + "you missed" email (BCC)
  *   monthlyReport.js  Feature 2: monthly individual attendance report
  *   studentAlerts.js  Feature 3: low attendance / syllabus due / absenteeism
  *
@@ -14,7 +14,7 @@
 import { paragraph, infoRows } from './components.js';
 import { renderLayout, renderText } from './layout.js';
 
-export { classReportEmail } from './classReport.js';
+export { classReportEmail, classMissedEmail } from './classReport.js';
 export { monthlyReportEmail } from './monthlyReport.js';
 export { lowAttendanceEmail, syllabusDueEmail, absenteeismEmail } from './studentAlerts.js';
 

@@ -1,161 +1,211 @@
-# 🎓 Digispire Academy — Learning Management & Operations Platform
+<div align="center">
 
-![React 18](https://img.shields.io/badge/React-18.x-61DAFB?logo=react&logoColor=black)
-![Vite 6](https://img.shields.io/badge/Vite-6.x-646CFF?logo=vite&logoColor=white)
-![Tailwind CSS 4](https://img.shields.io/badge/Tailwind-4.x-06B6D4?logo=tailwindcss&logoColor=white)
-![Firebase 11](https://img.shields.io/badge/Firebase-11.x-FFCA28?logo=firebase&logoColor=black)
-![PWA Ready](https://img.shields.io/badge/PWA-Supported-5A0FC8?logo=pwa&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-emerald)
+<img src="../.github/assets/readme-banner.svg" alt="DIGISPIRE Academy — Your Way To Success" width="100%">
 
-**Digispire Academy** is a modern, high-performance Learning Management System (LMS) and Operations Console designed for educational institutions, academies, and internship providers. Built with React 18, Vite 6, Tailwind CSS, and Firebase Firestore, Digispire Academy provides real-time course tracking, QR-based live attendance broadcasting, media resource hub, and student performance analytics.
+<br>
 
----
+**The official app of DIGISPIRE Academy for students, mentors and the academy team.**<br>
+Mark attendance with one scan, follow your syllabus, open study material, submit assignments<br>
+and see your progress, all in one place, on your phone or computer.
 
-## 🌟 Key Features & Modules
+<br>
 
-### 1. 📊 Course Completion & Pacing Velocity Report (`/admin/completion-reports`)
-- **Real-Time Pacing Velocity Matrix**: Automatically calculates student progress against time elapsed (`Ahead of Schedule 🚀`, `On Track 🟢`, `Behind Schedule ⚠️`, `Completed 🏆`).
-- **Module-by-Module Breakdown**: Visual progress bar, stepper dots, and topic completion percentages per module.
-- **Student Drill-down Inspector**: Modal inspection tab detailing topic-level credit status and mentor assignments.
-- **Dual View Modes**: Switch seamlessly between interactive **Cards Grid** and compact **Data Table**.
-- **Data Export**: One-click CSV export of student pacing reports.
+[![Open the App](https://img.shields.io/badge/Open%20the%20App-digispire.vercel.app-255A84?style=for-the-badge&logo=googlechrome&logoColor=white)](https://digispire.vercel.app)
+&nbsp;
+[![Install on your phone](https://img.shields.io/badge/Install-on%20your%20phone-F48B1F?style=for-the-badge&logo=android&logoColor=white)](#-install-it-on-your-phone)
+&nbsp;
+[![Privacy Policy](https://img.shields.io/badge/Privacy-Policy-1E3A5F?style=for-the-badge)](https://digispire.vercel.app/privacy-policy)
 
-### 2. 📲 Live Attendance Console (`/admin/attendance`)
-- **QR Code Broadcaster**: Generates live entry passes with dynamic 6-digit verification codes and session expiration countdown timers.
-- **Real-Time Check-In Stream**: Live feed displaying student avatars, ID badges, track tags (Morning, Evening, Internship), and check-in timestamps.
-- **Multi-Batch & Internship Support**: Supports academic course tracks as well as internship daily attendance logging.
-- **Automated Schedules & Holiday Calendar**: Set recurring batch class schedules, mark official holidays, and handle cancelled sessions.
-- **Student Attendance Inspector**: Detailed attendance calendar and percentage summary per student.
+</div>
 
-### 3. 📚 Media & Resource Hub (`/admin/content` & `/student/content`)
-- **In-App Interactive Media Player Modal**: Supports inline YouTube video streaming (`iframe`) and Google Drive file preview frames directly inside the app.
-- **📌 Pinned Featured Notes**: Admins can pin priority study materials to the top of student feeds.
-- **Category Filter Tabs**: Multi-tab filtering for PDFs, Google Drive links, YouTube videos, bookmarks, and pinned resources.
-- **Smart URL Type Auto-Detection**: Automatically identifies resource types (PDF, Google Drive, YouTube, Web Link) upon paste.
+<br>
 
-### 4. 👨‍🎓 Student Workspace (`/student/*`)
-- **Student Dashboard**: Live attendance summary badge, course progress, and recent announcements.
-- **Resource Center**: Access pinned study notes, downloadable PDFs, and embedded video lectures.
-- **Task & Submissions Portal**: Submit project links and view feedback from educators.
-- **Digital ID Card**: Interactive ID card with generated QR code for live attendance scanning.
+<img src="../.github/assets/readme-divider.svg" width="100%" alt="">
 
-### 5. 🛡️ Executive Admin Dashboard (`/admin/dashboard`)
-- **High-Level Metrics**: Active enrollment stats, overall attendance %, upcoming schedule, and recent submissions.
-- **WhatsApp Attendance Broadcast Generator**: Generates formatted daily attendance summaries ready for one-click WhatsApp sharing.
+## ✨ Highlights
 
----
+<table>
+  <tr>
+    <td width="33%" valign="top">
+      <h3>📲 Attendance in seconds</h3>
+      Scan the QR code shown in class, or type the short code. Done, you're marked present.
+    </td>
+    <td width="33%" valign="top">
+      <h3>📚 Your syllabus, your pace</h3>
+      See every module and topic of your course and exactly what you've completed.
+    </td>
+    <td width="33%" valign="top">
+      <h3>🎬 Study material in one place</h3>
+      Notes, PDFs, Google Drive files and YouTube lessons open right inside the app.
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">
+      <h3>📝 Assignments & feedback</h3>
+      Submit your work and read your mentor's review and feedback.
+    </td>
+    <td width="33%" valign="top">
+      <h3>📢 Instant announcements</h3>
+      Important notices reach you right away, with notifications on your phone.
+    </td>
+    <td width="33%" valign="top">
+      <h3>✉️ Reports by email</h3>
+      A summary after every class you attend, and your attendance report every month.
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">
+      <h3>🪪 Digital student ID</h3>
+      Your personal ID card with a QR code, always in your pocket.
+    </td>
+    <td width="33%" valign="top">
+      <h3>📊 Clear reports for mentors</h3>
+      Attendance, progress and who needs help, visible at a glance.
+    </td>
+    <td width="33%" valign="top">
+      <h3>📱 Works like an app</h3>
+      Install it on your phone's home screen. Pages you've opened still work offline.
+    </td>
+  </tr>
+</table>
 
-## 🛠️ Technology Stack
+<img src="../.github/assets/readme-divider.svg" width="100%" alt="">
 
-| Layer | Technology Used |
-| :--- | :--- |
-| **Frontend Framework** | React 18 (Hooks, Context API, `useMemo`, `useCallback`) |
-| **Build Tool & HMR** | Vite 6 |
-| **Styling & UI** | Tailwind CSS 4, Lucide React Icons |
-| **Backend & Database** | Firebase Firestore (Realtime Listeners & Queries) |
-| **Authentication** | Firebase Auth (Email/Password & Role-based Access Control) |
-| **Progressive Web App** | Vite PWA Plugin (`vite-plugin-pwa`), Workbox Service Worker |
-| **Export Utilities** | Custom CSV Exporter (`utils/csvExport.js`) |
+## 👩‍🎓 For Students
 
----
+| | What you can do |
+|:--:|:--|
+| 🏠 | **Dashboard**: your attendance percentage, course progress, latest announcements and your mentor, all on one screen. |
+| ✅ | **Mark Attendance**: scan the class QR code with your camera, or type the code your mentor shows. |
+| 📅 | **Attendance calendar**: see each day of the month marked as present, absent, leave, holiday or cancelled class. |
+| 📘 | **My Courses**: follow your course module by module, see which topics are done, and request a revision if a topic needs another look. |
+| 🎬 | **Study Materials**: open notes, PDFs, Drive files and video lessons without leaving the app. Pinned notes stay on top, and you can save your favourites. |
+| 📝 | **Assignments**: submit your project or homework link and see your mentor's review and feedback. |
+| 🪪 | **My Profile & ID card**: your digital student ID with QR code, your details, and a safe place to change your password. |
+| ✉️ | **Emails**: after each class you attend, you get a short report with the topics covered and the tasks given. On the last day of every month, you get your own attendance report. |
 
-## 📁 Repository Directory Structure
+## 👨‍🏫 For Faculty & Mentors
 
-```
-digispire-app/
-├── public/                     # Static branding assets, logo, manifest
-├── src/
-│   ├── components/             # Reusable UI components (AttendanceCalendar, Modals, Navbar)
-│   ├── context/                # React AuthContext & Global State Providers
-│   ├── layouts/                # AdminLayout, StudentLayout, AuthLayout
-│   ├── pages/                  # Page Views
-│   │   ├── admin/              # Admin pages (Attendance, Content, Completion, Staff, Students)
-│   │   ├── student/            # Student pages (Dashboard, Content, Submissions, Profile)
-│   │   └── Auth/               # Login, Register, Password Reset
-│   ├── utils/                  # Attendance calculation engine, CSV export, Haptic feedback
-│   ├── App.jsx                 # Central Application Router & Role Protection
-│   ├── firebase.js             # Firebase Service Initialization
-│   └── main.jsx                # Application Entry Point & Service Worker Registration
-├── index.html                  # HTML5 Shell
-├── vite.config.js              # Vite & PWA Build Configuration
-└── package.json                # Project Dependencies & Scripts
-```
+| | What you can do |
+|:--:|:--|
+| 📡 | **Live attendance**: show a QR code on screen and watch students check in live. Each code expires after 5 minutes, so attendance stays honest. |
+| ✍️ | **Manual entries**: mark present, leave or makeup attendance for any student and date. |
+| 🗓️ | **Schedules**: set class days and timings, plan makeup classes, add holidays and cancel classes when needed. |
+| 📨 | **Class Reports**: after class, send one email to everyone who attended, with the topics covered and the tasks for today. Students never see each other's email addresses. |
+| 📊 | **Attendance Reports**: each student's attendance with a day-by-day calendar. Students with low attendance or repeated absences are highlighted automatically. Download to Excel or print. |
+| 💌 | **Personal emails**: send a student their own attendance warning, pending-topics reminder or absence follow-up, with a personal note from you. |
+| 🏆 | **Completion Reports**: see who is ahead, on track or behind schedule, and mark topics or modules as complete. |
+| 🗂️ | **Assignments & revisions**: review submissions, give feedback and handle revision requests. |
+| 📢 | **Announcements**: publish notices for all students or a single batch, with instant phone notifications. |
+| 💬 | **Daily WhatsApp summary**: create a ready-to-share attendance summary for any batch in one tap. |
 
----
+## 🛡️ For Admins
 
-## 🚀 Quick Start Guide
+| | What you can do |
+|:--:|:--|
+| 👥 | **Students & staff**: add students and faculty, assign batches, courses and mentors, issue ID cards, and mark students active or inactive. |
+| 🎓 | **Courses & syllabus**: build each course from modules and topics. |
+| 📁 | **Study material library**: add notes, PDFs, Drive files and videos, and pin the important ones. |
+| ✉️ | **Email Center**: preview and send the monthly attendance reports and see the history of every email sent. |
 
-### Prerequisites
-- **Node.js**: `v18.0.0` or higher
-- **npm**: `v9.0.0` or higher
-- **Firebase Project**: Firestore Database & Auth enabled
+<img src="../.github/assets/readme-divider.svg" width="100%" alt="">
 
-### 1. Clone & Install Dependencies
-```bash
-git clone https://github.com/ABVicky/Digispire-Academy.git
-cd Digispire-Academy/digispire-app
-npm install
-```
+## 🚀 Getting started
 
-### 2. Configure Firebase Environment
-Create or edit `src/firebase.js` with your Firebase web app configuration keys:
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>👩‍🎓 Students</h3>
+      <ol>
+        <li>Open <a href="https://digispire.vercel.app"><b>digispire.vercel.app</b></a></li>
+        <li>Choose <b>Student</b></li>
+        <li>Sign in with your <b>registered phone number</b> and the password the academy gave you</li>
+        <li>Change your password in <b>My Profile</b></li>
+      </ol>
+      <sub>💡 Make sure the academy has your correct email address so you receive your class and monthly reports.</sub>
+    </td>
+    <td width="50%" valign="top">
+      <h3>👨‍🏫 Faculty & Admins</h3>
+      <ol>
+        <li>Open <a href="https://digispire.vercel.app"><b>digispire.vercel.app</b></a></li>
+        <li>Choose <b>Faculty</b></li>
+        <li>Sign in with your <b>academy email</b> and password</li>
+        <li>Start from the <b>Dashboard</b></li>
+      </ol>
+      <sub>💡 New staff accounts are created by an admin under <b>Teachers & Staff</b>.</sub>
+    </td>
+  </tr>
+</table>
 
-```javascript
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+## 📱 Install it on your phone
 
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
+| Phone | How to install |
+|:--|:--|
+| **Android** (Chrome) | Open the website → tap <kbd>⋮</kbd> → **Install app** / **Add to Home screen**, or use the DIGISPIRE Android app |
+| **iPhone** (Safari) | Open the website → tap <kbd>Share</kbd> → **Add to Home Screen** |
+| **Computer** | Works in any modern browser (Chrome, Edge, Safari, Firefox) |
 
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-export const auth = getAuth(app);
-```
+Once installed, DIGISPIRE opens full-screen like any other app and updates itself automatically.
 
-### 3. Run Development Server
-```bash
-npm run dev
-```
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+## ✉️ Emails from the academy
 
-### 4. Build for Production
-```bash
-npm run build
-```
-The optimized production bundle will be generated in the `dist/` directory.
+| Email | When it arrives | Who receives it |
+|:--|:--|:--|
+| 📨 **Class report** | After each class | Students who attended that class |
+| 📅 **Monthly attendance report** | On the last day of every month | Every active student, each with their own report |
+| 💌 **Attendance / syllabus / absence reminder** | When your mentor sends one | Only you |
 
----
+<sub>Emails come from the academy's official address. Group emails are sent privately, so no one can see who else received them.</sub>
 
-## 📊 Firestore Database Schema Overview
+## 🔒 Privacy & safety
 
-- **`users`**: Contains user profiles, roles (`admin`, `educator`, `student`), batch assignments, mentor IDs, and joining dates.
-- **`courses`**: Course metadata, track names, duration in days.
-- **`modules`**: Curriculum modules linked to `courseId`.
-- **`topics`**: Topic credits linked to `moduleId` and array of `completedStudents`.
-- **`content`**: Resource library items (URLs, types, subjects, `isPinned`, click counts).
-- **`attendance`**: Daily attendance records (`studentId`, `date`, `status`, `coveredCourse`, `coveredModule`).
-- **`batches`**: Batch schedule configurations, timings, active days.
-- **`qr_sessions`**: Active live QR broadcaster verification tokens.
+- 🔐 Every account is protected by a personal login.
+- 👀 Only faculty and admins can see attendance reports.
+- ✉️ Your email address is never shown to other students.
+- 📄 Read how your information is used in our [Privacy Policy](https://digispire.vercel.app/privacy-policy).
 
----
+## ❓ Frequently asked questions
 
-## 📱 Mobile Responsiveness & PWA Support
+<details>
+<summary><b>The QR code says it has expired. What do I do?</b></summary>
+<br>
+Class QR codes are valid for 5 minutes. Ask your mentor to show a fresh code, or type the new code shown on screen.
+</details>
 
-Digispire Academy is **100% mobile-responsive** across smartphones, tablets, and desktop displays:
-- **Mobile Stacked Cards View**: Data tables automatically switch to touch-friendly card layouts on mobile viewports (`< 768px`).
-- **Offline PWA**: Full offline caching capabilities using Vite PWA and Workbox service workers.
+<details>
+<summary><b>I'm not receiving any emails from the academy.</b></summary>
+<br>
+Check your Spam or Promotions folder first. If they're not there, ask the academy to check the email address saved on your profile.
+</details>
 
----
+<details>
+<summary><b>My attendance for a day looks wrong.</b></summary>
+<br>
+Tell your mentor the date. They can review and correct it.
+</details>
 
-## 📄 License
-Distributed under the **MIT License**. See `LICENSE` for details.
+<details>
+<summary><b>I forgot my password.</b></summary>
+<br>
+Contact the academy office or your mentor to have your password reset.
+</details>
 
----
-*Maintained with ❤️ for Digispire Academy.*
+<details>
+<summary><b>Can I use DIGISPIRE on a computer?</b></summary>
+<br>
+Yes. Open <a href="https://digispire.vercel.app">digispire.vercel.app</a> in any modern browser and sign in.
+</details>
+
+## 💬 Need help?
+
+Talk to your **mentor** or the **DIGISPIRE Academy office**. We're happy to help.
+
+<br>
+
+<div align="center">
+
+<img src="../.github/assets/readme-footer.svg" alt="© DIGISPIRE Academy — Your Way To Success" width="100%">
+
+<sub>© 2026 DIGISPIRE Academy. The DIGISPIRE name and logo belong to DIGISPIRE Academy.</sub>
+
+</div>

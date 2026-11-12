@@ -32,7 +32,7 @@ Then **redeploy**, because environment changes only apply to new deployments.
 | `SMTP_ENCRYPTION` | `ssl` for 465, `starttls` for 587 | same page |
 | `SMTP_USER` | the full address, e.g. `info@yourdomain.com` | same page |
 | `SMTP_PASS` | that mailbox's password | the password you set in cPanel |
-| `MAIL_FROM_NAME` | `DIGISPIRE Academy` | — |
+| `MAIL_FROM_NAME` | `DIGISPIRE` | — |
 | `MAIL_FROM_ADDRESS` | `info@yourdomain.com` (normally the same as `SMTP_USER`) | — |
 | `MAIL_TEST_MODE` | `true` until you have checked everything, then `false` | — |
 | `MAIL_TEST_RECIPIENT` | **your own** email address | — |
@@ -42,7 +42,7 @@ Then **redeploy**, because environment changes only apply to new deployments.
 
 Optional settings with their defaults: `MAIL_REPLY_TO` (empty), `MAIL_SEND_DELAY_MS=1000`, `MAIL_MAX_ATTEMPTS=5`,
 `MAIL_TEST_SAMPLE_SIZE=3`, `MONTHLY_REPORT_ENABLED=true`, `MONTHLY_REPORT_TIME=20:00`, `APP_TIMEZONE=Asia/Kolkata`,
-`ACADEMY_NAME=DIGISPIRE Academy`, `APP_BASE_URL=https://digispire.vercel.app`, `ACADEMY_LOGO_URL=<APP_BASE_URL>/logo.png`.
+`ACADEMY_NAME=DIGISPIRE`, `MAIL_CC_ADDRESS=digispireacademy@gmail.com`, `APP_BASE_URL=https://digispire.vercel.app`, `ACADEMY_LOGO_URL=<APP_BASE_URL>/logo.png`.
 [`.env.example`](.env.example) lists everything.
 
 > Never give these variables a `VITE_` prefix, because Vite would put them in the browser bundle.

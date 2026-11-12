@@ -36,10 +36,11 @@ export function closeTransport() {
 }
 
 /** Sends one message over the cPanel SMTP account. Throws on failure. */
-export async function deliver(config, { to = [], bcc = [], subject, html, text }) {
+export async function deliver(config, { to = [], cc = [], bcc = [], subject, html, text }) {
   const info = await getTransport(config).sendMail({
     from: { name: config.from.name, address: config.from.address },
     to,
+    cc: cc.length ? cc : undefined,
     bcc: bcc.length ? bcc : undefined,
     replyTo: config.replyTo || undefined,
     subject,

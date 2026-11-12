@@ -21,8 +21,10 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
   const [testing, setTesting] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
-  const [showRecipients, setShowRecipients] = useState(false);
+  const [showRecipients, setShowRecipients] = useState('');
   const [deliveries, setDeliveries] = useState([]);
+  const [previewTab, setPreviewTab] = useState('attended');
+  const [cc, setCc] = useState(true);
 
   const docId = classSessionDocId(batchId, date);
 
@@ -78,19 +80,22 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
 
   const status = data?.status || { sendCount: 0 };
   const alreadySent = status.sendCount > 0;
-  const recipientCount = data?.recipients?.length || 0;
+  const attendedCount = data?.audiences?.attended?.recipients?.length || 0;
+  const missedCount = data?.audiences?.missed?.recipients?.length || 0;
+  const recipientCount = attendedCount + missedCount;
+  const ccAddress = data?.ccAddress || '';
 
   const send = async (resend) => {
     setError('');
     setNotice('');
     if (!form.tasks.trim()) { setError('Please enter the tasks given today. This is the only field you must fill in.'); return; }
     if (resend && !window.confirm(
-      `This class report was already sent on ${formatDateTime(status.lastSentAt)} by ${status.lastSentBy?.name || 'someone'}.\n\nSend it AGAIN to ${recipientCount} student(s)? They will receive a second email.`
+      `This class report was already sent on ${formatDateTime(status.lastSentAt)} by ${status.lastSentBy?.name || 'someone'}.\n\nSend it AGAIN to ${attendedCount} attended + ${missedCount} missed student(s)? They will receive a second email.`
     )) return;
     setSending(true);
     try {
-      const res = await callEmailApi('classReport.send', { batchId, date, ...form, resend, expectedSendCount: status.sendCount });
-      setNotice(`${resend ? 'Resend queued' : 'Class report queued'} for ${res.recipients} student(s)${res.messages > 1 ? ` in ${res.messages} BCC batches` : ''}. It is sending in the background — you can close this window.${res.testMode ? ' (Test mode: delivered only to the test address.)' : ''}`);
+      const res = await callEmailApi('classReport.send', { batchId, date, ...form, cc, resend, expectedSendCount: status.sendCount });
+      setNotice(`${resend ? 'Resend queued' : 'Class report queued'}: ${res.recipients} attended + ${res.missedRecipients} missed student(s)${res.cc?.length ? `, CC ${res.cc.join(', ')}` : ''}. It is sending in the background — you can close this window.${res.testMode ? ' (Test mode: delivered only to the test address.)' : ''}`);
       await loadPreview(form);
     } catch (err) {
       setError(err.message);
@@ -107,7 +112,7 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
     setTesting(true);
     try {
       const res = await callEmailApi('classReport.sendTest', { batchId, date, ...form });
-      setNotice(`Test copy queued to ${res.to}. Students were not emailed.`);
+      setNotice(`Test copies of both emails (attended and missed) queued to ${res.to}. Students were not emailed.`);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -159,7 +164,7 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
                 </div>
                 {(data.attendance.leave > 0 || data.attendance.absent > 0) && (
                   <p className="text-[11px] text-slate-500 font-medium -mt-2 ml-1">
-                    {data.attendance.absent} absent · {data.attendance.leave} on leave — they will not receive this email.
+                    {data.attendance.absent} absent · {data.attendance.leave} on leave — they get the “you missed today’s class” email.
                   </p>
                 )}
 
@@ -175,7 +180,7 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
                       {status.testMode && <TestModeBadge />}
                     </div>
                     <p className="text-[11px] text-emerald-700 font-medium">
-                      {status.sendCount > 1 ? `Sent ${status.sendCount} times. ` : ''}Last send: {status.lastRecipientCount} recipient(s).
+                      {status.sendCount > 1 ? `Sent ${status.sendCount} times. ` : ''}Last send: {status.lastRecipientCount} attended · {status.lastMissedCount} missed.
                     </p>
                     {latest.some(d => d.status === 'failed') && (
                       <p className="text-[11px] text-rose-700 font-semibold">
@@ -266,29 +271,51 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
                   />
                 </div>
 
-                {/* Recipients */}
-                <div className="p-3 rounded-xl border border-slate-200 bg-white space-y-2">
-                  <button type="button" onClick={() => setShowRecipients(v => !v)} className="w-full flex items-center justify-between text-left">
-                    <span className="text-xs font-bold text-slate-700">
-                      <Users size={13} className="inline mr-1 text-[#255A84]" />
-                      {recipientCount} student(s) will receive this in BCC
-                      {data.chunks > 1 ? ` · ${data.chunks} emails of up to ${data.bccChunkSize}` : ''}
-                    </span>
-                    <span className="text-[10px] font-bold uppercase text-[#255A84]">{showRecipients ? 'Hide' : 'Show'}</span>
-                  </button>
-                  <p className="text-[11px] text-slate-400">To: our own address. Students never see each other’s email.</p>
-                  {showRecipients && (
-                    <ul className="max-h-40 overflow-y-auto divide-y divide-slate-50">
-                      {data.recipients.map(r => (
-                        <li key={r.uid || r.email} className="py-1.5 flex items-center justify-between gap-2 text-xs">
-                          <span className="font-semibold text-slate-700 truncate">{r.name}{r.guest ? <span className="ml-1 text-[10px] text-slate-400">(other batch)</span> : null}</span>
-                          <span className="text-slate-400 truncate">{r.email}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <SkippedRecipients skipped={data.skipped} title="Present but no usable email" />
+                {/* Recipients: two emails */}
+                {[
+                  { key: 'attended', title: 'Attended', note: 'get the class report' },
+                  { key: 'missed', title: 'Missed', note: 'get the “you missed today’s class” email' },
+                ].map(({ key, title, note }) => {
+                  const a = data.audiences[key];
+                  const open = showRecipients === key;
+                  return (
+                    <div key={key} className="p-3 rounded-xl border border-slate-200 bg-white space-y-2">
+                      <button type="button" onClick={() => setShowRecipients(open ? '' : key)} className="w-full flex items-center justify-between text-left gap-2">
+                        <span className="text-xs font-bold text-slate-700">
+                          <Users size={13} className={`inline mr-1 ${key === 'attended' ? 'text-emerald-600' : 'text-rose-500'}`} />
+                          {title}: {a.recipients.length} student(s) {note}
+                          {a.chunks > 1 ? ` · ${a.chunks} emails of up to ${data.bccChunkSize}` : ''}
+                        </span>
+                        <span className="text-[10px] font-bold uppercase text-[#255A84] shrink-0">{open ? 'Hide' : 'Show'}</span>
+                      </button>
+                      {open && (
+                        <ul className="max-h-40 overflow-y-auto divide-y divide-slate-50">
+                          {a.recipients.length === 0 && <li className="py-1.5 text-xs text-slate-400">Nobody</li>}
+                          {a.recipients.map(r => (
+                            <li key={r.uid || r.email} className="py-1.5 flex items-center justify-between gap-2 text-xs">
+                              <span className="font-semibold text-slate-700 truncate">
+                                {r.name}
+                                {r.guest ? <span className="ml-1 text-[10px] text-slate-400">(other batch)</span> : null}
+                                {r.status === 'leave' ? <span className="ml-1 text-[10px] text-amber-600">(on leave)</span> : null}
+                              </span>
+                              <span className="text-slate-400 truncate">{r.email}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      <SkippedRecipients skipped={a.skipped} title={`${title} but no usable email`} />
+                    </div>
+                  );
+                })}
+                <p className="text-[11px] text-slate-400 ml-1 -mt-2">Both emails go in BCC with our own address in To, so students never see each other’s email.</p>
+
+                {/* CC */}
+                {ccAddress && (
+                  <label className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 bg-white cursor-pointer">
+                    <input type="checkbox" checked={cc} onChange={e => setCc(e.target.checked)} className="rounded border-slate-300 text-[#255A84] focus:ring-[#255A84]" />
+                    <span className="text-xs font-semibold text-slate-700">CC <span className="font-bold">{ccAddress}</span> <span className="text-slate-400 font-medium">(one copy of each email)</span></span>
+                  </label>
+                )}
 
                 <ErrorNotice message={error} />
                 {notice && <div className="p-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs font-semibold">{notice}</div>}
@@ -296,11 +323,19 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
 
               {/* ── Right: preview ── */}
               <div className="space-y-3 min-w-0 lg:sticky lg:top-0 self-start">
+                <div className="flex bg-slate-100 p-1 rounded-xl">
+                  {[['attended', `Attended (${attendedCount})`], ['missed', `Missed (${missedCount})`]].map(([key, text]) => (
+                    <button key={key} type="button" onClick={() => setPreviewTab(key)}
+                      className={`flex-1 px-3 py-2 rounded-lg text-xs font-bold transition ${previewTab === key ? 'bg-white text-[#255A84] shadow-xs' : 'text-slate-500 hover:text-slate-700'}`}>
+                      {text}
+                    </button>
+                  ))}
+                </div>
                 <EmailPreviewFrame
-                  subject={data.content.subject}
-                  html={data.content.html}
+                  subject={data.audiences[previewTab].content.subject}
+                  html={data.audiences[previewTab].content.html}
                   loading={refreshing}
-                  meta={`To: our address · BCC: ${recipientCount} present student(s)`}
+                  meta={`To: our address${cc && ccAddress ? ` · CC: ${ccAddress}` : ''} · BCC: ${data.audiences[previewTab].recipients.length} student(s)`}
                 />
                 <button type="button" onClick={refresh} disabled={refreshing} className="btn-outline-premium w-full px-4 py-2.5 flex items-center justify-center gap-2 text-xs">
                   <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} /> Update preview with my changes
@@ -321,7 +356,7 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
               </button>
             ) : (
               <button type="button" onClick={() => send(false)} disabled={sending || !recipientCount} className="btn-primary-premium px-5 py-2.5 flex items-center gap-2 text-xs">
-                {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />} Send to {recipientCount} student(s)
+                {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />} Send ({attendedCount} attended · {missedCount} missed)
               </button>
             )}
           </div>

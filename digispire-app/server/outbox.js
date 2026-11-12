@@ -33,8 +33,8 @@ const chunk = (items, size) => {
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 const nextHourMillis = () => Math.ceil((Date.now() + 1) / 3_600_000) * 3_600_000 + 30_000;
 
-function describeIntended(to, bcc, max = 25) {
-  const all = [...to.map(e => `To: ${e}`), ...bcc.map(e => `BCC: ${e}`)];
+function describeIntended(to, cc, bcc, max = 25) {
+  const all = [...to.map(e => `To: ${e}`), ...cc.map(e => `CC: ${e}`), ...bcc.map(e => `BCC: ${e}`)];
   const shown = all.slice(0, max);
   return all.length > max ? [...shown, `…and ${all.length - max} more`] : shown;
 }
@@ -50,8 +50,11 @@ function describeIntended(to, bcc, max = 25) {
  *
  * With MAIL_TEST_MODE on, live messages are redirected to MAIL_TEST_RECIPIENT
  * and a banner lists who would have received them.
+ *
+ * `cc` (live sends only) is added to the first message, so a CC'd address
+ * gets one copy per email rather than one per BCC chunk.
  */
-export function prepareMessages(config, { idBase, type, delivery, content, meta = {}, createdBy }) {
+export function prepareMessages(config, { idBase, type, delivery, content, meta = {}, createdBy, cc = [] }) {
   const purpose = delivery.kind === 'staff' ? 'test' : 'live';
   let groups;
   if (delivery.kind === 'bcc') {
@@ -69,16 +72,18 @@ export function prepareMessages(config, { idBase, type, delivery, content, meta 
   return groups.map((g, i) => {
     const id = groups.length > 1 ? `${idBase}_c${i + 1}` : idBase;
     let { to, bcc } = g;
+    let ccList = purpose === 'live' && i === 0 ? cc : [];
     let { subject, html, text } = content;
     const chunkLabel = groups.length > 1 ? ` (part ${i + 1} of ${groups.length})` : '';
 
     if (redirect) {
-      const lines = describeIntended(to, bcc);
+      const lines = describeIntended(to, ccList, bcc);
       const title = `TEST MODE — not sent to students${chunkLabel}. It would have gone to:`;
       html = withBanner(html, title, lines);
       text = `${textBanner(title, lines)}${text}`;
       subject = `[TEST] ${subject}`;
       to = [config.testRecipient];
+      ccList = [];
       bcc = [];
     } else if (purpose === 'test') {
       const intended = delivery.intended || [];
@@ -99,8 +104,9 @@ export function prepareMessages(config, { idBase, type, delivery, content, meta 
         testMode: redirect,
         subject,
         to,
+        cc: ccList,
         bcc,
-        deliveryCount: to.length + bcc.length,
+        deliveryCount: to.length + ccList.length + bcc.length,
         recipients: g.recipients.map(r => ({ uid: r.uid || '', name: r.name || '', email: r.email })),
         recipientUids: g.recipients.map(r => r.uid).filter(Boolean),
         recipientCount: g.recipients.length,
@@ -239,7 +245,7 @@ export async function refreshClassReportStatus(classSessionId, sendNo) {
 }
 
 async function afterFinal(msg) {
-  if (msg.type === 'class_report' && msg.purpose === 'live') {
+  if ((msg.type === 'class_report' || msg.type === 'class_missed') && msg.purpose === 'live') {
     try { await refreshClassReportStatus(msg.classSessionId, msg.sendNo); } catch (err) { console.error('[email] status refresh failed', err); }
   }
 }
@@ -253,7 +259,7 @@ async function sendOne(db, config, ref, msg) {
   }
   const body = bodySnap.data();
   try {
-    const info = await deliver(config, { to: msg.to, bcc: msg.bcc || [], subject: body.subject, html: body.html, text: body.text });
+    const info = await deliver(config, { to: msg.to, cc: msg.cc || [], bcc: msg.bcc || [], subject: body.subject, html: body.html, text: body.text });
     await ref.update({
       status: 'sent', nextAttemptAt: null, sentAt: FieldValue.serverTimestamp(),
       messageId: info.messageId, rejected: info.rejected, smtpResponse: info.response, lastError: null,
@@ -337,7 +343,7 @@ export async function retryMessage(id) {
     tx.update(ref, { status: 'queued', attempts: 0, nextAttemptAt: Timestamp.now(), previousError: d.lastError || null, lastError: null });
     return d;
   });
-  if (msg && !msg.skipped && msg.type === 'class_report') {
+  if (msg && !msg.skipped && (msg.type === 'class_report' || msg.type === 'class_missed')) {
     await db.doc(`class_sessions/${msg.classSessionId}`).set({ emailReport: { lastStatus: 'sending' } }, { merge: true });
   }
   return msg;
