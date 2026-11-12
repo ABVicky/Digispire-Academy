@@ -126,6 +126,25 @@ service cloud.firestore {
       allow read: if isAuth();
       allow write: if isAdmin();
     }
+
+    // Email queue + log. Written only by the email API (Admin SDK bypasses
+    // these rules); faculty/admins can read it for status and history.
+    match /email_outbox/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    match /email_bodies/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    match /email_runs/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    match /email_meta/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
   }
 }
 

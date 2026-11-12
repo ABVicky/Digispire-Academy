@@ -2,9 +2,15 @@
   "installCommand": "cd digispire-app && npm install",
   "buildCommand": "cd digispire-app && npm run build",
   "outputDirectory": "digispire-app/dist",
+  "functions": {
+    "api/*.mjs": { "maxDuration": 60 }
+  },
+  "crons": [
+    { "path": "/api/email-cron", "schedule": "0 15 * * *" }
+  ],
   "rewrites": [
     { "source": "/privacy-policy", "destination": "/privacy-policy/index.html" },
     { "source": "/privacy", "destination": "/privacy/index.html" },
-    { "source": "/((?!assets/|privacy-policy|privacy|logo.png|favicon).*)", "destination": "/index.html" }
+    { "source": "/((?!api/|assets/|privacy-policy|privacy|logo.png|favicon).*)", "destination": "/index.html" }
   ]
 }

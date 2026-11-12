@@ -3,6 +3,12 @@
  * Formula:
  * Eligible Classes = Scheduled Classes Since Joining Date - Holidays - Cancelled Classes
  * Attendance Percentage = Present Classes / Eligible Classes * 100
+ *
+ * Optional `startDateStr` (YYYY-MM-DD) narrows the window, e.g. to one month.
+ * The window never starts before the student's joining date.
+ *
+ * Keep this file free of browser/Firebase imports: the email API (server/)
+ * imports it too.
  */
 export function calculateAttendance({
   student,
@@ -10,6 +16,7 @@ export function calculateAttendance({
   batchSchedule,
   holidays = [],
   cancelledClasses = [],
+  startDateStr = null,
   endDateStr = new Date().toISOString().split('T')[0]
 }) {
   if (!student || !batchSchedule) {
@@ -30,7 +37,8 @@ export function calculateAttendance({
     (student.createdAt ? new Date(student.createdAt.seconds * 1000).toISOString().split('T')[0] : '2026-05-01');
 
   // Normalize dates to timezone-safe strings
-  const start = new Date(joinStr);
+  const effectiveStartStr = startDateStr && startDateStr > joinStr ? startDateStr : joinStr;
+  const start = new Date(effectiveStartStr);
   const end = new Date(endDateStr);
 
   let eligibleClasses = 0;

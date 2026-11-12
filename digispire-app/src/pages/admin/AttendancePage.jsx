@@ -5,14 +5,18 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../firebase';
 import {
-  QrCode, Clock, History, Trash2, X, Users, Calendar, 
-  Settings, ShieldAlert, Plus, Play, UserCheck, AlertTriangle, Search
+  QrCode, Clock, History, Trash2, X, Users, Calendar,
+  Settings, ShieldAlert, Plus, Play, UserCheck, AlertTriangle, Search, Mail
 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { calculateAttendance } from '../../utils/attendanceEngine';
 import AttendanceCalendar from '../../components/AttendanceCalendar';
 import { initializeDatabase } from '../../utils/dbInit';
 import { triggerHaptic } from '../../utils/haptic';
+import { useAuth } from '../../context/AuthContext';
+import { classSessionDocId } from '../../utils/studentReport';
+import { emailFeaturesEnabled } from '../../utils/platform';
+import ClassReportsPanel from '../../components/email/ClassReportsPanel';
 
 const DAYS_OF_WEEK = [
   { value: 0, label: 'Sunday' },
@@ -25,7 +29,8 @@ const DAYS_OF_WEEK = [
 ];
 
 export default function AttendancePage() {
-  const [activeTab, setActiveTab] = useState('live'); // live, schedules, calendar, inspector
+  const { userProfile } = useAuth();
+  const [activeTab, setActiveTab] = useState('live'); // live, schedules, calendar, inspector, reports
   
   // Live Broadcaster States
   const [broadcastBatch, setBroadcastBatch] = useState('morning'); // morning, evening, internship
@@ -289,17 +294,20 @@ export default function AttendancePage() {
 
     try {
       await setDoc(doc(db, 'qr_sessions', broadcastBatch), newQr);
-      
-      await addDoc(collection(db, 'class_sessions'), {
+
+      // One class_sessions doc per batch per day; regenerating the QR updates it.
+      await setDoc(doc(db, 'class_sessions', classSessionDocId(newQr.batchId, newQr.date)), {
         type: newQr.type,
         batchId: newQr.batchId,
         date: newQr.date,
         sessionId: newQr.sessionId,
+        sessionIds: arrayUnion(newQr.sessionId),
         timestamp: serverTimestamp(),
         coveredCourse: selectedCourse,
         coveredModule: selectedModule,
-        coveredTopics: selectedTopics
-      });
+        coveredTopics: selectedTopics,
+        ...(userProfile ? { takenBy: { uid: userProfile.uid || userProfile.id, name: userProfile.name || userProfile.email || 'Faculty' } } : {})
+      }, { merge: true });
     } catch (err) {
       console.error('QR Generation Error:', err);
     }
@@ -395,7 +403,7 @@ export default function AttendancePage() {
         studentId: student.studentId,
         uid: student.uid || student.id,
         name: student.name,
-        batchId: student.batchId || 'morning',
+        batchId: qrData.batchId || student.batchId || 'morning',
         isIntern: !!student.isIntern,
         type: qrData.type,
         date: today,
@@ -789,6 +797,7 @@ export default function AttendancePage() {
               { id: 'schedules', label: 'Schedules', fullLabel: 'Class Schedules', icon: Settings },
               { id: 'calendar', label: 'Calendar', fullLabel: 'Calendar', icon: Calendar },
               { id: 'inspector', label: 'Inspector', fullLabel: 'Student Inspector', icon: UserCheck },
+              ...(emailFeaturesEnabled() ? [{ id: 'reports', label: 'Reports', fullLabel: 'Class Reports', icon: Mail }] : []),
             ].map(tab => (
               <button
                 key={tab.id}
@@ -1517,6 +1526,18 @@ export default function AttendancePage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Class Reports Tab (email, web only) */}
+      {activeTab === 'reports' && emailFeaturesEnabled() && (
+        <ClassReportsPanel
+          batches={batches}
+          students={students}
+          staff={educators}
+          courses={courses}
+          modules={modules}
+          topics={topics}
+        />
       )}
 
       {/* Student Inspector Calendar Tab */}

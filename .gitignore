@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local env files (email secrets) — never commit
+.env
+.env.*
+!.env.example
+.vercel

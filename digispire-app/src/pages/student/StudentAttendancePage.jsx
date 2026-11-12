@@ -156,7 +156,8 @@ export default function StudentAttendancePage() {
       studentId: userProfile.studentId,
       uid: userProfile.uid,
       name: userProfile.name,
-      batchId: userProfile.batchId,
+      // The batch of the session that was scanned, not the student's primary batch
+      batchId: sessionData.batchId || userProfile.batchId,
       isIntern: !!userProfile.isIntern,
       type: sessionType,
       date: today,

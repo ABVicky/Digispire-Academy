@@ -25,6 +25,7 @@ const StaffPage = lazy(() => import('./pages/admin/StaffPage'));
 const RevisionAppealsPage = lazy(() => import('./pages/admin/RevisionAppealsPage'));
 const SubmissionsPage = lazy(() => import('./pages/admin/SubmissionsPage'));
 const AnnouncementsPage = lazy(() => import('./pages/admin/AnnouncementsPage'));
+const EmailCenterPage = lazy(() => import('./pages/admin/EmailCenterPage'));
 
 // Student pages
 const StudentDashboard = lazy(() => import('./pages/student/StudentDashboard'));
@@ -99,6 +100,7 @@ function App() {
                 <Route path="revisions" element={<RevisionAppealsPage />} />
                 <Route path="submissions" element={<SubmissionsPage />} />
                 <Route path="announcements" element={<AnnouncementsPage />} />
+                <Route path="emails" element={<EmailCenterPage />} />
                 <Route path="profile" element={<ProfilePage />} />
               </Route>
             </Route>

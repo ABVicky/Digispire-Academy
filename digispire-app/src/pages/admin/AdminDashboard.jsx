@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { collection, getDocs, query, where, addDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, query, where, setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { classSessionDocId, mergeClassSessionDocs } from '../../utils/studentReport';
 import { useAuth } from '../../context/AuthContext';
 import {
   Users, CalendarCheck, Clock, UserPlus, Layers,
@@ -190,7 +191,8 @@ export default function AdminDashboard() {
         setShareAttendance(attDocs);
 
         if (!sessionSnap.empty) {
-          const session = { id: sessionSnap.docs[0].id, ...sessionSnap.docs[0].data() };
+          // Older data can hold several docs per batch/day (one per QR); fold them together.
+          const session = mergeClassSessionDocs(sessionSnap.docs.map(d => ({ id: d.id, ...d.data() })));
           setShareSession(session);
           setSelCourseId(session.coveredCourse || '');
           setSelModuleId(session.coveredModule || '');
@@ -346,13 +348,6 @@ export default function AdminDashboard() {
   const handleSaveAndShare = async () => {
     try {
       if (selCourseId && selModuleId) {
-        const q = query(
-          collection(db, 'class_sessions'),
-          where('date', '==', shareDate),
-          where('batchId', '==', shareBatchId)
-        );
-        const snap = await getDocs(q);
-
         const sessionPayload = {
           date: shareDate,
           batchId: shareBatchId,
@@ -363,11 +358,8 @@ export default function AdminDashboard() {
           timestamp: serverTimestamp()
         };
 
-        if (!snap.empty) {
-          await updateDoc(doc(db, 'class_sessions', snap.docs[0].id), sessionPayload);
-        } else {
-          await addDoc(collection(db, 'class_sessions'), sessionPayload);
-        }
+        // Same single doc per batch/day that the QR broadcaster and class report use.
+        await setDoc(doc(db, 'class_sessions', classSessionDocId(shareBatchId, shareDate)), sessionPayload, { merge: true });
       }
 
       const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(customMessage)}`;
