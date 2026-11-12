@@ -1,14 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="190" viewBox="0 0 1200 190" role="img" aria-label="© DIGISPIRE Academy — Your Way To Success">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="222" viewBox="0 0 1200 222" role="img" aria-label="© DIGISPIRE Academy — Your Way To Success · Designed &amp; developed by Vicky Prasad Mahato (@ABVicky)">
   <title>© DIGISPIRE Academy — Your Way To Success</title>
   <defs>
     <linearGradient id="fbg" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#0D2136"/>
       <stop offset="1" stop-color="#1E3A5F"/>
     </linearGradient>
-    <clipPath id="fcard"><rect width="1200" height="190" rx="24"/></clipPath>
+    <clipPath id="fcard"><rect width="1200" height="222" rx="24"/></clipPath>
   </defs>
   <g clip-path="url(#fcard)">
-    <rect width="1200" height="190" fill="url(#fbg)"/>
+    <rect width="1200" height="222" fill="url(#fbg)"/>
     <text x="600" y="150" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="168" font-weight="900" letter-spacing="22" fill="#FFFFFF" fill-opacity="0.045">DIGISPIRE</text>
     <rect x="0" y="0" width="1200" height="5" fill="#F48B1F"/>
   </g>
@@ -17,4 +17,6 @@
   <text x="540" y="88" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" fill="#FFFFFF">DIGISPIRE Academy</text>
   <text x="541" y="116" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#F7A24A" letter-spacing="4">YOUR WAY TO SUCCESS</text>
   <text x="600" y="168" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="13" fill="#9FB6CC">© 2026 DIGISPIRE Academy · All content belongs to DIGISPIRE Academy</text>
+  <line x1="420" y1="186" x2="780" y2="186" stroke="#FFFFFF" stroke-opacity="0.12"/>
+  <text x="600" y="206" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="13" fill="#9FB6CC">Designed &amp; developed by <tspan font-weight="800" fill="#FFFFFF">Vicky Prasad Mahato</tspan> <tspan fill="#F7A24A" font-weight="700">@ABVicky</tspan></text>
 </svg>

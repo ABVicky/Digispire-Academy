@@ -204,8 +204,13 @@ Talk to your **mentor** or the **DIGISPIRE Academy office**. We're happy to help
 
 <div align="center">
 
-<img src="../.github/assets/readme-footer.svg" alt="© DIGISPIRE Academy — Your Way To Success" width="100%">
+<img src="../.github/assets/readme-footer.svg" alt="© DIGISPIRE Academy — Your Way To Success · Designed & developed by Vicky Prasad Mahato (@ABVicky)" width="100%">
 
-<sub>© 2026 DIGISPIRE Academy. The DIGISPIRE name and logo belong to DIGISPIRE Academy.</sub>
+<br>
+
+[![Designed & developed by Vicky Prasad Mahato (@ABVicky)](https://img.shields.io/badge/Designed%20%26%20developed%20by-Vicky%20Prasad%20Mahato%20%28%40ABVicky%29-1E3A5F?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ABVicky)
+
+<sub>© 2026 DIGISPIRE Academy. The DIGISPIRE name and logo belong to DIGISPIRE Academy.<br>
+App designed & developed by <a href="https://github.com/ABVicky"><b>Vicky Prasad Mahato</b> (@ABVicky)</a>.</sub>
 
 </div>
