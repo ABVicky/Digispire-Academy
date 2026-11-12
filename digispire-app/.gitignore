@@ -31,3 +31,9 @@ android/capacitor-cordova-android-plugins/build
 android/local.properties
 .gradle
 
+
+# Local env files (email secrets) — never commit
+.env
+.env.*
+!.env.example
+.vercel

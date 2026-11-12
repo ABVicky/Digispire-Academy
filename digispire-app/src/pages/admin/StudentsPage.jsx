@@ -5,13 +5,33 @@ import {
 import { initializeApp, deleteApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { db, firebaseConfig } from '../../firebase';
-import { 
-  Plus, Search, Pencil, Trash2, X, Users, Phone, Lock, 
-  Briefcase, Check, Calendar, Loader2, CreditCard, Download
+import {
+  Plus, Search, Pencil, Trash2, X, Users, Phone, Lock,
+  Briefcase, Check, Calendar, Loader2, CreditCard, Download, Mail, UserX
 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { downloadCSV } from '../../utils/csvExport';
 import StudentIDCardModal from '../../components/StudentIDCardModal';
+import { EMAIL_SKIP_REASONS, checkEmail, isStudentActive } from '../../utils/studentReport';
+
+function StudentStatusBadges({ student }) {
+  const emailCheck = checkEmail(student.email);
+  if (isStudentActive(student) && emailCheck.ok) return null;
+  return (
+    <div className="flex flex-wrap gap-1 mt-1">
+      {!isStudentActive(student) && (
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
+          <UserX size={10} /> Inactive
+        </span>
+      )}
+      {!emailCheck.ok && (
+        <span title={EMAIL_SKIP_REASONS[emailCheck.reason]} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold uppercase tracking-wider">
+          <Mail size={10} /> {emailCheck.reason === 'missing' ? 'No email' : 'Check email'}
+        </span>
+      )}
+    </div>
+  );
+}
 
 function generateStudentId() {
   return 'DS' + Math.floor(100000 + Math.random() * 900000);
@@ -35,7 +55,8 @@ const emptyForm = {
   tempPassword: '',
   joiningDate: new Date().toISOString().split('T')[0],
   courseId: '',
-  mentorId: ''
+  mentorId: '',
+  status: 'active'
 };
 
 function StatChip({ label, value, icon: Icon, colorBg = 'bg-slate-100', colorText = 'text-slate-700' }) {
@@ -62,6 +83,7 @@ export default function StudentsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterBatch, setFilterBatch] = useState('all'); // all, morning, evening, internship
+  const [filterStatus, setFilterStatus] = useState('all'); // all, active, inactive
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -172,7 +194,8 @@ export default function StudentsPage() {
       tempPassword: '',
       joiningDate: s.joiningDate || new Date().toISOString().split('T')[0],
       courseId: s.courseId || '',
-      mentorId: s.mentorId || ''
+      mentorId: s.mentorId || '',
+      status: s.status || 'active'
     });
     setEditingId(s.id);
     setShowModal(true);
@@ -182,6 +205,11 @@ export default function StudentsPage() {
     e.preventDefault();
     if (!form.name.trim() || !form.phone.trim()) {
       alert("Name and Phone are required.");
+      return;
+    }
+    const emailCheck = checkEmail(form.email);
+    if (form.email.trim() && !emailCheck.ok) {
+      alert(`${EMAIL_SKIP_REASONS[emailCheck.reason]}. Please enter the student's real email address, or leave it empty.`);
       return;
     }
 
@@ -204,7 +232,8 @@ export default function StudentsPage() {
         courseId: form.courseId || '',
         course: selectedCourseObj ? selectedCourseObj.name : '',
         role: 'student',
-        mentorId: form.mentorId || ''
+        mentorId: form.mentorId || '',
+        status: form.status === 'inactive' ? 'inactive' : 'active'
       };
 
       if (!editingId) {
@@ -260,7 +289,8 @@ export default function StudentsPage() {
   const filtered = students.filter(s => {
     const q = search.toLowerCase();
     const matchesSearch = !q || s.name?.toLowerCase().includes(q) || s.studentId?.includes(q) || s.phone?.includes(q);
-    
+    if (filterStatus !== 'all' && (filterStatus === 'active') !== isStudentActive(s)) return false;
+
     if (filterBatch === 'all') return matchesSearch;
     if (filterBatch === 'internship') return matchesSearch && s.isIntern;
     const enrolledBatches = s.batchIds || (s.batchId ? [s.batchId] : []);
@@ -367,6 +397,18 @@ export default function StudentsPage() {
             />
           </div>
           <div className="chip-scroll">
+            {[['all', 'All statuses'], ['active', 'Active'], ['inactive', 'Inactive']].map(([val, text]) => (
+              <button
+                key={val} onClick={() => setFilterStatus(val)}
+                className={`px-4 py-2 text-[11px] font-bold uppercase tracking-wider transition-all whitespace-nowrap rounded-xl border ${
+                  filterStatus === val ? 'bg-slate-800 text-white border-transparent shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                {text}
+              </button>
+            ))}
+          </div>
+          <div className="chip-scroll">
             {batches.length === 0 ? (
               ['all', 'morning', 'evening', 'internship'].map(b => (
                 <button
@@ -437,6 +479,7 @@ export default function StudentsPage() {
                                   Mentor: {staff.find(m => m.id === s.mentorId)?.name || 'Loading...'}
                                 </p>
                               )}
+                              <StudentStatusBadges student={s} />
                             </div>
                           </div>
                         </td>
@@ -501,6 +544,7 @@ export default function StudentsPage() {
                             Mentor: {staff.find(m => m.id === s.mentorId)?.name || 'Loading...'}
                           </p>
                         )}
+                        <StudentStatusBadges student={s} />
                       </div>
                       {/* Action buttons – always visible on touch */}
                       <div className="flex items-center gap-1.5 shrink-0">
@@ -588,6 +632,35 @@ export default function StudentsPage() {
                       <input readOnly value={form.studentId} className="input-premium bg-slate-100 font-mono text-slate-400 cursor-not-allowed" />
                     </div>
                   )}
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Email (for class reports & attendance emails)</label>
+                  <div className="relative">
+                    <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+                    <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                      className="input-premium pl-11" placeholder="student@example.com" autoComplete="off" />
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1 ml-1">The student's real email. The phone number is still used for login.</p>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Status</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[['active', 'Active'], ['inactive', 'Inactive']].map(([val, text]) => (
+                      <button
+                        key={val} type="button" onClick={() => setForm(f => ({ ...f, status: val }))}
+                        className={`py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest border transition-all ${
+                          form.status === val
+                            ? (val === 'active' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-slate-700 text-white border-slate-700')
+                            : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        {text}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1 ml-1">Inactive students receive no emails and are hidden from email lists.</p>
                 </div>
 
                 <div>

@@ -4,12 +4,13 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Users, CalendarCheck, FileText,
   LogOut, Menu, X, GraduationCap, ChevronRight,
-  FileSpreadsheet, UserCog, History, FolderOpen, Award, Megaphone
+  FileSpreadsheet, UserCog, History, FolderOpen, Award, Megaphone, Mail
 } from 'lucide-react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import AmbientBackground from '../components/AmbientBackground';
 import { triggerHaptic } from '../utils/haptic';
+import { emailFeaturesEnabled } from '../utils/platform';
 
 const navItems = [
   { path: '/admin/dashboard', label: 'Dashboard', shortLabel: 'Overview', icon: LayoutDashboard, category: 'Management' },
@@ -23,8 +24,12 @@ const navItems = [
   { path: '/admin/completion-reports', label: 'Completion Reports', shortLabel: 'Completions', icon: Award, category: 'Submissions & Reports' },
   { path: '/admin/revisions', label: 'Revision Requests', shortLabel: 'Revisions', icon: History, category: 'Submissions & Reports' },
   { path: '/admin/submissions', label: 'Student Assignments', shortLabel: 'Assignments', icon: FolderOpen, category: 'Submissions & Reports' },
+  { path: '/admin/emails', label: 'Email Center', shortLabel: 'Emails', icon: Mail, category: 'Submissions & Reports', adminOnly: true, webOnly: true },
   { path: '/admin/profile', label: 'Admin Profile', shortLabel: 'Profile', icon: UserCog, category: 'Management' },
 ];
+
+const isNavItemVisible = (item, role) =>
+  (!item.adminOnly || role === 'admin') && (!item.webOnly || emailFeaturesEnabled());
 
 const bottomNavItems = [
   { path: '/admin/dashboard', shortLabel: 'Overview', icon: LayoutDashboard },
@@ -171,7 +176,7 @@ export default function AdminLayout() {
           {/* Nav Links */}
           <nav className="flex-1 space-y-4 overflow-y-auto no-scrollbar custom-scrollbar pr-1">
             {['Management', 'Courses & Content', 'Submissions & Reports'].map((category) => {
-              const items = navItems.filter(item => item.category === category);
+              const items = navItems.filter(item => item.category === category && isNavItemVisible(item, userProfile?.role));
               if (items.length === 0) return null;
               return (
                 <div key={category} className="space-y-0.5">

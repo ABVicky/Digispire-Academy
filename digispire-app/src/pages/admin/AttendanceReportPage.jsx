@@ -1,13 +1,54 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { collection, getDocs, query, where, deleteDoc, addDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 import {
   Users,
-  Download, Search, Briefcase, GraduationCap, X, CalendarDays
+  Download, Search, Briefcase, GraduationCap, X, CalendarDays, Mail, Flag, CheckSquare, Square
 } from 'lucide-react';
 import { calculateAttendance } from '../../utils/attendanceEngine';
 import AttendanceCalendar from '../../components/AttendanceCalendar';
 import { downloadCSV } from '../../utils/csvExport';
+import {
+  DEFAULT_THRESHOLDS, attendancePctExcludingLeave, buildSessionBatchMap, checkEmail, computeAbsenceStats,
+  evaluateFlags, getReportBatchId, isStudentActive, resolveAttendanceLogs
+} from '../../utils/studentReport';
+import { emailFeaturesEnabled } from '../../utils/platform';
+import { readPref, writePref } from '../../utils/emailFormat';
+import StudentEmailModal from '../../components/email/StudentEmailModal';
+import EmailHistoryList from '../../components/email/EmailHistoryList';
+
+const THRESHOLD_PREF_KEY = 'digispire.attendanceFlags';
+
+function FlagChips({ s, thresholds }) {
+  const chips = [];
+  if (!s.active) chips.push({ key: 'inactive', text: 'Inactive', cls: 'bg-slate-100 text-slate-500 border-slate-200' });
+  if (s.active && s.flags.lowAttendance) chips.push({ key: 'low', text: `Below ${thresholds.lowAttendancePct}%`, cls: 'bg-rose-50 text-rose-600 border-rose-200' });
+  if (s.active && s.flags.consecutive) chips.push({ key: 'row', text: `${s.absenceStats.currentConsecutiveAbsences} absent in a row`, cls: 'bg-orange-50 text-orange-700 border-orange-200' });
+  if (s.active && s.flags.frequent) chips.push({ key: 'freq', text: `${s.absenceStats.recentAbsentDates.length} absences / ${thresholds.frequentWindowDays}d`, cls: 'bg-amber-50 text-amber-700 border-amber-200' });
+  if (s.active && !s.emailOk) chips.push({ key: 'mail', text: 'No valid email', cls: 'bg-slate-50 text-slate-500 border-slate-200' });
+  if (!chips.length) return null;
+  return (
+    <div className="flex flex-wrap gap-1 mt-1">
+      {chips.map(c => (
+        <span key={c.key} className={`px-1.5 py-0.5 rounded-md border text-[9px] font-bold uppercase tracking-wider ${c.cls}`}>{c.text}</span>
+      ))}
+    </div>
+  );
+}
+
+function ThresholdInput({ label, value, onChange, min, max, suffix }) {
+  return (
+    <label className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 whitespace-nowrap">
+      {label}
+      <input
+        type="number" min={min} max={max} value={value}
+        onChange={e => onChange(Math.min(max, Math.max(min, Number(e.target.value) || min)))}
+        className="w-14 px-2 py-1 rounded-lg border border-slate-200 text-xs font-bold text-slate-700 bg-white focus:outline-none focus:border-[#255A84]"
+      />
+      {suffix}
+    </label>
+  );
+}
 
 export default function AttendanceReportPage() {
   const [loading, setLoading] = useState(true);
@@ -16,7 +57,8 @@ export default function AttendanceReportPage() {
   const [batches, setBatches] = useState([]);
   const [holidays, setHolidays] = useState([]);
   const [cancellations, setCancellations] = useState([]);
-  
+  const [classSessions, setClassSessions] = useState([]);
+
   const [search, setSearch] = useState('');
   const [reportType, setReportType] = useState('academic'); // academic, internship
   const [inspectStudent, setInspectStudent] = useState(null);
@@ -25,7 +67,19 @@ export default function AttendanceReportPage() {
   const [modules, setModules] = useState([]);
   const [topics, setTopics] = useState([]);
 
+  // Email features (web only)
+  const emailEnabled = emailFeaturesEnabled();
+  const [thresholds, setThresholds] = useState(() => readPref(THRESHOLD_PREF_KEY, DEFAULT_THRESHOLDS));
+  const [selected, setSelected] = useState(() => new Set());
+  const [emailTarget, setEmailTarget] = useState(null);
 
+  const updateThreshold = (key, value) => {
+    setThresholds(prev => {
+      const next = { ...prev, [key]: value };
+      writePref(THRESHOLD_PREF_KEY, next);
+      return next;
+    });
+  };
 
   const handleUpdateStatus = async (dateStr, newStatus) => {
     if (!inspectStudent) return;
@@ -37,7 +91,7 @@ export default function AttendanceReportPage() {
         where('type', '==', reportType)
       );
       const snap = await getDocs(q);
-      
+
       if (newStatus === 'absent') {
         if (!snap.empty) {
           await Promise.all(snap.docs.map(d => deleteDoc(d.ref)));
@@ -62,7 +116,7 @@ export default function AttendanceReportPage() {
           });
         }
       }
-      
+
       await fetchData();
       alert(`Updated status for ${dateStr} to ${newStatus}!`);
     } catch (err) {
@@ -110,6 +164,13 @@ export default function AttendanceReportPage() {
     }
 
     try {
+      const csSnap = await getDocs(collection(db, 'class_sessions'));
+      setClassSessions(csSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (err) {
+      console.error('Failed to fetch class sessions:', err);
+    }
+
+    try {
       const cSnap = await getDocs(collection(db, 'courses'));
       setCourses(cSnap.docs.map(d => ({ id: d.id, ...d.data() })));
     } catch (err) {
@@ -140,7 +201,14 @@ export default function AttendanceReportPage() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Older check-ins stored the student's primary batch; use the scanned session's batch instead.
+  const resolvedAttendance = useMemo(
+    () => resolveAttendanceLogs(attendance, buildSessionBatchMap(classSessions)),
+    [attendance, classSessions]
+  );
+
   const processReport = () => {
+    const todayStr = new Date().toISOString().split('T')[0];
     // Process each student through the central calculation engine
     const report = students
       .filter(s => {
@@ -153,19 +221,12 @@ export default function AttendanceReportPage() {
       })
       .map(student => {
         // Find batch schedule
-        let targetBatchId = 'morning';
-        if (reportType === 'internship') {
-          targetBatchId = 'internship';
-        } else if (selectedBatchId !== 'all') {
-          targetBatchId = selectedBatchId;
-        } else {
-          targetBatchId = student.batchId || student.batchIds?.[0] || 'morning';
-        }
+        const targetBatchId = getReportBatchId(student, reportType, selectedBatchId);
         const batchSchedule = batches.find(b => b.id === targetBatchId);
-        
+
         // Filter attendance logs for this student and batch
-        const studentLogs = attendance.filter(r => 
-          r.studentId === student.studentId && 
+        const studentLogs = resolvedAttendance.filter(r =>
+          r.studentId === student.studentId &&
           (r.type || 'academic') === reportType &&
           (reportType === 'internship' ? true : r.batchId === targetBatchId)
         );
@@ -178,6 +239,9 @@ export default function AttendanceReportPage() {
           cancelledClasses: cancellations
         });
 
+        const absenceStats = computeAbsenceStats(calculation.dailyStatus, { endDateStr: todayStr, windowDays: thresholds.frequentWindowDays });
+        const pctExcludingLeave = attendancePctExcludingLeave(calculation);
+
         return {
           ...student,
           totalHeld: calculation.eligibleClasses,
@@ -187,7 +251,12 @@ export default function AttendanceReportPage() {
           percentage: calculation.attendancePercentage,
           dailyStatus: calculation.dailyStatus,
           logs: studentLogs,
-          batchScheduleObj: batchSchedule
+          batchScheduleObj: batchSchedule,
+          active: isStudentActive(student),
+          emailOk: checkEmail(student.email).ok,
+          absenceStats,
+          pctExcludingLeave,
+          flags: evaluateFlags({ ...calculation, pctExcludingLeave, absenceStats }, thresholds)
         };
       });
 
@@ -198,6 +267,26 @@ export default function AttendanceReportPage() {
   };
 
   const filteredReport = processReport();
+  const flaggedVisible = filteredReport.filter(s => s.active && s.flags.any);
+  const selectedRows = filteredReport.filter(s => selected.has(s.id));
+
+  const toggleSelected = (id) => setSelected(prev => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+  const clearSelection = () => setSelected(new Set());
+  const switchTrack = (type) => { setReportType(type); setSelectedBatchId('all'); clearSelection(); };
+
+  const openEmail = (rows) => {
+    const sendable = rows.filter(r => r.active);
+    if (!sendable.length) return;
+    const allAbsentee = sendable.every(r => r.flags.absenteeism && !r.flags.lowAttendance);
+    setEmailTarget({
+      students: sendable.map(r => ({ id: r.id, uid: r.uid || r.id, name: r.name })),
+      initialType: allAbsentee ? 'absenteeism' : 'low_attendance',
+    });
+  };
 
   const handleDownloadExcel = () => {
     if (filteredReport.length === 0) {
@@ -292,8 +381,25 @@ export default function AttendanceReportPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [students, attendance, inspectStudentId]);
 
+  const renderSelectBox = (s) => {
+    if (!emailEnabled) return null;
+    const isOn = selected.has(s.id);
+    return (
+      <button
+        type="button"
+        disabled={!s.active}
+        onClick={e => { e.stopPropagation(); toggleSelected(s.id); }}
+        className={`p-1 rounded-md transition ${s.active ? 'text-slate-400 hover:text-[#255A84]' : 'text-slate-200 cursor-not-allowed'}`}
+        aria-label={isOn ? `Deselect ${s.name}` : `Select ${s.name}`}
+        title={s.active ? 'Select for email' : 'Inactive students cannot be emailed'}
+      >
+        {isOn ? <CheckSquare size={17} className="text-[#255A84]" /> : <Square size={17} />}
+      </button>
+    );
+  };
+
   return (
-    <div className="space-y-5">
+    <div className={`space-y-5 ${selectedRows.length ? 'pb-24' : ''}`}>
       <div className="section-header">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Attendance Ledger</h1>
@@ -314,13 +420,13 @@ export default function AttendanceReportPage() {
         {/* Track Toggle */}
         <div className="flex bg-slate-100 p-1 rounded-2xl w-full sm:w-fit">
           <button
-            onClick={() => { setReportType('academic'); setSelectedBatchId('all'); }}
+            onClick={() => switchTrack('academic')}
             className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all ${reportType === 'academic' ? 'bg-[#255A84] text-white shadow-md' : 'text-slate-400'}`}
           >
             <GraduationCap size={13} /> Academic
           </button>
           <button
-            onClick={() => { setReportType('internship'); setSelectedBatchId('all'); }}
+            onClick={() => switchTrack('internship')}
             className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all ${reportType === 'internship' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400'}`}
           >
             <Briefcase size={13} /> Internship
@@ -332,7 +438,7 @@ export default function AttendanceReportPage() {
           {reportType === 'academic' && (
             <select
               value={selectedBatchId}
-              onChange={e => setSelectedBatchId(e.target.value)}
+              onChange={e => { setSelectedBatchId(e.target.value); clearSelection(); }}
               className="select-premium text-xs font-bold text-slate-600 sm:min-w-[150px] cursor-pointer"
             >
               <option value="all">All Batches</option>
@@ -350,6 +456,27 @@ export default function AttendanceReportPage() {
               placeholder="Search students..."
               className="input-premium pl-10 text-sm"
             />
+          </div>
+        </div>
+
+        {/* Highlight thresholds & email selection (web only) */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pt-3 border-t border-slate-100 print:hidden">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400"><Flag size={12} /> Highlight</span>
+            <ThresholdInput label="Below" value={thresholds.lowAttendancePct} min={1} max={100} suffix="%" onChange={v => updateThreshold('lowAttendancePct', v)} />
+            <ThresholdInput label="" value={thresholds.consecutiveAbsences} min={1} max={60} suffix="+ absent in a row" onChange={v => updateThreshold('consecutiveAbsences', v)} />
+            <ThresholdInput label="" value={thresholds.frequentAbsences} min={1} max={60} suffix={`+ absences in ${thresholds.frequentWindowDays} days`} onChange={v => updateThreshold('frequentAbsences', v)} />
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {emailEnabled && (
+              <button
+                onClick={() => setSelected(new Set(flaggedVisible.map(s => s.id)))}
+                disabled={!flaggedVisible.length}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 text-[11px] font-bold disabled:opacity-40"
+              >
+                <Flag size={13} /> Select flagged ({flaggedVisible.length})
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -370,6 +497,7 @@ export default function AttendanceReportPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                    {emailEnabled && <th className="w-10 pl-4 py-4 print:hidden"></th>}
                     <th className="text-left px-6 py-4">Student</th>
                     <th className="text-center px-4 py-4">Eligible</th>
                     <th className="text-center px-4 py-4">Present</th>
@@ -381,7 +509,8 @@ export default function AttendanceReportPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-50">
                   {filteredReport.map(s => (
-                    <tr key={s.id} onClick={() => setInspectStudent(s)} className="hover:bg-slate-50/50 transition-colors group cursor-pointer">
+                    <tr key={s.id} onClick={() => setInspectStudent(s)} className={`hover:bg-slate-50/50 transition-colors group cursor-pointer ${selected.has(s.id) ? 'bg-blue-50/40' : ''} ${s.active ? '' : 'opacity-60'}`}>
+                      {emailEnabled && <td className="pl-4 py-3.5 print:hidden">{renderSelectBox(s)}</td>}
                       <td className="px-6 py-3.5">
                         <div className="flex items-center gap-3">
                           <div className={`h-9 w-9 rounded-xl flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0 overflow-hidden ${reportType === 'internship' ? 'bg-emerald-500' : 'bg-[#255A84]'}`}>
@@ -390,6 +519,7 @@ export default function AttendanceReportPage() {
                           <div className="min-w-0">
                             <p className="font-bold text-slate-800 text-sm truncate">{s.name}</p>
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{s.studentId}</p>
+                            <FlagChips s={s} thresholds={thresholds} />
                           </div>
                         </div>
                       </td>
@@ -416,12 +546,16 @@ export default function AttendanceReportPage() {
             {/* ── Mobile Card List ── */}
             <div className="md:hidden p-3 space-y-2">
               {filteredReport.map(s => (
-                <button
+                <div
                   key={s.id}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setInspectStudent(s)}
-                  className="w-full student-card-mobile text-left active:scale-[0.99] transition"
+                  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setInspectStudent(s); } }}
+                  className={`w-full student-card-mobile text-left active:scale-[0.99] transition cursor-pointer ${selected.has(s.id) ? 'ring-2 ring-[#255A84]/30' : ''} ${s.active ? '' : 'opacity-60'}`}
                 >
                   <div className="flex items-center gap-3">
+                    {emailEnabled && renderSelectBox(s)}
                     <div className={`h-10 w-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden ${reportType === 'internship' ? 'bg-emerald-500' : 'bg-[#255A84]'}`}>
                       {s.photoURL ? <img src={s.photoURL} alt={s.name} className="h-full w-full object-cover" /> : <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1 bg-white" />}
                     </div>
@@ -436,6 +570,7 @@ export default function AttendanceReportPage() {
                       <p className="text-[10px] text-slate-400 font-medium">{s.attended}/{s.totalHeld} present</p>
                     </div>
                   </div>
+                  <FlagChips s={s} thresholds={thresholds} />
                   {/* Progress bar */}
                   <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                     <div className={`h-full rounded-full ${s.percentage >= 75 ? 'bg-emerald-500' : s.percentage >= 50 ? 'bg-amber-400' : 'bg-rose-400'}`} style={{ width: `${s.percentage}%` }} />
@@ -446,12 +581,27 @@ export default function AttendanceReportPage() {
                     <span className="text-red-400">{s.absent} missed</span>
                     <span className="ml-auto flex items-center gap-0.5 text-[#255A84]"><CalendarDays size={11} /> View Log</span>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           </>
         )}
       </div>
+
+      {/* Selection bar */}
+      {emailEnabled && selectedRows.length > 0 && (
+        <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] md:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-xl print:hidden">
+          <div className="flex items-center justify-between gap-3 bg-slate-900 text-white rounded-2xl px-4 py-3 shadow-2xl">
+            <p className="text-xs font-bold">{selectedRows.length} student(s) selected</p>
+            <div className="flex items-center gap-2">
+              <button onClick={clearSelection} className="px-3 py-2 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white">Clear</button>
+              <button onClick={() => openEmail(selectedRows)} className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white text-slate-900 text-[11px] font-black">
+                <Mail size={13} /> Email individually
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Calendar Inspector Dialog */}
       {inspectStudent && (
@@ -464,7 +614,7 @@ export default function AttendanceReportPage() {
               </div>
               <button onClick={() => setInspectStudent(null)} className="p-2 text-slate-400 hover:text-slate-600 transition"><X size={20} /></button>
             </div>
-            
+
             <div className="modal-body-premium grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Profile/Metrics Info */}
               <div className="md:col-span-1 space-y-4">
@@ -474,6 +624,7 @@ export default function AttendanceReportPage() {
                     <p><span className="text-slate-400">Joining Date:</span> {inspectStudent.joiningDate || 'N/A'}</p>
                     <p><span className="text-slate-400">Batch Assignment:</span> {inspectStudent.batchId || 'morning'}</p>
                     <p><span className="text-slate-400">Track Type:</span> <span className="uppercase font-bold text-[#255A84]">{reportType}</span></p>
+                    {!inspectStudent.active && <p className="font-bold text-slate-500">Inactive — no emails are sent</p>}
                   </div>
                 </div>
 
@@ -483,7 +634,7 @@ export default function AttendanceReportPage() {
                     inspectStudent.percentage >= 75 ? 'text-emerald-500' :
                     inspectStudent.percentage >= 50 ? 'text-[#F48B1F]' : 'text-rose-500'
                   }`}>{inspectStudent.percentage}%</p>
-                  
+
                   <div className="grid grid-cols-2 gap-2 text-slate-600 pt-2 font-medium">
                     <div className="p-2.5 bg-white rounded-xl border border-slate-100">
                       <span className="text-sm font-bold text-slate-800 block">{inspectStudent.attended}</span>
@@ -495,10 +646,16 @@ export default function AttendanceReportPage() {
                     </div>
                   </div>
                 </div>
+
+                {emailEnabled && inspectStudent.active && (
+                  <button onClick={() => openEmail([inspectStudent])} className="btn-primary-premium w-full px-4 py-2.5 flex items-center justify-center gap-2 text-xs">
+                    <Mail size={14} /> Email this student
+                  </button>
+                )}
               </div>
 
               {/* Dynamic Calendar */}
-              <div className="md:col-span-2">
+              <div className="md:col-span-2 space-y-4">
                 <AttendanceCalendar
                   student={inspectStudent}
                   dailyStatus={inspectStudent.dailyStatus}
@@ -511,10 +668,22 @@ export default function AttendanceReportPage() {
                   topics={topics}
                   onUpdateStatus={handleUpdateStatus}
                 />
+                {emailEnabled && <EmailHistoryList studentUid={inspectStudent.uid || inspectStudent.id} />}
               </div>
             </div>
           </div>
         </div>
+      )}
+
+      {emailTarget && (
+        <StudentEmailModal
+          students={emailTarget.students}
+          initialType={emailTarget.initialType}
+          track={reportType}
+          batchId={selectedBatchId}
+          thresholds={thresholds}
+          onClose={() => setEmailTarget(null)}
+        />
       )}
     </div>
   );
