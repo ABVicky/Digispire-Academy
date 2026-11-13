@@ -18,7 +18,7 @@ import { HttpError, requireString } from '../http.js';
 import { addMessagesToTransaction, createMessagesIfAbsent, prepareMessages } from '../outbox.js';
 import { classMissedEmail, classReportEmail } from '../templates/index.js';
 import { kickWorker } from '../worker.js';
-import { ccListFor, isoOf, publicCcAddress, staffTestAddress } from './shared.js';
+import { ccListFor, isoOf, publicCcAddress, staffTestAddress, validEmailOrEmpty } from './shared.js';
 
 const MAX_TOPICS = 100;
 const AUDIENCES = {
@@ -65,7 +65,7 @@ function normalizeForm(body, ctx, user) {
   const takenBy = member
     ? { uid: member.id, name: member.name || member.email || 'Faculty' }
     : ctx.batch.educator ? { uid: '', name: ctx.batch.educator } : { uid: user.uid, name: user.name };
-  return { topicIds, topicsNote, tasks, takenBy };
+  return { topicIds, topicsNote, tasks, takenBy, facultyEmail: validEmailOrEmpty(member?.email) };
 }
 
 /** Valid, de-duplicated recipients for a list of attendance entries; the rest are reported as skipped. */
@@ -164,6 +164,7 @@ export async function previewClassReport(user, body) {
     form: { topicIds: form.topicIds, topicsNote: form.topicsNote, tasks: form.tasks, takenByUid: form.takenBy.uid },
     audiences,
     ccAddress: publicCcAddress(config),
+    educatorCcAddress: form.facultyEmail,
     bccChunkSize: config.bccChunkSize,
     status: emailStatusOf(ctx.session),
     curriculumSource: ctx.sessionInfo?.source || null,
@@ -216,7 +217,7 @@ export async function sendClassReport(user, body, { test = false } = {}) {
   const resend = body.resend === true;
   const expected = Number.isInteger(body.expectedSendCount) ? body.expectedSendCount : null;
   const topics = describeTopics(form.topicIds, ctx.lookup);
-  const cc = ccListFor(body, config);
+  const cc = ccListFor(body, config, { educatorEmail: form.facultyEmail });
   const attended = groups.find(g => g.key === 'attended');
   const missed = groups.find(g => g.key === 'missed');
 

@@ -19,14 +19,23 @@ export function staffTestAddress(user) {
   return check.email;
 }
 
-/** CC list for a send: MAIL_CC_ADDRESS unless the user unticked "CC". */
-export function ccListFor(body, config) {
-  if (body.cc === false) return [];
-  const check = checkEmail(config.ccAddress);
-  return check.ok ? [check.email] : [];
+/**
+ * CC list for a send: MAIL_CC_ADDRESS (unless "cc" is unticked) and the
+ * educator's email (unless "ccEducator" is unticked).
+ */
+export function ccListFor(body, config, { educatorEmail = '' } = {}) {
+  const list = [];
+  if (body.cc !== false) list.push(config.ccAddress);
+  if (body.ccEducator !== false && educatorEmail) list.push(educatorEmail);
+  const seen = new Set();
+  return list
+    .map(e => checkEmail(e))
+    .filter(c => c.ok && !seen.has(c.email.toLowerCase()) && seen.add(c.email.toLowerCase()))
+    .map(c => c.email);
 }
 
 export const publicCcAddress = (config) => (checkEmail(config.ccAddress).ok ? config.ccAddress : '');
+export const validEmailOrEmpty = (email) => (checkEmail(email).ok ? String(email).trim() : '');
 
 export function sanitizeThresholds(input = {}) {
   const pick = (v, min, max) => {

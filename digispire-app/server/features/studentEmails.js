@@ -14,7 +14,7 @@ import { HttpError, requireString } from '../http.js';
 import { createMessagesIfAbsent, prepareMessages } from '../outbox.js';
 import { absenteeismEmail, lowAttendanceEmail, syllabusDueEmail } from '../templates/index.js';
 import { kickWorker } from '../worker.js';
-import { ccListFor, publicCcAddress, sanitizeThresholds, staffTestAddress } from './shared.js';
+import { ccListFor, publicCcAddress, sanitizeThresholds, staffTestAddress, validEmailOrEmpty } from './shared.js';
 
 const TEMPLATES = { low_attendance: lowAttendanceEmail, syllabus_due: syllabusDueEmail, absenteeism: absenteeismEmail };
 const MAX_STUDENTS = 200;
@@ -78,6 +78,7 @@ export async function previewStudentEmails(user, body) {
   return {
     type: req.type,
     ccAddress: publicCcAddress(config),
+    educatorCcAddress: validEmailOrEmpty(user.email),
     rows: rows.map(r => ({
       uid: r.uid, name: r.name, studentId: r.studentId, email: r.email,
       skip: r.skip, skipLabel: r.skip ? EMAIL_SKIP_REASONS[r.skip] : null,
@@ -111,7 +112,7 @@ export async function sendStudentEmails(user, body, { test = false } = {}) {
   if (!/^[A-Za-z0-9-]{8,64}$/.test(requestId)) throw new HttpError(400, 'requestId is missing or invalid.');
 
   const sendable = rows.filter(r => !r.skip);
-  const cc = ccListFor(body, config);
+  const cc = ccListFor(body, config, { educatorEmail: user.email });
   const messages = sendable.flatMap(r => prepareMessages(config, {
     idBase: `ind_${req.type}_${requestId}_${r.uid}`, type: req.type, content: renderFor(config, req, r, user),
     delivery: { kind: 'to', recipient: { uid: r.uid, name: r.name, email: r.email } },

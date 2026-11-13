@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { callEmailApi } from '../../utils/emailApi';
 import { formatDateTime, tsMillis } from '../../utils/emailFormat';
-import { classSessionDocId } from '../../utils/studentReport';
+import { checkEmail, classSessionDocId } from '../../utils/studentReport';
 import { EmailPreviewFrame, EmailStatusBadge, ErrorNotice, ModalPortal, SkippedRecipients, TestModeBadge } from './EmailBits';
 
 const label = 'block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1';
@@ -25,6 +25,7 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
   const [deliveries, setDeliveries] = useState([]);
   const [previewTab, setPreviewTab] = useState('attended');
   const [cc, setCc] = useState(true);
+  const [ccEducator, setCcEducator] = useState(true);
 
   const docId = classSessionDocId(batchId, date);
 
@@ -84,6 +85,9 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
   const missedCount = data?.audiences?.missed?.recipients?.length || 0;
   const recipientCount = attendedCount + missedCount;
   const ccAddress = data?.ccAddress || '';
+  const facultyEmail = staff.find(s => s.id === form.takenByUid)?.email || '';
+  const educatorEmail = checkEmail(facultyEmail).ok ? facultyEmail.trim() : '';
+  const ccShown = [cc && ccAddress, ccEducator && educatorEmail].filter(Boolean);
 
   const send = async (resend) => {
     setError('');
@@ -94,7 +98,7 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
     )) return;
     setSending(true);
     try {
-      const res = await callEmailApi('classReport.send', { batchId, date, ...form, cc, resend, expectedSendCount: status.sendCount });
+      const res = await callEmailApi('classReport.send', { batchId, date, ...form, cc, ccEducator, resend, expectedSendCount: status.sendCount });
       setNotice(`${resend ? 'Resend queued' : 'Class report queued'}: ${res.recipients} attended + ${res.missedRecipients} missed student(s)${res.cc?.length ? `, CC ${res.cc.join(', ')}` : ''}. It is sending in the background — you can close this window.`);
       await loadPreview(form);
     } catch (err) {
@@ -315,6 +319,12 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
                     <span className="text-xs font-semibold text-slate-700">CC <span className="font-bold">{ccAddress}</span> <span className="text-slate-400 font-medium">(one copy of each email)</span></span>
                   </label>
                 )}
+                {educatorEmail && (
+                  <label className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 bg-white cursor-pointer -mt-2">
+                    <input type="checkbox" checked={ccEducator} onChange={e => setCcEducator(e.target.checked)} className="rounded border-slate-300 text-[#255A84] focus:ring-[#255A84]" />
+                    <span className="text-xs font-semibold text-slate-700">CC <span className="font-bold">{educatorEmail}</span> <span className="text-slate-400 font-medium">(faculty who took the class)</span></span>
+                  </label>
+                )}
 
                 <ErrorNotice message={error} />
                 {notice && <div className="p-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs font-semibold">{notice}</div>}
@@ -334,7 +344,7 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
                   subject={data.audiences[previewTab].content.subject}
                   html={data.audiences[previewTab].content.html}
                   loading={refreshing}
-                  meta={`To: our address${cc && ccAddress ? ` · CC: ${ccAddress}` : ''} · BCC: ${data.audiences[previewTab].recipients.length} student(s)`}
+                  meta={`To: our address${ccShown.length ? ` · CC: ${ccShown.join(', ')}` : ''} · BCC: ${data.audiences[previewTab].recipients.length} student(s)`}
                 />
                 <button type="button" onClick={refresh} disabled={refreshing} className="btn-outline-premium w-full px-4 py-2.5 flex items-center justify-center gap-2 text-xs">
                   <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} /> Update preview with my changes
