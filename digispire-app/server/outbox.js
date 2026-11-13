@@ -33,12 +33,6 @@ const chunk = (items, size) => {
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 const nextHourMillis = () => Math.ceil((Date.now() + 1) / 3_600_000) * 3_600_000 + 30_000;
 
-function describeIntended(to, cc, bcc, max = 25) {
-  const all = [...to.map(e => `To: ${e}`), ...cc.map(e => `CC: ${e}`), ...bcc.map(e => `BCC: ${e}`)];
-  const shown = all.slice(0, max);
-  return all.length > max ? [...shown, `…and ${all.length - max} more`] : shown;
-}
-
 /**
  * Turns one logical email into queue messages.
  *
@@ -47,9 +41,6 @@ function describeIntended(to, cc, bcc, max = 25) {
  *           so no student ever sees another student's address
  *   'to'    a single recipient in To (individual emails)
  *   'staff' a "send test to me" copy for the signed-in staff member
- *
- * With MAIL_TEST_MODE on, live messages are redirected to MAIL_TEST_RECIPIENT
- * and a banner lists who would have received them.
  *
  * `cc` (live sends only) is added to the first message, so a CC'd address
  * gets one copy per email rather than one per BCC chunk.
@@ -67,25 +58,13 @@ export function prepareMessages(config, { idBase, type, delivery, content, meta 
     groups = [{ recipients: [], to: [delivery.email], bcc: [] }];
   }
 
-  const redirect = purpose === 'live' && config.testMode;
-
   return groups.map((g, i) => {
     const id = groups.length > 1 ? `${idBase}_c${i + 1}` : idBase;
-    let { to, bcc } = g;
-    let ccList = purpose === 'live' && i === 0 ? cc : [];
+    const { to, bcc } = g;
+    const ccList = purpose === 'live' && i === 0 ? cc : [];
     let { subject, html, text } = content;
-    const chunkLabel = groups.length > 1 ? ` (part ${i + 1} of ${groups.length})` : '';
 
-    if (redirect) {
-      const lines = describeIntended(to, ccList, bcc);
-      const title = `TEST MODE — not sent to students${chunkLabel}. It would have gone to:`;
-      html = withBanner(html, title, lines);
-      text = `${textBanner(title, lines)}${text}`;
-      subject = `[TEST] ${subject}`;
-      to = [config.testRecipient];
-      ccList = [];
-      bcc = [];
-    } else if (purpose === 'test') {
+    if (purpose === 'test') {
       const intended = delivery.intended || [];
       const title = `Preview sent only to you. Real send: ${intended.length} recipient(s).`;
       const lines = intended.slice(0, 25).map(r => `${r.name || 'Student'} <${r.email}>`);
@@ -101,7 +80,6 @@ export function prepareMessages(config, { idBase, type, delivery, content, meta 
         type,
         purpose,
         status: 'queued',
-        testMode: redirect,
         subject,
         to,
         cc: ccList,

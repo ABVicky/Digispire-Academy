@@ -77,7 +77,6 @@ export async function previewStudentEmails(user, body) {
   const content = selected ? renderFor(config, req, selected, user) : null;
   return {
     type: req.type,
-    testMode: config.testMode,
     ccAddress: publicCcAddress(config),
     rows: rows.map(r => ({
       uid: r.uid, name: r.name, studentId: r.studentId, email: r.email,
@@ -126,6 +125,5 @@ export async function sendStudentEmails(user, body, { test = false } = {}) {
     queued: created.length,
     alreadyQueued: existing.length,
     skipped: rows.filter(r => r.skip).map(r => ({ uid: r.uid, name: r.name, reason: r.skip, label: EMAIL_SKIP_REASONS[r.skip] })),
-    testMode: config.testMode,
   };
 }

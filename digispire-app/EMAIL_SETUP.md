@@ -34,14 +34,12 @@ Then **redeploy**, because environment changes only apply to new deployments.
 | `SMTP_PASS` | that mailbox's password | the password you set in cPanel |
 | `MAIL_FROM_NAME` | `DIGISPIRE` | — |
 | `MAIL_FROM_ADDRESS` | `info@yourdomain.com` (normally the same as `SMTP_USER`) | — |
-| `MAIL_TEST_MODE` | `true` until you have checked everything, then `false` | — |
-| `MAIL_TEST_RECIPIENT` | **your own** email address | — |
 | `MAIL_MAX_PER_HOUR` | your host's hourly limit, minus a safety margin (e.g. host limit 200 → `180`) | Ask your host, or check cPanel → Email → *Track Delivery* / your plan's limits |
 | `MAIL_BCC_CHUNK_SIZE` | `50` (lower it if your host limits recipients per message) | Ask your host |
 | `CRON_SECRET` | any long random string (e.g. from a password generator) | — |
 
 Optional settings with their defaults: `MAIL_REPLY_TO` (empty), `MAIL_SEND_DELAY_MS=1000`, `MAIL_MAX_ATTEMPTS=5`,
-`MAIL_TEST_SAMPLE_SIZE=3`, `MONTHLY_REPORT_ENABLED=true`, `MONTHLY_REPORT_TIME=20:00`, `APP_TIMEZONE=Asia/Kolkata`,
+`MONTHLY_REPORT_ENABLED=true`, `MONTHLY_REPORT_TIME=20:00`, `APP_TIMEZONE=Asia/Kolkata`,
 `ACADEMY_NAME=DIGISPIRE`, `MAIL_CC_ADDRESS=digispireacademy@gmail.com`, `APP_BASE_URL=https://digispire.vercel.app`, `ACADEMY_LOGO_URL=<APP_BASE_URL>/logo.png`.
 [`.env.example`](.env.example) lists everything.
 
@@ -77,11 +75,10 @@ Optional settings with their defaults: `MAIL_REPLY_TO` (empty), `MAIL_SEND_DELAY
 > and each has its own `api/` folder, so it works either way. Once you know which one Vercel uses,
 > you can delete the other `api/` folder and `vercel.json`.
 
-## 3. Test everything with only your own address
+## 3. Testing
 
-Keep `MAIL_TEST_MODE=true` (the default). In test mode **every** email goes to `MAIL_TEST_RECIPIENT`, with a yellow
-banner listing who would have received it. Monthly runs send only `MAIL_TEST_SAMPLE_SIZE` sample reports.
-Every screen also has a **Send test to me** button, which sends to the signed-in staff member's own email and never to students.
+Emails go to the real students. To check an email first, use the **Send test to me** button on each screen:
+it sends a preview only to the signed-in staff member's own email, never to students.
 
 Before you start, make sure your own staff profile has your real email address. The email features are web-only and hidden in the Android app.
 
@@ -95,8 +92,7 @@ Before you start, make sure your own staff profile has your real email address. 
    3. Type the tasks, add or remove a topic, and click *Update preview*.
    4. Click *Send test to me* first, then *Send*.
    5. Check:
-      - One email arrives at your test address, banner "would have gone to … BCC: you+s1@…".
-      - The absent student is not listed.
+      - The present student gets the class report and the absent student gets the "you missed today's class" email.
       - The row now says "Sent on … by …".
       - *Send* has become *Resend…*, which asks for confirmation.
       - Topics you added show as completed for the present student in Completion Reports.
@@ -112,9 +108,6 @@ Before you start, make sure your own staff profile has your real email address. 
    4. Click *Run* again. It should report "0 queued · N already sent", because re-runs never double-send.
 6. **Inactive students.** Mark a test student *Inactive* (Students → edit → Status). They disappear from email lists
    and receive nothing.
-
-**Going live:** set `MAIL_TEST_MODE=false` in Vercel and redeploy. Test-mode monthly runs use a separate key,
-so the real monthly run still goes to everyone.
 
 ## 4. Where things are stored
 

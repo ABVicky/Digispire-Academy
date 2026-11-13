@@ -56,11 +56,6 @@ export function getConfig() {
     maxPerHour,
     sendDelayMs: num('MAIL_SEND_DELAY_MS', 1000, { max: 60000 }),
     maxAttempts: num('MAIL_MAX_ATTEMPTS', 5, { min: 1, max: 20 }),
-    // Test mode is ON unless explicitly turned off.
-    testMode: bool('MAIL_TEST_MODE', true),
-    testRecipient: env('MAIL_TEST_RECIPIENT'),
-    // In test mode a monthly run only queues this many students (all go to you).
-    testSampleSize: num('MAIL_TEST_SAMPLE_SIZE', 3, { min: 1, max: 50 }),
     monthly: {
       enabled: bool('MONTHLY_REPORT_ENABLED', true),
       time: /^\d{2}:\d{2}$/.test(env('MONTHLY_REPORT_TIME')) ? env('MONTHLY_REPORT_TIME') : '20:00',
@@ -84,7 +79,6 @@ export function missingConfig(config = getConfig()) {
   if (!config.smtp.pass) missing.push('SMTP_PASS');
   if (!config.from.address) missing.push('MAIL_FROM_ADDRESS');
   if (!config.cronSecret) missing.push('CRON_SECRET');
-  if (config.testMode && !config.testRecipient) missing.push('MAIL_TEST_RECIPIENT');
   return missing;
 }
 

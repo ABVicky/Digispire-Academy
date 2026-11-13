@@ -9,7 +9,7 @@ import { callEmailApi } from '../../utils/emailApi';
 import { emailTypeLabel, formatDateTime } from '../../utils/emailFormat';
 import { DEFAULT_TIMEZONE, EMAIL_TYPE_LABELS, zonedNow } from '../../utils/studentReport';
 import { emailFeaturesEnabled } from '../../utils/platform';
-import { EmailPreviewFrame, EmailStatusBadge, ErrorNotice, ModalPortal, SkippedRecipients, TestModeBadge, TestModeNotice } from '../../components/email/EmailBits';
+import { EmailPreviewFrame, EmailStatusBadge, ErrorNotice, ModalPortal, SkippedRecipients, TestModeBadge } from '../../components/email/EmailBits';
 
 function Card({ title, icon: Icon, children, action }) {
   return (
@@ -57,18 +57,15 @@ function ConfigCard({ config, error, onReload }) {
           {config.missing?.includes('CRON_SECRET') && config.configured && (
             <ErrorNotice message="CRON_SECRET is missing, so scheduled sending and retries will not run." />
           )}
-          <TestModeNotice testMode={config.testMode} />
           <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
             {[
               ['From', `${config.from?.name} <${config.from?.address || '—'}>`],
               ['SMTP', config.smtp ? `${config.smtp.host || '—'}:${config.smtp.port} (${config.smtp.encryption})` : '—'],
-              ['Test recipient', config.testMode ? (config.testRecipient || '—') : 'Test mode off (live)'],
               ['BCC per message', config.bccChunkSize],
               ['Hourly cap (recipients)', config.maxPerHour],
               ['Delay between emails', `${config.sendDelayMs} ms`],
               ['Retries', `${config.maxAttempts} attempts`],
               ['Monthly report', config.monthly?.enabled ? `Last day of month, ${config.monthly.time} (${config.timezone})` : 'Automatic run disabled'],
-              ['Test-mode monthly sample', `${config.testSampleSize} student(s)`],
             ].map(([k, v]) => (
               <div key={k} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 min-w-0">
                 <dt className="text-[10px] font-black uppercase tracking-wider text-slate-400">{k}</dt>
@@ -124,8 +121,7 @@ function MonthlyCard() {
 
   const runNow = async () => {
     const eligible = data?.counts?.eligible ?? 0;
-    const note = data?.testMode ? `\n\nTest mode is ON: only ${Math.min(eligible, data.testSampleSize)} sample email(s) go to the test address.` : '';
-    if (!window.confirm(`Send the ${data?.monthLabel || month} report to ${eligible} active student(s)?\nStudents who already got it are skipped automatically.${note}`)) return;
+    if (!window.confirm(`Send the ${data?.monthLabel || month} report to ${eligible} active student(s)?\nStudents who already got it are skipped automatically.`)) return;
     setBusy('run'); setError(''); setMsg('');
     try {
       const res = await callEmailApi('monthly.run', { month });
@@ -161,13 +157,11 @@ function MonthlyCard() {
       {runResult && (
         <div className="p-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs font-semibold space-y-1">
           <p>{runResult.queued} queued · {runResult.alreadyQueued} already sent earlier · {runResult.skipped.length} skipped.</p>
-          {runResult.sampleLimited && <p>Test mode: only a sample was queued.</p>}
         </div>
       )}
       {data && (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           <div className="space-y-3 min-w-0">
-            <TestModeNotice testMode={data.testMode} />
             <p className="text-xs font-semibold text-slate-600">
               {data.counts.eligible} will receive it · {data.counts.skipped} skipped · {data.counts.alreadyQueued} already queued/sent
               {data.run?.lastRunAt ? ` · last run ${formatDateTime(data.run.lastRunAt)} (${data.run.lastTrigger})` : ''}

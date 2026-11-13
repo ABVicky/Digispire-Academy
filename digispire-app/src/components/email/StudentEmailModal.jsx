@@ -3,7 +3,7 @@ import { X, Send, FlaskConical, Loader2, Mail, AlertTriangle, BookOpen, UserX } 
 import { callEmailApi } from '../../utils/emailApi';
 import { newRequestId } from '../../utils/emailFormat';
 import { STUDENT_EMAIL_TYPES } from '../../utils/studentReport';
-import { EmailPreviewFrame, ErrorNotice, ModalPortal, SkippedRecipients, TestModeNotice } from './EmailBits';
+import { EmailPreviewFrame, ErrorNotice, ModalPortal, SkippedRecipients } from './EmailBits';
 
 const TYPE_ICONS = { low_attendance: AlertTriangle, syllabus_due: BookOpen, absenteeism: UserX };
 
@@ -95,7 +95,6 @@ export default function StudentEmailModal({ students, track, batchId, thresholds
         <div className="modal-body-premium">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <div className="space-y-4 min-w-0">
-              <TestModeNotice testMode={data?.testMode} />
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {STUDENT_EMAIL_TYPES.map(t => {
@@ -153,7 +152,7 @@ export default function StudentEmailModal({ students, track, batchId, thresholds
               {notice && <div className="p-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs font-semibold">{notice}</div>}
               {result && (
                 <div className="p-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs font-semibold space-y-1">
-                  <p>{result.queued} email(s) queued and sending in the background.{result.testMode ? ' (Test mode: delivered only to the test address.)' : ''}</p>
+                  <p>{result.queued} email(s) queued and sending in the background.</p>
                   {result.alreadyQueued > 0 && <p>{result.alreadyQueued} were already queued from this window and were not sent twice.</p>}
                   {result.skipped?.length > 0 && <p>{result.skipped.length} skipped (see list above).</p>}
                 </div>

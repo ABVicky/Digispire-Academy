@@ -25,7 +25,6 @@ export function smtpTestEmail(config, { requestedBy }) {
     ['From', `${config.from.name} <${config.from.address}>`],
     ['BCC chunk size', String(config.bccChunkSize)],
     ['Hourly cap', `${config.maxPerHour} recipients`],
-    ['Test mode', config.testMode ? `ON → ${config.testRecipient}` : 'OFF (live)'],
     ['Requested by', requestedBy],
   ];
   return {

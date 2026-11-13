@@ -15,9 +15,6 @@ export async function getPublicConfig(user) {
   return {
     configured: missing.filter(n => n !== 'CRON_SECRET').length === 0,
     missing,
-    testMode: config.testMode,
-    testRecipient: user.role === 'admin' ? config.testRecipient : undefined,
-    testSampleSize: config.testSampleSize,
     from: config.from,
     smtp: user.role === 'admin' ? { host: config.smtp.host, port: config.smtp.port, encryption: config.smtp.encryption, user: config.smtp.user } : undefined,
     bccChunkSize: config.bccChunkSize,

@@ -167,7 +167,6 @@ export async function previewClassReport(user, body) {
     bccChunkSize: config.bccChunkSize,
     status: emailStatusOf(ctx.session),
     curriculumSource: ctx.sessionInfo?.source || null,
-    testMode: config.testMode,
   };
 }
 
@@ -265,7 +264,7 @@ export async function sendClassReport(user, body, { test = false } = {}) {
         lastCc: cc,
         lastMessageIds: messages.map(m => m.id),
         lastDeliveredAt: null,
-        testMode: config.testMode,
+        testMode: false,
       },
     }, { merge: true });
     addMessagesToTransaction(tx, messages);
@@ -284,6 +283,5 @@ export async function sendClassReport(user, body, { test = false } = {}) {
     messages: result.messageCount,
     cc,
     skipped: [...attended.skipped, ...missed.skipped],
-    testMode: config.testMode,
   };
 }

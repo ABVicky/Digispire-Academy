@@ -27,16 +27,6 @@ export function TestModeBadge() {
   );
 }
 
-export function TestModeNotice({ testMode }) {
-  if (!testMode) return null;
-  return (
-    <div className="flex items-start gap-2 p-3 rounded-xl border border-amber-200 bg-amber-50 text-amber-800 text-xs font-medium">
-      <FlaskConical size={15} className="shrink-0 mt-0.5" />
-      <p><strong>Test mode is on.</strong> Emails go only to the test address set in MAIL_TEST_RECIPIENT, with a banner showing who would have received them.</p>
-    </div>
-  );
-}
-
 export function ErrorNotice({ message }) {
   if (!message) return null;
   return (

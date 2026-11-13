@@ -7,7 +7,7 @@ import {
 import { callEmailApi } from '../../utils/emailApi';
 import { formatDateTime, tsMillis } from '../../utils/emailFormat';
 import { classSessionDocId } from '../../utils/studentReport';
-import { EmailPreviewFrame, EmailStatusBadge, ErrorNotice, ModalPortal, SkippedRecipients, TestModeBadge, TestModeNotice } from './EmailBits';
+import { EmailPreviewFrame, EmailStatusBadge, ErrorNotice, ModalPortal, SkippedRecipients, TestModeBadge } from './EmailBits';
 
 const label = 'block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1';
 
@@ -95,7 +95,7 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
     setSending(true);
     try {
       const res = await callEmailApi('classReport.send', { batchId, date, ...form, cc, resend, expectedSendCount: status.sendCount });
-      setNotice(`${resend ? 'Resend queued' : 'Class report queued'}: ${res.recipients} attended + ${res.missedRecipients} missed student(s)${res.cc?.length ? `, CC ${res.cc.join(', ')}` : ''}. It is sending in the background — you can close this window.${res.testMode ? ' (Test mode: delivered only to the test address.)' : ''}`);
+      setNotice(`${resend ? 'Resend queued' : 'Class report queued'}: ${res.recipients} attended + ${res.missedRecipients} missed student(s)${res.cc?.length ? `, CC ${res.cc.join(', ')}` : ''}. It is sending in the background — you can close this window.`);
       await loadPreview(form);
     } catch (err) {
       setError(err.message);
@@ -146,7 +146,6 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {/* ── Left: details & form ── */}
               <div className="space-y-4 min-w-0">
-                <TestModeNotice testMode={data.testMode} />
 
                 {/* Attendance summary */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">

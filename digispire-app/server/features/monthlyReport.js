@@ -1,8 +1,8 @@
 /**
  * Feature 2 — monthly individual attendance report.
  *
- * Idempotency: each student's message id is `monthly_<YYYY-MM>_<uid>` (with a
- * `_test` suffix in test mode). Queueing uses create-if-absent, so re-running
+ * Idempotency: each student's message id is `monthly_<YYYY-MM>_<uid>`.
+ * Queueing uses create-if-absent, so re-running
  * a month — by the scheduler or an admin — never double-sends.
  */
 import { FieldValue } from 'firebase-admin/firestore';
@@ -21,7 +21,7 @@ import { monthlyReportEmail } from '../templates/index.js';
 import { kickWorker } from '../worker.js';
 import { SYSTEM_ACTOR, isoOf, staffTestAddress } from './shared.js';
 
-export const monthlyRunId = (month, testMode) => `monthly_${month}${testMode ? '_test' : ''}`;
+export const monthlyRunId = (month) => `monthly_${month}`;
 
 async function buildEntries(month, config, { onlyUid } = {}) {
   if (!isMonthString(month)) throw new HttpError(400, 'month must be YYYY-MM.');
@@ -77,7 +77,7 @@ export async function previewMonthly(user, body) {
   const config = getConfig();
   const month = body.month;
   const entries = await buildEntries(month, config);
-  const runId = monthlyRunId(month, config.testMode);
+  const runId = monthlyRunId(month);
 
   const eligible = entries.filter(e => !e.skip);
   const db = adminDb();
@@ -91,8 +91,6 @@ export async function previewMonthly(user, body) {
   return {
     month,
     monthLabel: formatMonthLabel(month),
-    testMode: config.testMode,
-    testSampleSize: config.testSampleSize,
     schedule: { ...config.monthly, timezone: config.timezone },
     run: await loadRun(runId),
     counts: { students: entries.length, eligible: eligible.length, skipped: entries.length - eligible.length, alreadyQueued: queuedIds.size },
@@ -104,10 +102,8 @@ export async function previewMonthly(user, body) {
 export async function runMonthly(month, { actor, trigger }) {
   const config = assertMailConfig(getConfig());
   const entries = await buildEntries(month, config);
-  const runId = monthlyRunId(month, config.testMode);
-  let eligible = entries.filter(e => !e.skip);
-  const sampleLimited = config.testMode && eligible.length > config.testSampleSize;
-  if (sampleLimited) eligible = eligible.slice(0, config.testSampleSize);
+  const runId = monthlyRunId(month);
+  const eligible = entries.filter(e => !e.skip);
 
   const messages = eligible.flatMap(e => prepareMessages(config, {
     idBase: `${runId}_${e.uid}`,
@@ -125,7 +121,6 @@ export async function runMonthly(month, { actor, trigger }) {
   await runRef.set({
     type: 'monthly_report',
     month,
-    testMode: config.testMode,
     lastTrigger: trigger,
     lastRunAt: FieldValue.serverTimestamp(),
     lastRunBy: actor,
@@ -136,13 +131,12 @@ export async function runMonthly(month, { actor, trigger }) {
       queued: created.length,
       alreadyQueued: existing.length,
       skipped: skipped.length,
-      sampleLimited,
     },
     skipped: skipped.slice(0, 300),
   }, { merge: true });
 
   if (created.length) kickWorker(config);
-  return { runId, queued: created.length, alreadyQueued: existing.length, skipped, sampleLimited, testMode: config.testMode };
+  return { runId, queued: created.length, alreadyQueued: existing.length, skipped };
 }
 
 export async function runMonthlyAction(user, body) {
@@ -185,7 +179,7 @@ export async function maybeRunScheduledMonthly(now = new Date()) {
   for (const month of [previousMonth(currentMonth), currentMonth]) {
     const { end } = monthBounds(month);
     if (nowKey < `${end}T${config.monthly.time}` || date > addDays(end, 1)) continue;
-    const runId = monthlyRunId(month, config.testMode);
+    const runId = monthlyRunId(month);
     const runRef = adminDb().doc(`email_runs/${runId}`);
     if ((await runRef.get()).data()?.scheduledRunAt) continue;
     const result = await runMonthly(month, { actor: SYSTEM_ACTOR, trigger: 'schedule' });
