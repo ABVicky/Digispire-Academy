@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Html5Qrcode } from 'html5-qrcode';
+import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode';
 import { 
   collection, addDoc, serverTimestamp, query, where, getDocs, 
   orderBy, limit, doc, updateDoc, arrayUnion, getDoc 
@@ -15,6 +15,7 @@ import {
 import { calculateAttendance } from '../../utils/attendanceEngine';
 import AttendanceCalendar from '../../components/AttendanceCalendar';
 import { triggerHaptic } from '../../utils/haptic';
+import { isNativeApp } from '../../utils/platform';
 
 export default function StudentAttendancePage() {
   const { userProfile } = useAuth();
@@ -31,6 +32,7 @@ export default function StudentAttendancePage() {
   const [manualCode, setManualCode] = useState('');
   const [selectedType, setSelectedType] = useState('academic'); // 'academic' | 'internship'
   const scannerRef = useRef(null);
+  const cameraReleasedRef = useRef(Promise.resolve());
 
   // History calculation states
   const [selectedBatchId, setSelectedBatchId] = useState(null);
@@ -246,82 +248,75 @@ export default function StudentAttendancePage() {
     }
   }, [submitAttendance, courses, modules]);
 
+  // Latest scan handler, so data loading in the background never restarts the camera
+  const onScanSuccessRef = useRef(onScanSuccess);
   useEffect(() => {
-    let html5QrCode = null;
+    onScanSuccessRef.current = onScanSuccess;
+  }, [onScanSuccess]);
 
-    if (status === 'scanning') {
-      const startScanner = async () => {
+  useEffect(() => {
+    if (status !== 'scanning') return undefined;
+
+    let cancelled = false;
+    let scanner = null;
+
+    const startScanner = async () => {
+      // The previous camera must be released before opening it again
+      await cameraReleasedRef.current;
+      if (cancelled) return;
+
+      // Only the Android app has a native camera plugin; browsers ask by themselves
+      if (isNativeApp()) {
         try {
-          // 1. Request native Android / iOS Camera permission via Capacitor
-          if (typeof window !== 'undefined') {
-            if (window.Capacitor?.Plugins?.Camera) {
-              await window.Capacitor.Plugins.Camera.requestPermissions();
-            } else {
-              try {
-                const { Camera } = await import('@capacitor/camera');
-                if (Camera) {
-                  await Camera.requestPermissions();
-                }
-              } catch {
-                // Continue to web mediaDevices
-              }
-            }
-          }
-
-          // 2. Pre-verify camera stream in WebView
-          if (navigator?.mediaDevices?.getUserMedia) {
-            try {
-              const testStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-              testStream.getTracks().forEach(track => track.stop());
-            } catch (mediaErr) {
-              console.warn("Camera stream pre-check warning:", mediaErr);
-            }
-          }
-
-          html5QrCode = new Html5Qrcode("qr-reader");
-          scannerRef.current = html5QrCode;
-          
-          const config = { 
-            fps: 15, 
-            qrbox: (viewWidth, viewHeight) => {
-              const size = Math.min(viewWidth, viewHeight) * 0.72;
-              return { width: size, height: size };
-            },
-            aspectRatio: 1.0
-          };
-
-          await html5QrCode.start(
-            { facingMode: "environment" },
-            config,
-            onScanSuccess,
-            () => { /* ignore minor scan errors */ }
-          );
+          await window.Capacitor.Plugins?.Camera?.requestPermissions();
         } catch (err) {
-          console.error("Scanner start error:", err);
-          setStatus('error');
-          setMessage("Could not access camera. Please ensure permissions are granted.");
+          console.warn('Native camera permission warning:', err);
         }
+        if (cancelled) return;
+      }
+
+      scanner = new Html5Qrcode("qr-reader");
+      scannerRef.current = scanner;
+
+      const config = {
+        fps: 15,
+        qrbox: (viewWidth, viewHeight) => {
+          const size = Math.max(50, Math.min(viewWidth, viewHeight) * 0.72);
+          return { width: size, height: size };
+        },
+        aspectRatio: 1.0
       };
 
-      startScanner();
-    }
+      await scanner.start(
+        { facingMode: "environment" },
+        config,
+        (decodedText) => onScanSuccessRef.current(decodedText),
+        () => { /* ignore minor scan errors */ }
+      );
+    };
+
+    const started = startScanner().catch((err) => {
+      if (cancelled) return;
+      console.error("Scanner start error:", err);
+      setStatus('error');
+      setMessage(/NotAllowed|Permission/i.test(String(err))
+        ? "Camera permission is blocked. Please allow camera access, or enter the session code instead."
+        : "Could not start the camera. Close other apps using it and try again, or enter the session code instead.");
+    });
 
     return () => {
-      const cleanup = async () => {
-        if (scannerRef.current) {
-          try {
-            if (scannerRef.current.isScanning) {
-              await scannerRef.current.stop();
-            }
-            scannerRef.current.clear();
-          } catch (err) {
-            console.error("Cleanup error:", err);
+      cancelled = true;
+      cameraReleasedRef.current = started.then(async () => {
+        try {
+          if (scanner && scanner.getState() !== Html5QrcodeScannerState.NOT_STARTED) {
+            await scanner.stop();
           }
+        } catch (err) {
+          console.warn("Scanner cleanup warning:", err);
         }
-      };
-      cleanup();
+      });
     };
-  }, [status, onScanSuccess]);
+  }, [status]);
 
   const handleManualCheckIn = async (e) => {
     e.preventDefault();
@@ -469,7 +464,12 @@ export default function StudentAttendancePage() {
           <span>Check In</span>
         </button>
         <button
-          onClick={() => { triggerHaptic('light'); setActiveTab('history'); fetchHistoryDetails(); }}
+          onClick={() => {
+            triggerHaptic('light');
+            if (status === 'scanning') setStatus('idle'); // release the camera
+            setActiveTab('history');
+            fetchHistoryDetails();
+          }}
           className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
             activeTab === 'history' 
               ? 'bg-[#255A84] text-white shadow-xs' 

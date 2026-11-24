@@ -46,6 +46,10 @@ export default function StudentIDCardModal({ student, onClose }) {
     setIsFlipped(!isFlipped);
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   const handleMouseMove = (e) => {
     if (!cardContainerRef.current) return;
     const rect = cardContainerRef.current.getBoundingClientRect();
