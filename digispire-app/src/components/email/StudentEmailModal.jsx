@@ -90,7 +90,7 @@ export default function StudentEmailModal({ students, track, batchId, thresholds
             <h2 className="text-lg sm:text-xl font-bold text-slate-800">Email students individually</h2>
             <p className="text-xs font-bold text-[#255A84] uppercase tracking-wider mt-0.5">{students.length} selected · one private email each</p>
           </div>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 transition" aria-label="Close"><X size={20} /></button>
+          <button onClick={onClose} className="p-2 text-slate-500 hover:text-slate-600 transition" aria-label="Close"><X size={20} /></button>
         </div>
 
         <div className="modal-body-premium">
@@ -105,14 +105,14 @@ export default function StudentEmailModal({ students, track, batchId, thresholds
                     <button key={t.id} type="button" onClick={() => changeType(t.id)}
                       className={`text-left p-3 rounded-xl border transition ${active ? 'border-[#255A84] bg-blue-50/70 shadow-xs' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
                       <p className={`flex items-center gap-1.5 text-xs font-bold ${active ? 'text-[#255A84]' : 'text-slate-700'}`}><Icon size={13} /> {t.label}</p>
-                      <p className="text-[10px] text-slate-400 font-medium mt-1 leading-snug">{t.description}</p>
+                      <p className="text-[10px] text-slate-500 font-medium mt-1 leading-snug">{t.description}</p>
                     </button>
                   );
                 })}
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Personal note (optional, added to every email)</label>
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Personal note (optional, added to every email)</label>
                 <textarea value={note} onChange={e => setNote(e.target.value)} rows={3} maxLength={3000} className="textarea-premium text-sm"
                   placeholder="e.g. Please meet me after Thursday's class so we can plan your catch-up." />
               </div>
@@ -120,18 +120,18 @@ export default function StudentEmailModal({ students, track, batchId, thresholds
               {data?.ccAddress && (
                 <label className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 bg-white cursor-pointer">
                   <input type="checkbox" checked={cc} onChange={e => setCc(e.target.checked)} className="rounded border-slate-300 text-[#255A84] focus:ring-[#255A84]" />
-                  <span className="text-xs font-semibold text-slate-700">CC <span className="font-bold">{data.ccAddress}</span> <span className="text-slate-400 font-medium">(a copy of each email)</span></span>
+                  <span className="text-xs font-semibold text-slate-700">CC <span className="font-bold">{data.ccAddress}</span> <span className="text-slate-500 font-medium">(a copy of each email)</span></span>
                 </label>
               )}
               {data?.educatorCcAddress && (
                 <label className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 bg-white cursor-pointer -mt-2">
                   <input type="checkbox" checked={ccEducator} onChange={e => setCcEducator(e.target.checked)} className="rounded border-slate-300 text-[#255A84] focus:ring-[#255A84]" />
-                  <span className="text-xs font-semibold text-slate-700">CC <span className="font-bold">{data.educatorCcAddress}</span> <span className="text-slate-400 font-medium">(you, the educator)</span></span>
+                  <span className="text-xs font-semibold text-slate-700">CC <span className="font-bold">{data.educatorCcAddress}</span> <span className="text-slate-500 font-medium">(you, the educator)</span></span>
                 </label>
               )}
 
               <div className="rounded-xl border border-slate-200 bg-white">
-                <p className="px-3 pt-3 text-[11px] font-black uppercase tracking-wider text-slate-400">Recipients — tap a name to preview their email</p>
+                <p className="px-3 pt-3 text-[11px] font-black uppercase tracking-wider text-slate-500">Recipients — tap a name to preview their email</p>
                 <ul className="max-h-72 overflow-y-auto divide-y divide-slate-50 p-1">
                   {rows.map(r => (
                     <li key={r.uid}>
@@ -139,11 +139,11 @@ export default function StudentEmailModal({ students, track, batchId, thresholds
                         className={`w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between gap-3 transition ${data?.preview?.uid === r.uid ? 'bg-blue-50' : 'hover:bg-slate-50'}`}>
                         <span className="min-w-0">
                           <span className="block text-xs font-bold text-slate-800 truncate">{r.name}</span>
-                          <span className={`block text-[11px] truncate ${r.skip ? 'text-amber-700 font-semibold' : 'text-slate-400'}`}>{r.skip ? r.skipLabel : r.email}</span>
+                          <span className={`block text-[11px] truncate ${r.skip ? 'text-amber-700 font-semibold' : 'text-slate-500'}`}>{r.skip ? r.skipLabel : r.email}</span>
                         </span>
                         {r.summary && (
                           <span className="text-right shrink-0 text-[10px] font-bold text-slate-500 leading-tight">
-                            <span className={r.summary.pct >= 75 ? 'text-emerald-600' : r.summary.pct >= 50 ? 'text-amber-600' : 'text-rose-600'}>{r.summary.pct}%</span>
+                            <span className={r.summary.pct >= 75 ? 'text-emerald-700' : r.summary.pct >= 50 ? 'text-amber-600' : 'text-rose-600'}>{r.summary.pct}%</span>
                             {' · '}{r.summary.absent} absent{r.summary.leave ? ` · ${r.summary.leave} leave` : ''}<br />
                             {r.summary.streak ? `${r.summary.streak} in a row · ` : ''}{r.summary.missedTopics + r.summary.pendingTopics} topic(s) pending
                           </span>

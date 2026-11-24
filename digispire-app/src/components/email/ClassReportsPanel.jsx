@@ -12,7 +12,7 @@ import SendClassReportModal from './SendClassReportModal';
 
 function SentStatus({ report }) {
   if (!report?.sendCount) {
-    return <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Not sent</span>;
+    return <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Not sent</span>;
   }
   return (
     <div className="space-y-1">
@@ -92,7 +92,7 @@ export default function ClassReportsPanel({ batches = [], students = [], staff =
             <h2 className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2">
               <Mail size={16} className="text-[#255A84]" /> Class Reports
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">After class, open a session to email the report to the students who were present.</p>
+            <p className="text-xs text-slate-500 mt-0.5">After class, open a session to email the report to the students who were present.</p>
           </div>
           <button onClick={() => { setLoading(true); setReloadKey(k => k + 1); }} className="btn-outline-premium px-3 py-2 flex items-center gap-1.5 text-xs self-start">
             <RefreshCw size={13} /> Refresh
@@ -112,7 +112,7 @@ export default function ClassReportsPanel({ batches = [], students = [], staff =
         {loading ? (
           <div className="py-16 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-[#255A84] border-t-transparent rounded-full" /></div>
         ) : rows.length === 0 ? (
-          <div className="py-16 text-center text-slate-400">
+          <div className="py-16 text-center text-slate-500">
             <CalendarDays size={40} className="mx-auto mb-3 opacity-20" />
             <p className="text-xs font-bold uppercase tracking-widest">No class sessions in this range</p>
             <p className="text-[11px] mt-1">Sessions appear once a QR is broadcast or attendance is marked.</p>
@@ -122,7 +122,7 @@ export default function ClassReportsPanel({ batches = [], students = [], staff =
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                     <th className="text-left px-5 py-3.5">Class</th>
                     <th className="text-center px-3 py-3.5">Present</th>
                     <th className="text-left px-3 py-3.5">Report</th>
@@ -138,13 +138,13 @@ export default function ClassReportsPanel({ batches = [], students = [], staff =
                         <p className="text-[11px] text-slate-500 font-medium">{formatDateLabel(r.date)} · {r.time}</p>
                       </td>
                       <td className="px-3 py-3 text-center font-bold text-slate-700">
-                        {r.present}<span className="text-slate-400 font-semibold">/{r.enrolled}</span>
-                        {r.guests ? <span className="block text-[10px] text-slate-400">+{r.guests} guest</span> : null}
+                        {r.present}<span className="text-slate-500 font-semibold">/{r.enrolled}</span>
+                        {r.guests ? <span className="block text-[10px] text-slate-500">+{r.guests} guest</span> : null}
                       </td>
                       <td className="px-3 py-3">
                         <div className="flex flex-col gap-0.5 text-[11px] font-semibold">
-                          <span className={r.topicCount ? 'text-slate-600' : 'text-slate-300'}><BookOpen size={11} className="inline mr-1" />{r.topicCount} topic(s)</span>
-                          <span className={r.hasTasks ? 'text-emerald-600' : 'text-slate-300'}>{r.hasTasks ? <Check size={11} className="inline mr-1" /> : <ClipboardList size={11} className="inline mr-1" />}{r.hasTasks ? 'Tasks saved' : 'No tasks yet'}</span>
+                          <span className={r.topicCount ? 'text-slate-600' : 'text-slate-500'}><BookOpen size={11} className="inline mr-1" />{r.topicCount} topic(s)</span>
+                          <span className={r.hasTasks ? 'text-emerald-600' : 'text-slate-500'}>{r.hasTasks ? <Check size={11} className="inline mr-1" /> : <ClipboardList size={11} className="inline mr-1" />}{r.hasTasks ? 'Tasks saved' : 'No tasks yet'}</span>
                         </div>
                       </td>
                       <td className="px-3 py-3"><SentStatus report={r.session?.emailReport} /></td>

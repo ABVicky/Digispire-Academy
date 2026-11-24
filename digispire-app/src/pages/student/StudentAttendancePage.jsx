@@ -488,20 +488,20 @@ export default function StudentAttendancePage() {
           <div className="lg:col-span-7 space-y-4">
             <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col min-h-[420px]">
               {/* Terminal Card Header */}
-              <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between gap-3">
+              <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="h-8 w-8 rounded-xl bg-blue-50 text-[#255A84] flex items-center justify-center font-bold">
+                  <div className="h-8 w-8 rounded-xl bg-blue-50 text-[#255A84] flex items-center justify-center font-bold shrink-0">
                     <KeyRound size={16} />
                   </div>
                   <div>
                     <h3 className="font-extrabold text-slate-800 text-xs sm:text-sm">Attendance Scanner Deck</h3>
-                    <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium">Scan broadcast screen or enter code</p>
+                    <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium">Scan broadcast screen or enter code</p>
                   </div>
                 </div>
 
                 {/* Mode Selector */}
                 {status !== 'scanning' && status !== 'processing' && status !== 'success' && status !== 'error' && (
-                  <div className="flex items-center bg-slate-100 p-1 rounded-xl">
+                  <div className="flex items-center bg-slate-100 p-1 rounded-xl w-full sm:w-auto [&>button]:flex-1 [&>button]:whitespace-nowrap">
                     <button
                       onClick={() => { triggerHaptic('light'); setMode('scan'); setStatus('idle'); }}
                       className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition ${
@@ -534,7 +534,7 @@ export default function StudentAttendancePage() {
 
                     <div className="space-y-1">
                       <h4 className="text-base font-black text-slate-800">Ready to Scan QR Code</h4>
-                      <p className="text-xs text-slate-400 max-w-xs mx-auto">
+                      <p className="text-xs text-slate-500 max-w-xs mx-auto">
                         Point your device camera at the classroom projector or educator's broadcast screen.
                       </p>
                     </div>
@@ -560,21 +560,12 @@ export default function StudentAttendancePage() {
                 {/* 2. LIVE CAMERA SCANNER */}
                 {status === 'scanning' && (
                   <div className="relative flex-1 flex flex-col items-center justify-center min-h-[320px] rounded-2xl overflow-hidden bg-slate-950">
-                    <div className="absolute inset-0 z-10 pointer-events-none flex flex-col items-center justify-center">
-                      <div className="w-[240px] h-[240px] border-2 border-white/20 rounded-2xl relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-[2px] bg-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.9)] animate-scan-line" />
-                        <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-blue-400 rounded-tl-2xl" />
-                        <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-blue-400 rounded-tr-2xl" />
-                        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-blue-400 rounded-bl-2xl" />
-                        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-blue-400 rounded-br-2xl" />
-                      </div>
-                      <p className="mt-6 text-white text-[10px] font-bold uppercase tracking-widest bg-black/60 px-3.5 py-1.5 rounded-full backdrop-blur-md border border-white/10">
-                        Align QR within frame
-                      </p>
-                    </div>
+                    <p className="absolute bottom-3 inset-x-0 mx-auto w-fit z-10 pointer-events-none text-white text-[10px] font-bold uppercase tracking-widest bg-black/60 px-3.5 py-1.5 rounded-full backdrop-blur-md border border-white/10">
+                      Align QR within frame
+                    </p>
 
                     <div id="qr-reader" className="w-full h-full bg-black flex items-center justify-center" />
-                    
+
                     <button
                       onClick={() => { triggerHaptic('light'); setStatus('idle'); }}
                       className="absolute top-3 right-3 z-20 p-2 bg-white/15 hover:bg-white/25 text-white rounded-full backdrop-blur-md transition-colors"
@@ -594,7 +585,7 @@ export default function StudentAttendancePage() {
                           type="button"
                           onClick={() => { triggerHaptic('light'); setSelectedType('academic'); }}
                           className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
-                            selectedType === 'academic' ? 'bg-white text-[#255A84] shadow-xs' : 'text-slate-400 hover:text-slate-600'
+                            selectedType === 'academic' ? 'bg-white text-[#255A84] shadow-xs' : 'text-slate-500 hover:text-slate-600'
                           }`}
                         >
                           Academic Track
@@ -603,7 +594,7 @@ export default function StudentAttendancePage() {
                           type="button"
                           onClick={() => { triggerHaptic('light'); setSelectedType('internship'); }}
                           className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
-                            selectedType === 'internship' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'
+                            selectedType === 'internship' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-600'
                           }`}
                         >
                           Internship Track
@@ -612,7 +603,7 @@ export default function StudentAttendancePage() {
                     )}
 
                     <div className="space-y-2 text-center">
-                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">
                         Enter 6-Character Session Code
                       </label>
                       <input 
@@ -624,7 +615,7 @@ export default function StudentAttendancePage() {
                         className="w-full text-center text-2xl sm:text-3xl font-mono font-black tracking-[0.3em] py-3.5 border-2 border-slate-200 focus:border-[#255A84] rounded-2xl bg-slate-50 uppercase placeholder-slate-300 focus:outline-none focus:bg-white transition-all shadow-inner"
                         autoFocus
                       />
-                      <p className="text-[10px] text-slate-400 font-medium">
+                      <p className="text-[10px] text-slate-500 font-medium">
                         Case-insensitive code displayed on educator's board
                       </p>
                     </div>
@@ -651,7 +642,7 @@ export default function StudentAttendancePage() {
                     <div className="h-10 w-10 border-3 border-[#255A84] border-t-transparent rounded-full animate-spin" />
                     <div>
                       <p className="text-xs font-black text-slate-800 uppercase tracking-widest">Validating Session...</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">Recording attendance in academy database</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">Recording attendance in academy database</p>
                     </div>
                   </div>
                 )}
@@ -660,12 +651,12 @@ export default function StudentAttendancePage() {
                 {(status === 'success' || status === 'error') && (
                   <div className="p-6 text-center space-y-4 my-auto animate-in zoom-in-95 duration-200">
                     <div className={`h-16 w-16 rounded-2xl mx-auto flex items-center justify-center shadow-lg ${
-                      status === 'success' ? 'bg-emerald-50 text-emerald-600 shadow-emerald-500/20' : 'bg-red-50 text-red-500 shadow-red-500/20'
+                      status === 'success' ? 'bg-emerald-50 text-emerald-700 shadow-emerald-500/20' : 'bg-red-50 text-red-600 shadow-red-500/20'
                     }`}>
                       {status === 'success' ? <CheckCircle2 size={36} /> : <AlertCircle size={36} />}
                     </div>
                     <div>
-                      <h4 className={`text-lg font-black ${status === 'success' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      <h4 className={`text-lg font-black ${status === 'success' ? 'text-emerald-700' : 'text-rose-600'}`}>
                         {status === 'success' ? 'Attendance Recorded!' : 'Check-In Failed'}
                       </h4>
                       <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto leading-relaxed">
@@ -715,14 +706,14 @@ export default function StudentAttendancePage() {
                 {todayAttendance ? (
                   <>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400 font-semibold text-[11px]">Timestamp</span>
+                      <span className="text-slate-500 font-semibold text-[11px]">Timestamp</span>
                       <span className="font-mono font-bold text-slate-700 text-xs">
                         {todayAttendance.timestamp?.toDate ? todayAttendance.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Today'}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400 font-semibold text-[11px]">Track</span>
+                      <span className="text-slate-500 font-semibold text-[11px]">Track</span>
                       <span className="font-bold text-[#255A84] capitalize">
                         {todayAttendance.type || 'Academic'}
                       </span>
@@ -742,9 +733,9 @@ export default function StudentAttendancePage() {
                     )}
                   </>
                 ) : (
-                  <div className="text-center py-3 space-y-1 text-slate-400">
+                  <div className="text-center py-3 space-y-1 text-slate-500">
                     <p className="text-xs font-semibold text-slate-600">No Check-In Recorded for Today</p>
-                    <p className="text-[11px] text-slate-400">Use the camera scanner or enter session code when class starts.</p>
+                    <p className="text-[11px] text-slate-500">Use the camera scanner or enter session code when class starts.</p>
                   </div>
                 )}
               </div>
@@ -769,13 +760,13 @@ export default function StudentAttendancePage() {
                 {myBatchSchedule && (
                   <>
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400 font-medium text-[11px]">Scheduled Hours</span>
+                      <span className="text-slate-500 font-medium text-[11px]">Scheduled Hours</span>
                       <span className="font-bold text-slate-700">{myBatchSchedule.startTime || '09:00'} - {myBatchSchedule.endTime || '11:00'}</span>
                     </div>
 
                     {myBatchSchedule.educator && (
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-400 font-medium text-[11px]">Educator</span>
+                        <span className="text-slate-500 font-medium text-[11px]">Educator</span>
                         <span className="font-bold text-slate-700">{myBatchSchedule.educator}</span>
                       </div>
                     )}
@@ -783,8 +774,8 @@ export default function StudentAttendancePage() {
                 )}
 
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400 font-medium text-[11px]">Internship Program</span>
-                  <span className={`font-bold ${userProfile?.isIntern ? 'text-emerald-600' : 'text-slate-400'}`}>
+                  <span className="text-slate-500 font-medium text-[11px]">Internship Program</span>
+                  <span className={`font-bold ${userProfile?.isIntern ? 'text-emerald-700' : 'text-slate-500'}`}>
                     {userProfile?.isIntern ? 'Active Track' : 'Not Enrolled'}
                   </span>
                 </div>
@@ -810,13 +801,13 @@ export default function StudentAttendancePage() {
           {loadingHistory ? (
             <div className="py-20 flex flex-col items-center justify-center gap-3 bg-white rounded-2xl border border-slate-100 shadow-xs">
               <div className="animate-spin h-7 w-7 border-3 border-[#255A84] border-t-transparent rounded-full" />
-              <p className="text-xs text-slate-400 font-bold">Calculating attendance metrics...</p>
+              <p className="text-xs text-slate-500 font-bold">Calculating attendance metrics...</p>
             </div>
           ) : !myBatchSchedule ? (
-            <div className="p-8 bg-white border border-slate-200/80 rounded-2xl text-center text-slate-400 space-y-2 shadow-xs">
+            <div className="p-8 bg-white border border-slate-200/80 rounded-2xl text-center text-slate-500 space-y-2 shadow-xs">
               <AlertCircle size={32} className="mx-auto text-rose-500" />
               <p className="text-xs font-bold text-slate-700">Batch schedule settings are not initialized.</p>
-              <p className="text-[11px] text-slate-400">Please reach out to your instructor to assign your batch schedule.</p>
+              <p className="text-[11px] text-slate-500">Please reach out to your instructor to assign your batch schedule.</p>
             </div>
           ) : calculatedHistory ? (
             <div className="space-y-4 sm:space-y-6">
@@ -835,7 +826,7 @@ export default function StudentAttendancePage() {
                             : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                         }`}
                       >
-                        {bId === 'internship' ? 'Internship Track' : `${bId} Batch`}
+                        {bId === 'internship' ? 'Internship Track' : <><span className="capitalize">{bId}</span> Batch</>}
                       </button>
                     ))}
                   </div>
@@ -845,20 +836,20 @@ export default function StudentAttendancePage() {
               {/* Top Statistics Cards Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                 <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs text-center space-y-0.5">
-                  <p className="text-xl sm:text-2xl font-black text-emerald-600">{calculatedHistory.presentClasses}</p>
-                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Present Days</p>
+                  <p className="text-xl sm:text-2xl font-black text-emerald-700">{calculatedHistory.presentClasses}</p>
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Present Days</p>
                 </div>
                 <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs text-center space-y-0.5">
                   <p className="text-xl sm:text-2xl font-black text-slate-800">{calculatedHistory.eligibleClasses}</p>
-                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Scheduled Days</p>
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Scheduled Days</p>
                 </div>
                 <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs text-center space-y-0.5">
                   <p className="text-xl sm:text-2xl font-black text-amber-600">{calculatedHistory.leaveClasses}</p>
-                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Approved Leaves</p>
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Approved Leaves</p>
                 </div>
                 <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs text-center space-y-0.5">
                   <p className="text-xl sm:text-2xl font-black text-blue-600">{calculatedHistory.holidaysCount}</p>
-                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Holidays</p>
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Holidays</p>
                 </div>
               </div>
 
@@ -886,13 +877,13 @@ export default function StudentAttendancePage() {
                       Recent Check-In Records
                     </h3>
                   </div>
-                  <span className="text-[11px] font-bold text-slate-400">
+                  <span className="text-[11px] font-bold text-slate-500">
                     Total: {myLogs.length} logs
                   </span>
                 </div>
 
                 {myLogs.length === 0 ? (
-                  <div className="p-8 text-center text-slate-400 text-xs font-semibold">
+                  <div className="p-8 text-center text-slate-500 text-xs font-semibold">
                     No attendance records found yet.
                   </div>
                 ) : (
@@ -902,7 +893,7 @@ export default function StudentAttendancePage() {
                       .map((log, idx) => (
                         <div key={idx} className="p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="h-8 w-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 font-bold border border-emerald-200/60">
+                            <div className="h-8 w-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 font-bold border border-emerald-200/60">
                               <CheckCircle2 size={16} />
                             </div>
                             <div className="min-w-0">
@@ -910,12 +901,12 @@ export default function StudentAttendancePage() {
                                 <p className="font-bold text-slate-800 text-xs truncate">
                                   {courses.find(c => c.id === log.coveredCourse)?.name || 'General Class Session'}
                                 </p>
-                                <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">
+                                <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
                                   {log.type || 'academic'}
                                 </span>
                               </div>
                               {log.coveredModule && (
-                                <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                                <p className="text-[11px] text-slate-500 truncate mt-0.5">
                                   {modules.find(m => m.id === log.coveredModule)?.title || log.coveredModule}
                                 </p>
                               )}
@@ -924,7 +915,7 @@ export default function StudentAttendancePage() {
 
                           <div className="text-right shrink-0">
                             <p className="text-xs font-mono font-bold text-slate-700">{log.date}</p>
-                            <p className="text-[10px] text-slate-400 font-mono">
+                            <p className="text-[10px] text-slate-500 font-mono">
                               {log.timestamp?.toDate ? log.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recorded'}
                             </p>
                           </div>

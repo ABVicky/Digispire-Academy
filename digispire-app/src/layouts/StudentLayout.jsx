@@ -97,7 +97,7 @@ export default function StudentLayout() {
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Student Portal</p>
               </div>
             </div>
-            <button onClick={() => setIsSidebarOpen(false)} className="md:hidden p-1.5 text-slate-400 hover:text-slate-600 rounded-lg transition cursor-pointer">
+            <button onClick={() => setIsSidebarOpen(false)} aria-label="Close navigation menu" className="md:hidden p-1.5 text-slate-500 hover:text-slate-600 rounded-lg transition cursor-pointer">
               <X size={18} />
             </button>
           </div>
@@ -126,17 +126,17 @@ export default function StudentLayout() {
                 {userProfile?.studentId || 'STUDENT'}
               </p>
             </div>
-            <ChevronRight size={18} className="text-slate-400 group-hover:text-slate-700 transition-transform shrink-0" />
+            <ChevronRight size={18} className="text-slate-500 group-hover:text-slate-700 transition-transform shrink-0" />
           </NavLink>
 
           {/* Navigation Links */}
-          <nav className="flex-1 space-y-4 overflow-y-auto no-scrollbar custom-scrollbar pr-1">
+          <nav className="flex-1 space-y-4 md:space-y-2.5 overflow-y-auto custom-scrollbar pr-1">
             {['Main Menu', 'Courses & Learning'].map((category) => {
               const items = navItems.filter(item => item.category === category);
               if (items.length === 0) return null;
               return (
                 <div key={category} className="space-y-0.5">
-                  <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{category}</p>
+                  <p className="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">{category}</p>
                   {items.map((item) => (
                     <NavLink
                       key={item.path}
@@ -145,7 +145,7 @@ export default function StudentLayout() {
                         triggerHaptic('light');
                         setIsSidebarOpen(false);
                       }}
-                      className={({ isActive }) => `flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                      className={({ isActive }) => `flex items-center gap-2.5 px-3 py-2 md:py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                         isActive
                           ? 'bg-[#1E3A5F] text-white shadow-2xs font-bold'
                           : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
@@ -153,7 +153,7 @@ export default function StudentLayout() {
                     >
                       {({ isActive }) => (
                         <>
-                          <item.icon size={15} className={`shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                          <item.icon size={15} className={`shrink-0 ${isActive ? 'text-white' : 'text-slate-500'}`} />
                           <span className="truncate">{item.label}</span>
                         </>
                       )}
@@ -173,7 +173,7 @@ export default function StudentLayout() {
               <NavLink 
                 to="/privacy-policy" 
                 onClick={() => setIsSidebarOpen(false)}
-                className="text-[10px] text-slate-400 hover:text-slate-700 underline font-medium transition-colors"
+                className="text-[10px] text-slate-500 hover:text-slate-700 underline font-medium transition-colors"
               >
                 Privacy Policy
               </NavLink>
@@ -182,14 +182,13 @@ export default function StudentLayout() {
         </div>
       </aside>
 
-      {/* ── Real-Time Announcement System Notification Watcher ── */}
-      <AnnouncementNotificationWatcher />
-
       {/* ── Ambient Background Mesh & Gradient Shapes ── */}
       <AmbientBackground variant="light" />
 
       {/* ── Main Content ── */}
-      <main className="flex-1 p-4 md:p-8 lg:p-10 max-w-5xl mx-auto w-full has-bottom-nav md:pb-8 relative z-10">
+      <main className="flex-1 p-4 md:p-8 lg:p-10 max-w-5xl mx-auto w-full min-w-0 has-bottom-nav md:pb-8 relative">
+        {/* ── Real-Time Announcement System Notification Watcher ── */}
+        <AnnouncementNotificationWatcher />
         <Outlet />
       </main>
 
@@ -208,14 +207,14 @@ export default function StudentLayout() {
               className={`bottom-nav-item ${isActive ? 'active' : ''}`}
               aria-current={isActive ? 'page' : undefined}
             >
-              <div className={`bottom-nav-icon ${isActive ? 'text-[#1E3A5F]' : 'text-slate-400'}`}>
+              <div className={`bottom-nav-icon ${isActive ? 'text-[#1E3A5F]' : 'text-slate-500'}`}>
                 <item.icon
                   size={18}
                   strokeWidth={isActive ? 2.5 : 1.8}
-                  className={isActive ? 'text-[#1E3A5F]' : 'text-slate-400'}
+                  className={isActive ? 'text-[#1E3A5F]' : 'text-slate-500'}
                 />
               </div>
-              <span className={`bottom-nav-label ${isActive ? 'text-[#1E3A5F]' : 'text-slate-400'}`}>
+              <span className={`bottom-nav-label ${isActive ? 'text-[#1E3A5F]' : 'text-slate-500'}`}>
                 {item.shortLabel}
               </span>
             </NavLink>

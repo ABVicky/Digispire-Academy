@@ -51,7 +51,7 @@ export default function MarketingToolsPage() {
       {/* Search Bar */}
       <div className="px-2">
         <div className="relative group">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 z-10" size={20} />
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 z-10" size={20} />
           <input 
             type="text"
             placeholder="Search for tools, strategies, or platforms..."
@@ -81,7 +81,7 @@ export default function MarketingToolsPage() {
       ) : filteredTools.length === 0 ? (
         <div className="py-20 text-center">
           <Sparkles size={48} className="mx-auto text-slate-200 mb-4" />
-          <p className="text-slate-400 font-medium text-sm">No tools found matching your criteria.</p>
+          <p className="text-slate-500 font-medium text-sm">No tools found matching your criteria.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-2">
@@ -93,7 +93,7 @@ export default function MarketingToolsPage() {
                   <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-[#255A84] group-hover:scale-110 transition-transform duration-300">
                     <cat.icon size={24} />
                   </div>
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] bg-slate-50 px-3 py-1.5 rounded-full">{cat.label}</span>
+                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] bg-slate-50 px-3 py-1.5 rounded-full">{cat.label}</span>
                 </div>
                 <h3 className="text-lg font-bold text-slate-800 leading-tight">{tool.name}</h3>
                 <p className="text-xs text-slate-500 mt-3 leading-relaxed flex-1">{tool.description}</p>
@@ -107,7 +107,7 @@ export default function MarketingToolsPage() {
                     <div className="flex items-center gap-2">
                        <span className="text-[11px] font-bold text-[#255A84] uppercase tracking-widest">Open Tool</span>
                        <div className="h-1 w-1 rounded-full bg-[#255A84]/30" />
-                       <span className="text-[11px] font-medium text-slate-400 truncate max-w-[120px]">{new URL(tool.url).hostname}</span>
+                       <span className="text-[11px] font-medium text-slate-500 truncate max-w-[120px]">{new URL(tool.url).hostname}</span>
                     </div>
                     <div className="h-10 w-10 bg-[#255A84]/5 text-[#255A84] rounded-xl flex items-center justify-center group-hover/btn:bg-[#255A84] group-hover/btn:text-white transition-all duration-300">
                        <ExternalLink size={16} />

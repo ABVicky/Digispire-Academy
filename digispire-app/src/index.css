@@ -134,7 +134,14 @@ html {
 /* Form inputs text selection & autofill */
 input, textarea, [contenteditable="true"] {
   user-select: text;
-  font-size: 16px !important;
+}
+/* 16px stops iOS zooming in on focus; desktop keeps each field's own size */
+@media (max-width: 767px), (pointer: coarse) {
+  input, textarea, [contenteditable="true"] { font-size: 16px !important; }
+}
+/* Let staff copy IDs, phone numbers and emails on a computer */
+@media (pointer: fine) {
+  body { user-select: auto; }
 }
 
 input:-webkit-autofill,
@@ -165,8 +172,87 @@ textarea:-webkit-autofill {
 }
 
 /* Touch Targets per HIG Standards */
-button, a[role="button"] { min-height: 42px; }
-select { min-height: 42px; }
+@layer base {
+  button, a[role="button"], select { min-height: 42px; }
+  button:not(:disabled), [role="button"], select:not(:disabled) { cursor: pointer; }
+
+  /* Icon-only buttons stay square instead of stretching to 42px tall */
+  button:is([aria-label], [title]):has(> svg:only-child) {
+    min-width: 36px;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  :where(a, button, select, [role="button"], [tabindex]):focus-visible {
+    outline: 2px solid #3B82F6;
+    outline-offset: 2px;
+  }
+}
+
+/* One consistent dropdown arrow */
+select:not([multiple]) {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.25rem;
+  text-overflow: ellipsis;
+}
+
+/* Entrance animations (classes already used across the app) */
+@utility animate-in {
+  animation: ds-enter var(--tw-duration, 200ms) cubic-bezier(0.16, 1, 0.3, 1);
+}
+@utility fade-in { --enter-opacity: 0; }
+@utility zoom-in-95 { --enter-scale: 0.95; }
+@utility slide-in-from-top-1 { --enter-y: -0.25rem; }
+@utility slide-in-from-top-2 { --enter-y: -0.5rem; }
+@utility slide-in-from-top-3 { --enter-y: -0.75rem; }
+@utility slide-in-from-top-4 { --enter-y: -1rem; }
+@utility slide-in-from-top-6 { --enter-y: -1.5rem; }
+@utility slide-in-from-bottom { --enter-y: 2rem; }
+@utility slide-in-from-bottom-2 { --enter-y: 0.5rem; }
+@utility slide-in-from-bottom-4 { --enter-y: 1rem; }
+@utility slide-in-from-bottom-5 { --enter-y: 1.25rem; }
+@utility animate-spin-slow {
+  animation: spin 3s linear infinite;
+}
+
+/* No fill mode: a leftover transform would trap fixed pop-ups inside the element */
+@keyframes ds-enter {
+  from {
+    opacity: var(--enter-opacity, 1);
+    transform: translateY(var(--enter-y, 0)) scale(var(--enter-scale, 1));
+  }
+}
+@keyframes ds-scan {
+  from { top: 0; }
+  to { top: calc(100% - 2px); }
+}
+
+/* QR scanner: style the library's own frame, which marks the real scan area */
+#qr-shaded-region > div { background-color: #60A5FA !important; }
+#qr-shaded-region::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #60A5FA;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.9);
+  animation: ds-scan 2s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *:not(.animate-spin), *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 .touch-target-small { min-height: 36px; }
 .touch-target-xs { min-height: 28px; }
 
@@ -511,11 +597,21 @@ select { min-height: 42px; }
 
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.875rem;
 }
+@media (max-width: 639px) {
+  /* An odd last card fills its row instead of leaving a hole */
+  .stat-grid > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
 @media (min-width: 640px) {
-  .stat-grid { grid-template-columns: repeat(3, 1fr); }
+  .stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.375rem;
 }
 @media (min-width: 1024px) {
   .stat-grid-5 { grid-template-columns: repeat(5, 1fr); }

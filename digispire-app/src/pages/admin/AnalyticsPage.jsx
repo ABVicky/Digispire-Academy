@@ -46,7 +46,7 @@ export default function AnalyticsPage() {
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-48 gap-3">
       <div className="animate-spin rounded-full h-8 w-8 border-4 border-[#255A84] border-t-transparent" />
-      <p className="text-xs text-slate-400 font-medium">Generating insights...</p>
+      <p className="text-xs text-slate-500 font-medium">Generating insights...</p>
     </div>
   );
 
@@ -69,7 +69,7 @@ export default function AnalyticsPage() {
           <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Academy Analytics</h1>
           <p className="text-sm text-slate-500 mt-0.5 font-medium">Deep insights into student engagement and curriculum</p>
         </div>
-        <div className="flex items-center gap-2 bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl border border-emerald-100 animate-pulse">
+        <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-xl border border-emerald-100 animate-pulse">
           <TrendingUp size={16} />
           <span className="text-xs font-bold uppercase tracking-wider">Live Insights</span>
         </div>
@@ -99,16 +99,16 @@ export default function AnalyticsPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-slate-700 truncate group-hover:text-[#255A84] transition-colors">{res.title}</p>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{res.subject || 'Resource'}</p>
+                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{res.subject || 'Resource'}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-bold text-slate-800">{res.clicks || 0}</p>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">clicks</p>
+                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">clicks</p>
                 </div>
               </div>
             ))}
             {topResources.length === 0 && (
-              <p className="text-center text-slate-400 py-6 text-xs">No resources recorded</p>
+              <p className="text-center text-slate-500 py-6 text-xs">No resources recorded</p>
             )}
           </div>
         </div>
@@ -127,11 +127,11 @@ export default function AnalyticsPage() {
 
             <div className="pt-4 border-t border-slate-50 grid grid-cols-2 gap-4">
               <div className="p-4 bg-slate-50 rounded-xl">
-                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Avg. Attendance</p>
+                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">Avg. Attendance</p>
                 <p className="text-lg font-bold text-slate-800">82%</p>
               </div>
               <div className="p-4 bg-slate-50 rounded-xl">
-                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Interactions</p>
+                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">Interactions</p>
                 <p className="text-lg font-bold text-slate-800">{totalClicks}</p>
               </div>
             </div>
@@ -149,7 +149,7 @@ function BatchBar({ label, count, total, color }) {
       <div className="flex justify-between items-end mb-2">
         <div>
           <p className="text-sm font-bold text-slate-800">{label}</p>
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{count} Students</p>
+          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{count} Students</p>
         </div>
         <span className="text-sm font-bold text-slate-800">{pct}%</span>
       </div>
@@ -171,7 +171,7 @@ function InsightCard({ icon: Icon, label, value, color }) {
       </div>
       <div>
         <p className="text-2xl font-bold text-slate-800 tracking-tight">{value}</p>
-        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{label}</p>
+        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{label}</p>
       </div>
     </div>
   );

@@ -61,13 +61,13 @@ const emptyForm = {
 
 function StatChip({ label, value, icon: Icon, colorBg = 'bg-slate-100', colorText = 'text-slate-700' }) {
   return (
-    <div className="bg-white rounded-xl p-4 shadow-2xs border border-slate-200 flex items-center gap-3 flex-1 min-w-[140px]">
+    <div className="bg-white rounded-xl p-4 shadow-2xs border border-slate-200 flex items-center gap-3 flex-1 min-w-0">
       <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${colorBg} ${colorText} shrink-0`}>
         <Icon size={18} />
       </div>
       <div className="min-w-0">
         <p className="text-lg font-bold text-slate-800 leading-none font-mono">{value}</p>
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1 truncate">{label}</p>
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mt-1 leading-tight">{label}</p>
       </div>
     </div>
   );
@@ -351,7 +351,7 @@ export default function StudentsPage() {
       <div className="section-header">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Student Registry</h1>
-          <p className="text-xs text-slate-400 font-medium mt-0.5">Manage profiles, joining dates, and batch enrolment</p>
+          <p className="text-xs text-slate-500 font-medium mt-0.5">Manage profiles, joining dates, and batch enrolment</p>
         </div>
         <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
           <button onClick={handleDownloadStudents} className="btn-outline-premium px-4 py-2.5 flex items-center gap-2">
@@ -389,7 +389,7 @@ export default function StudentsPage() {
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="p-4 border-b border-slate-50 flex flex-col gap-3">
           <div className="relative">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 z-10" />
             <input
               type="text" value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Search by name, ID, or phone..."
@@ -444,7 +444,7 @@ export default function StudentsPage() {
             <div className="animate-spin h-8 w-8 border-4 border-[#255A84] border-t-transparent rounded-full" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-20 text-center text-slate-400">
+          <div className="py-20 text-center text-slate-500">
             <Users size={40} className="mx-auto mb-3 opacity-20" />
             <p className="text-sm font-bold">No students found</p>
           </div>
@@ -454,7 +454,7 @@ export default function StudentsPage() {
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                     <th className="text-left px-6 py-3.5">Student Info</th>
                     <th className="text-left px-4 py-3.5">Batch Details</th>
                     <th className="text-left px-4 py-3.5">Progress</th>
@@ -472,10 +472,10 @@ export default function StudentsPage() {
                             </div>
                             <div className="min-w-0">
                               <p className="font-bold text-slate-800 text-sm truncate">{s.name}</p>
-                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">{s.studentId}</p>
+                              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">{s.studentId}</p>
                               {s.course && <p className="text-[10px] font-semibold text-[#255A84] mt-0.5 truncate max-w-[160px]">{s.course}</p>}
                               {s.mentorId && (
-                                <p className="text-[10px] font-bold text-emerald-600 mt-0.5 truncate max-w-[160px]">
+                                <p className="text-[10px] font-bold text-emerald-700 mt-0.5 truncate max-w-[160px]">
                                   Mentor: {staff.find(m => m.id === s.mentorId)?.name || 'Loading...'}
                                 </p>
                               )}
@@ -493,7 +493,7 @@ export default function StudentsPage() {
                             })}
                             {s.isIntern && <span className="badge-premium-green">Intern</span>}
                           </div>
-                          <p className="text-[10px] text-slate-400 font-medium mt-1">Joined: {s.joiningDate || '—'}</p>
+                          <p className="text-[10px] text-slate-500 font-medium mt-1">Joined: {s.joiningDate || '—'}</p>
                         </td>
                         <td className="px-4 py-3.5">
                           <div className="flex items-center gap-2 max-w-[100px]">
@@ -504,15 +504,15 @@ export default function StudentsPage() {
                           </div>
                         </td>
                         <td className="px-6 py-3.5 text-right">
-                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => { setSelectedStudentForIdCard(s); setShowIdCardModal(true); }} className="p-2 hover:bg-slate-50 text-slate-400 hover:text-slate-600 rounded-lg transition active:scale-95 border border-slate-200" title="View Digital ID">
+                          <div className="flex items-center justify-end gap-2">
+                            <button onClick={() => { setSelectedStudentForIdCard(s); setShowIdCardModal(true); }} className="p-2 hover:bg-slate-50 text-slate-500 hover:text-slate-600 rounded-lg transition active:scale-95 border border-slate-200" title="View Digital ID">
                               <CreditCard size={15} />
                             </button>
-                            <button onClick={() => openEdit(s)} className="p-2 hover:bg-blue-50 text-slate-400 hover:text-[#255A84] rounded-lg transition active:scale-95 border border-slate-200" title="Edit Student">
+                            <button onClick={() => openEdit(s)} className="p-2 hover:bg-blue-50 text-slate-500 hover:text-[#255A84] rounded-lg transition active:scale-95 border border-slate-200" title="Edit Student">
                               <Pencil size={15} />
                             </button>
                             <button onClick={() => handleDelete(s.id)} disabled={deleting === s.id}
-                              className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-lg transition active:scale-95 disabled:opacity-50 border border-slate-200" title="Delete Student">
+                              className="p-2 hover:bg-red-50 text-slate-500 hover:text-red-500 rounded-lg transition active:scale-95 disabled:opacity-50 border border-slate-200" title="Delete Student">
                               {deleting === s.id ? <Loader2 size={15} className="animate-spin text-red-400" /> : <Trash2 size={15} />}
                             </button>
                           </div>
@@ -537,10 +537,10 @@ export default function StudentsPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-slate-800 text-sm truncate">{s.name}</p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mt-0.5">{s.studentId}</p>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono mt-0.5">{s.studentId}</p>
                         {s.course && <p className="text-[10px] text-[#255A84] font-semibold mt-0.5 truncate">{s.course}</p>}
                         {s.mentorId && (
-                          <p className="text-[10px] font-bold text-emerald-600 mt-0.5 truncate">
+                          <p className="text-[10px] font-bold text-emerald-700 mt-0.5 truncate">
                             Mentor: {staff.find(m => m.id === s.mentorId)?.name || 'Loading...'}
                           </p>
                         )}
@@ -572,7 +572,7 @@ export default function StudentsPage() {
                         );
                       })}
                       {s.isIntern && <span className="badge-premium-green">Intern</span>}
-                      <span className="text-[10px] text-slate-400 font-medium ml-auto">Joined {s.joiningDate || '—'}</span>
+                      <span className="text-[10px] text-slate-500 font-medium ml-auto">Joined {s.joiningDate || '—'}</span>
                     </div>
 
                     {/* Progress bar */}
@@ -580,7 +580,7 @@ export default function StudentsPage() {
                       <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                         <div className={`h-full ${s.isIntern ? 'bg-emerald-500' : 'bg-[#F48B1F]'} rounded-full`} style={{ width: `${progress}%` }} />
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400 shrink-0">{progress}% progress</span>
+                      <span className="text-[10px] font-bold text-slate-500 shrink-0">{progress}% progress</span>
                     </div>
                   </div>
                 );
@@ -596,75 +596,75 @@ export default function StudentsPage() {
           <div className="modal-container-premium max-w-md" onClick={e => e.stopPropagation()}>
             <div className="modal-header-premium">
               <h2 className="text-xl font-bold text-slate-800">{editingId ? 'Update Student' : 'New Enrollment'}</h2>
-              <button onClick={() => setShowModal(false)} className="p-2 text-slate-400 hover:text-slate-600 transition"><X size={20} /></button>
+              <button aria-label="Close" onClick={() => setShowModal(false)} className="p-2 text-slate-500 hover:text-slate-600 transition"><X size={20} /></button>
             </div>
             <form onSubmit={finalHandleSave} className="flex flex-col h-full overflow-hidden">
               <div className="modal-body-premium space-y-5">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Full Name *</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Full Name *</label>
                   <div className="relative">
-                    <Users size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+                    <Users size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 z-10" />
                     <input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                       className="input-premium pl-11" placeholder="John Doe" />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Phone *</label>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Phone *</label>
                     <div className="relative">
-                      <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+                      <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 z-10" />
                       <input required value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
                         className="input-premium pl-11" placeholder="+91..." />
                     </div>
                   </div>
                   {!editingId ? (
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Set Password *</label>
+                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Set Password *</label>
                       <div className="relative">
-                        <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+                        <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 z-10" />
                         <input required value={form.tempPassword} onChange={e => setForm(f => ({ ...f, tempPassword: e.target.value }))}
                           className="input-premium pl-11" placeholder="Access code" />
                       </div>
                     </div>
                   ) : (
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Student ID</label>
-                      <input readOnly value={form.studentId} className="input-premium bg-slate-100 font-mono text-slate-400 cursor-not-allowed" />
+                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Student ID</label>
+                      <input readOnly value={form.studentId} className="input-premium bg-slate-100 font-mono text-slate-500 cursor-not-allowed" />
                     </div>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Email (for class reports & attendance emails)</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Email (for class reports & attendance emails)</label>
                   <div className="relative">
-                    <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+                    <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 z-10" />
                     <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                       className="input-premium pl-11" placeholder="student@example.com" autoComplete="off" />
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-1 ml-1">The student's real email. The phone number is still used for login.</p>
+                  <p className="text-[10px] text-slate-500 mt-1 ml-1">The student's real email. The phone number is still used for login.</p>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Status</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Status</label>
                   <div className="grid grid-cols-2 gap-2">
                     {[['active', 'Active'], ['inactive', 'Inactive']].map(([val, text]) => (
                       <button
                         key={val} type="button" onClick={() => setForm(f => ({ ...f, status: val }))}
                         className={`py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest border transition-all ${
                           form.status === val
-                            ? (val === 'active' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-slate-700 text-white border-slate-700')
-                            : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'
+                            ? (val === 'active' ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-700 text-white border-slate-700')
+                            : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
                         }`}
                       >
                         {text}
                       </button>
                     ))}
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-1 ml-1">Inactive students receive no emails and are hidden from email lists.</p>
+                  <p className="text-[10px] text-slate-500 mt-1 ml-1">Inactive students receive no emails and are hidden from email lists.</p>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Enrolled Course Track *</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Enrolled Course Track *</label>
                   <select
                     required
                     value={form.courseId}
@@ -679,7 +679,7 @@ export default function StudentsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Assigned Mentor / Educator</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Assigned Mentor / Educator</label>
                   <select
                     value={form.mentorId}
                     onChange={e => setForm(f => ({ ...f, mentorId: e.target.value }))}
@@ -693,9 +693,9 @@ export default function StudentsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Joining Date *</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Joining Date *</label>
                   <div className="relative">
-                    <Calendar size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+                    <Calendar size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 z-10" />
                     <input required type="date" value={form.joiningDate} onChange={e => setForm(f => ({ ...f, joiningDate: e.target.value }))}
                       className="input-premium pl-11" />
                   </div>
@@ -703,7 +703,7 @@ export default function StudentsPage() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Academic Batch(es) *</label>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Academic Batch(es) *</label>
                     <div className="grid grid-cols-2 gap-2 border border-slate-200/80 rounded-xl p-2.5 bg-slate-50/50">
                       {(batches.length === 0 ? [{id: 'morning', name: 'Morning'}, {id: 'evening', name: 'Evening'}] : batches.filter(b => b.id !== 'internship')).map(b => {
                         const isChecked = form.batchIds?.includes(b.id);
@@ -730,13 +730,13 @@ export default function StudentsPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Internship</label>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Internship</label>
                     <button
                       type="button" onClick={() => setForm(f => ({ ...f, isIntern: !f.isIntern }))}
                       className={`w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-widest border transition-all flex items-center justify-center gap-2 ${
                         form.isIntern 
-                          ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/20' 
-                          : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'
+                          ? 'bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-500/20' 
+                          : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
                       }`}
                     >
                       {form.isIntern ? <Check size={14} /> : null}

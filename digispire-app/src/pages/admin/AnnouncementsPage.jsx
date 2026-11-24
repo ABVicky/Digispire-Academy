@@ -323,7 +323,7 @@ export default function AnnouncementsPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Announcements & Notices</h1>
-            <span className="badge-premium-blue">Batch Alerts</span>
+            <span className="badge-premium-blue whitespace-nowrap hidden sm:inline-flex">Batch Alerts</span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
             Send announcements, class notices, and batch updates to students
@@ -348,7 +348,7 @@ export default function AnnouncementsPage() {
           </div>
           <div className="min-w-0">
             <p className="text-lg font-bold text-slate-800 leading-none font-mono">{announcements.length}</p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1 truncate">Total Announcements</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mt-1 leading-tight">Total Announcements</p>
           </div>
         </div>
 
@@ -358,7 +358,7 @@ export default function AnnouncementsPage() {
           </div>
           <div className="min-w-0">
             <p className="text-lg font-bold text-slate-800 leading-none font-mono">{urgentCount}</p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1 truncate">Urgent Alerts</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mt-1 leading-tight">Urgent Alerts</p>
           </div>
         </div>
 
@@ -368,7 +368,7 @@ export default function AnnouncementsPage() {
           </div>
           <div className="min-w-0">
             <p className="text-lg font-bold text-slate-800 leading-none font-mono">{importantCount}</p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1 truncate">Important</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mt-1 leading-tight">Important</p>
           </div>
         </div>
 
@@ -378,7 +378,7 @@ export default function AnnouncementsPage() {
           </div>
           <div className="min-w-0">
             <p className="text-lg font-bold text-slate-800 leading-none font-mono">{pinnedCount}</p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1 truncate">Pinned</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mt-1 leading-tight">Pinned</p>
           </div>
         </div>
       </div>
@@ -387,7 +387,7 @@ export default function AnnouncementsPage() {
       <div className="bg-white rounded-xl border border-slate-200 shadow-2xs p-4 space-y-3">
         <div className="flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 z-10" />
             <input
               type="text"
               value={search}
@@ -402,7 +402,7 @@ export default function AnnouncementsPage() {
             <select
               value={filterBatch}
               onChange={e => setFilterBatch(e.target.value)}
-              className="select-premium text-xs cursor-pointer min-w-[160px]"
+              className="select-premium text-xs cursor-pointer min-w-[160px]" aria-label="Filter by batch"
             >
               <option value="all">Filter by Target Batch (All)</option>
               <option value="morning">Morning Batch ({batchStudentCounts['morning'] || 0} students)</option>
@@ -417,7 +417,7 @@ export default function AnnouncementsPage() {
             <select
               value={filterPriority}
               onChange={e => setFilterPriority(e.target.value)}
-              className="select-premium text-xs cursor-pointer min-w-[140px]"
+              className="select-premium text-xs cursor-pointer min-w-[140px]" aria-label="Filter by priority"
             >
               <option value="all">All Priorities</option>
               <option value="urgent">Urgent Alerts Only</option>
@@ -435,11 +435,11 @@ export default function AnnouncementsPage() {
         </div>
       ) : filteredAnnouncements.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-xl border border-slate-200 p-6 space-y-3">
-          <div className="h-12 w-12 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+          <div className="h-12 w-12 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center mx-auto">
             <Megaphone size={24} />
           </div>
           <h3 className="font-bold text-slate-700 text-sm">No Announcements Found</h3>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+          <p className="text-xs text-slate-500 max-w-sm mx-auto">
             {search || filterBatch !== 'all' || filterPriority !== 'all'
               ? 'No announcements match the active filter criteria. Try resetting your search filters.'
               : 'Broadcast your first batch-targeted notice by clicking "New Batch Announcement" above.'}
@@ -473,7 +473,7 @@ export default function AnnouncementsPage() {
                 )}
 
                 <div className="space-y-2.5">
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-start justify-between gap-2 sm:gap-3">
                     <div className="space-y-1 min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         {getPriorityBadge(item.priority)}
@@ -485,11 +485,11 @@ export default function AnnouncementsPage() {
                     </div>
 
                     {/* Actions Menu */}
-                    <div className="flex items-center gap-1 shrink-0">
+                    <div className="flex items-center justify-end gap-1 shrink-0">
                       <button
                         onClick={() => togglePin(item)}
                         className={`p-1.5 rounded-lg border transition cursor-pointer ${
-                          item.pinned ? 'bg-indigo-50 text-indigo-600 border-indigo-200' : 'text-slate-400 hover:text-slate-600 border-slate-200'
+                          item.pinned ? 'bg-indigo-50 text-indigo-600 border-indigo-200' : 'text-slate-500 hover:text-slate-600 border-slate-200'
                         }`}
                         title={item.pinned ? 'Unpin from Top' : 'Pin to Top of Dashboard'}
                       >
@@ -497,21 +497,21 @@ export default function AnnouncementsPage() {
                       </button>
                       <button
                         onClick={() => setPreviewItem(item)}
-                        className="p-1.5 text-slate-400 hover:text-[#1E3A5F] rounded-lg border border-slate-200 transition cursor-pointer"
+                        className="p-1.5 text-slate-500 hover:text-[#1E3A5F] rounded-lg border border-slate-200 transition cursor-pointer"
                         title="Student View Preview"
                       >
                         <Eye size={13} />
                       </button>
                       <button
                         onClick={() => openEdit(item)}
-                        className="p-1.5 text-slate-400 hover:text-[#1E3A5F] rounded-lg border border-slate-200 transition cursor-pointer"
+                        className="p-1.5 text-slate-500 hover:text-[#1E3A5F] rounded-lg border border-slate-200 transition cursor-pointer"
                         title="Edit Announcement"
                       >
                         <Edit3 size={13} />
                       </button>
                       <button
                         onClick={() => handleDelete(item.id)}
-                        className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg border border-slate-200 transition cursor-pointer"
+                        className="p-1.5 text-slate-500 hover:text-rose-600 rounded-lg border border-slate-200 transition cursor-pointer"
                         title="Delete Notice"
                       >
                         <Trash2 size={13} />
@@ -524,7 +524,7 @@ export default function AnnouncementsPage() {
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
                   <div className="flex items-center gap-1.5">
                     <Clock size={11} />
                     <span>{dateStr}</span>
@@ -550,9 +550,9 @@ export default function AnnouncementsPage() {
                   {editingId ? 'Edit Batch Announcement' : 'Publish Batch-Targeted Announcement'}
                 </h3>
               </div>
-              <button
+              <button aria-label="Close"
                 onClick={() => setShowModal(false)}
-                className="p-1 text-slate-400 hover:text-slate-600 rounded transition cursor-pointer"
+                className="p-1 text-slate-500 hover:text-slate-600 rounded transition cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -607,7 +607,7 @@ export default function AnnouncementsPage() {
                         </div>
                         <div>
                           <p className="text-xs font-bold leading-tight">All Batches (Global)</p>
-                          <p className={`text-[10px] ${form.targetBatchIds.includes('all') ? 'text-slate-300' : 'text-slate-400'}`}>
+                          <p className={`text-[10px] ${form.targetBatchIds.includes('all') ? 'text-slate-300' : 'text-slate-500'}`}>
                             Broadcast to entire academy
                           </p>
                         </div>
@@ -642,7 +642,7 @@ export default function AnnouncementsPage() {
                             </div>
                             <div className="min-w-0">
                               <p className="text-xs font-bold leading-tight truncate">{b.name || b.id}</p>
-                              <p className={`text-[10px] truncate ${isSelected ? 'text-slate-300' : 'text-slate-400'}`}>
+                              <p className={`text-[10px] truncate ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>
                                 {b.startTime ? `${b.startTime} - ${b.endTime}` : (b.defaultDesc || 'Active Batch')}
                               </p>
                             </div>
@@ -736,13 +736,13 @@ export default function AnnouncementsPage() {
           <div className="modal-container-premium max-w-md" onClick={e => e.stopPropagation()}>
             <div className="modal-header-premium">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-600">Student Dashboard Alert Preview</span>
-              <button onClick={() => setPreviewItem(null)} className="p-1 text-slate-400 hover:text-slate-600 rounded">
+              <button aria-label="Close" onClick={() => setPreviewItem(null)} className="p-1 text-slate-500 hover:text-slate-600 rounded">
                 <X size={16} />
               </button>
             </div>
             <div className="modal-body-premium space-y-3">
               <div className="flex items-center justify-between pb-1">
-                <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
+                <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">
                   Targeted Batches:
                 </p>
                 {renderBatchBadges(previewItem)}

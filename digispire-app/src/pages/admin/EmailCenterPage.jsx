@@ -68,7 +68,7 @@ function ConfigCard({ config, error, onReload }) {
               ['Monthly report', config.monthly?.enabled ? `Last day of month, ${config.monthly.time} (${config.timezone})` : 'Automatic run disabled'],
             ].map(([k, v]) => (
               <div key={k} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 min-w-0">
-                <dt className="text-[10px] font-black uppercase tracking-wider text-slate-400">{k}</dt>
+                <dt className="text-[10px] font-black uppercase tracking-wider text-slate-500">{k}</dt>
                 <dd className="font-semibold text-slate-700 mt-0.5 break-words">{String(v)}</dd>
               </div>
             ))}
@@ -137,7 +137,7 @@ function MonthlyCard() {
         send yourself a test, or run it manually. Re-running never sends a student the same month twice.
       </p>
       <div className="flex flex-wrap items-center gap-2">
-        <input type="month" value={month} onChange={e => { setMonth(e.target.value); setData(null); setRunResult(null); }} className="input-premium text-sm w-auto" />
+        <input aria-label="Report month" type="month" value={month} onChange={e => { setMonth(e.target.value); setData(null); setRunResult(null); }} className="input-premium text-sm w-auto" />
         <button onClick={() => preview()} disabled={!!busy || !month} className="btn-outline-premium px-4 py-2.5 text-xs flex items-center gap-2">
           {busy === 'preview' ? <Loader2 size={14} className="animate-spin" /> : <Eye size={14} />} Preview
         </button>
@@ -169,7 +169,7 @@ function MonthlyCard() {
             <div className="rounded-xl border border-slate-200 max-h-[460px] overflow-y-auto">
               <table className="w-full text-xs">
                 <thead className="sticky top-0 bg-slate-50">
-                  <tr className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <tr className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                     <th className="text-left px-3 py-2">Student</th>
                     <th className="text-center px-2 py-2">Held</th>
                     <th className="text-center px-2 py-2">Att.</th>
@@ -183,11 +183,11 @@ function MonthlyCard() {
                     <tr key={r.uid} onClick={() => r.totals && preview(r.uid)}
                       className={`${r.totals ? 'cursor-pointer hover:bg-slate-50' : ''} ${studentUid === r.uid ? 'bg-blue-50/60' : ''}`}>
                       <td className="px-3 py-2">
-                        <p className="font-bold text-slate-700">{r.name} {r.queued && <span className="text-[10px] text-emerald-600 font-bold">· sent</span>}</p>
-                        <p className={`text-[10px] ${r.skip ? 'text-amber-700 font-semibold' : 'text-slate-400'}`}>{r.skip ? r.skipLabel : r.email}</p>
+                        <p className="font-bold text-slate-700">{r.name} {r.queued && <span className="text-[10px] text-emerald-700 font-bold">· sent</span>}</p>
+                        <p className={`text-[10px] ${r.skip ? 'text-amber-700 font-semibold' : 'text-slate-500'}`}>{r.skip ? r.skipLabel : r.email}</p>
                       </td>
                       <td className="text-center px-2">{r.totals?.held ?? '—'}</td>
-                      <td className="text-center px-2 text-emerald-600 font-bold">{r.totals?.attended ?? '—'}</td>
+                      <td className="text-center px-2 text-emerald-700 font-bold">{r.totals?.attended ?? '—'}</td>
                       <td className="text-center px-2 text-rose-500 font-bold">{r.totals?.absent ?? '—'}</td>
                       <td className="text-center px-2 text-amber-600 font-bold">{r.totals?.leave ?? '—'}</td>
                       <td className="text-center px-2 font-black">{r.totals ? `${r.totals.pct}%` : '—'}</td>
@@ -219,7 +219,7 @@ function BodyModal({ id, onClose }) {
         <div className="modal-container-premium w-full sm:max-w-3xl" onClick={e => e.stopPropagation()}>
           <div className="modal-header-premium">
             <h2 className="text-lg font-bold text-slate-800">Sent email</h2>
-            <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600" aria-label="Close"><X size={20} /></button>
+            <button onClick={onClose} className="p-2 text-slate-500 hover:text-slate-600" aria-label="Close"><X size={20} /></button>
           </div>
           <div className="modal-body-premium">
             <ErrorNotice message={error} />
@@ -264,11 +264,11 @@ function OutboxCard() {
   return (
     <Card title="Email log" icon={Inbox} action={
       <div className="flex gap-2">
-        <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className="select-premium text-xs py-2 cursor-pointer">
+        <select aria-label="Filter by type" value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className="select-premium text-xs py-2 cursor-pointer">
           <option value="all">All types</option>
           {Object.entries(EMAIL_TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
         </select>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="select-premium text-xs py-2 cursor-pointer">
+        <select aria-label="Filter by status" value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="select-premium text-xs py-2 cursor-pointer">
           <option value="all">All statuses</option>
           {['queued', 'sending', 'sent', 'failed'].map(s => <option key={s} value={s}>{s}</option>)}
         </select>
@@ -276,12 +276,12 @@ function OutboxCard() {
     }>
       <ErrorNotice message={error} />
       {filtered.length === 0 ? (
-        <p className="text-xs text-slate-400 py-6 text-center">No emails yet.</p>
+        <p className="text-xs text-slate-500 py-6 text-center">No emails yet.</p>
       ) : (
         <div className="overflow-x-auto -mx-4 sm:mx-0">
           <table className="w-full text-xs min-w-[720px]">
             <thead>
-              <tr className="bg-slate-50/60 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <tr className="bg-slate-50/60 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                 <th className="text-left px-3 py-2.5">When</th>
                 <th className="text-left px-3 py-2.5">Email</th>
                 <th className="text-left px-3 py-2.5">Recipients</th>
@@ -295,17 +295,17 @@ function OutboxCard() {
                 <tr key={m.id} className="align-top">
                   <td className="px-3 py-2.5 whitespace-nowrap text-slate-500">
                     {formatDateTime(m.createdAt)}
-                    {m.sentAt && <span className="block text-[10px] text-emerald-600">sent {formatDateTime(m.sentAt)}</span>}
+                    {m.sentAt && <span className="block text-[10px] text-emerald-700">sent {formatDateTime(m.sentAt)}</span>}
                   </td>
                   <td className="px-3 py-2.5 max-w-[260px]">
                     <p className="font-bold text-slate-700">{emailTypeLabel(m.type)}{m.purpose === 'test' ? ' (preview)' : ''}</p>
                     <p className="text-slate-500 truncate">{m.subject}</p>
-                    <p className="text-[10px] text-slate-400 truncate">{context(m)}</p>
+                    <p className="text-[10px] text-slate-500 truncate">{context(m)}</p>
                   </td>
                   <td className="px-3 py-2.5 max-w-[220px]">
                     <p className="font-semibold text-slate-700">{m.recipientCount ? `${m.recipientCount} student(s)` : (m.to || []).join(', ')}</p>
-                    {m.bcc?.length ? <p className="text-[10px] text-slate-400">BCC {m.bcc.length}</p> : null}
-                    {m.cc?.length ? <p className="text-[10px] text-slate-400 truncate">CC {m.cc.join(', ')}</p> : null}
+                    {m.bcc?.length ? <p className="text-[10px] text-slate-500">BCC {m.bcc.length}</p> : null}
+                    {m.cc?.length ? <p className="text-[10px] text-slate-500 truncate">CC {m.cc.join(', ')}</p> : null}
                     {m.testMode && <p className="text-[10px] text-amber-700 truncate">→ {(m.to || []).join(', ')}</p>}
                   </td>
                   <td className="px-3 py-2.5 text-slate-500">{m.createdBy?.name || '—'}</td>
@@ -314,7 +314,7 @@ function OutboxCard() {
                       <EmailStatusBadge status={m.status} />
                       {m.testMode && <TestModeBadge />}
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-0.5">{m.attempts || 0} attempt(s)</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5">{m.attempts || 0} attempt(s)</p>
                     {m.lastError && <p className="text-[10px] text-rose-600 max-w-[200px] break-words">{m.lastError}</p>}
                     {m.deferredReason && m.status === 'queued' && <p className="text-[10px] text-amber-700 max-w-[200px]">{m.deferredReason}</p>}
                   </td>
@@ -352,7 +352,7 @@ export default function EmailCenterPage() {
 
   if (!emailFeaturesEnabled() || userProfile?.role !== 'admin') {
     return (
-      <div className="bg-white rounded-2xl border border-slate-100 p-10 text-center text-slate-400">
+      <div className="bg-white rounded-2xl border border-slate-100 p-10 text-center text-slate-500">
         <AlertTriangle size={36} className="mx-auto mb-3 opacity-30" />
         <p className="text-sm font-bold">{emailFeaturesEnabled() ? 'Only admins can open the Email Center.' : 'The Email Center is available on the website only.'}</p>
       </div>
@@ -364,7 +364,7 @@ export default function EmailCenterPage() {
       <div className="section-header">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight flex items-center gap-2"><Mail size={22} className="text-[#255A84]" /> Email Center</h1>
-          <p className="text-xs text-slate-400 font-medium mt-0.5">SMTP status, monthly reports and the log of every email sent</p>
+          <p className="text-xs text-slate-500 font-medium mt-0.5">SMTP status, monthly reports and the log of every email sent</p>
         </div>
       </div>
       <ConfigCard config={config} error={error} onReload={loadConfig} />

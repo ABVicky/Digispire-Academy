@@ -100,7 +100,7 @@ export default function SubmissionsPage() {
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-64 gap-3">
       <div className="animate-spin rounded-full h-8 w-8 border-4 border-[#255A84] border-t-transparent" />
-      <p className="text-xs text-slate-400 font-medium">Loading submissions...</p>
+      <p className="text-xs text-slate-500 font-medium">Loading submissions...</p>
     </div>
   );
 
@@ -120,7 +120,7 @@ export default function SubmissionsPage() {
           </div>
           <div>
             <p className="text-xl font-bold text-slate-800 leading-none">{submissions.length}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Total Received</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Total Received</p>
           </div>
         </div>
 
@@ -130,17 +130,17 @@ export default function SubmissionsPage() {
           </div>
           <div>
             <p className="text-xl font-bold text-slate-800 leading-none">{pendingCount}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1 font-sans">Pending Action</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1 font-sans">Pending Action</p>
           </div>
         </div>
 
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-3.5 hover:shadow-md transition">
-          <div className="h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+          <div className="h-10 w-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
             <CheckCircle2 size={18} />
           </div>
           <div>
             <p className="text-xl font-bold text-slate-800 leading-none">{reviewedCount}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Reviewed</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Reviewed</p>
           </div>
         </div>
 
@@ -150,7 +150,7 @@ export default function SubmissionsPage() {
           </div>
           <div>
             <p className="text-xl font-bold text-slate-800 leading-none">{revisionCount}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Revisions Req.</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Revisions Req.</p>
           </div>
         </div>
       </div>
@@ -177,7 +177,7 @@ export default function SubmissionsPage() {
 
         {/* Search Field */}
         <div className="relative w-full md:w-72">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
           <input
             type="text"
             value={search}
@@ -192,8 +192,8 @@ export default function SubmissionsPage() {
       {filteredSubmissions.length === 0 ? (
         <div className="bg-white rounded-2xl py-20 text-center border border-slate-100">
           <FolderOpen size={48} className="mx-auto mb-3 text-slate-300" />
-          <p className="text-slate-400 font-bold text-sm">No submissions match the filters</p>
-          <p className="text-slate-400 text-[11px] mt-1">Check back later or adjust filters</p>
+          <p className="text-slate-500 font-bold text-sm">No submissions match the filters</p>
+          <p className="text-slate-500 text-[11px] mt-1">Check back later or adjust filters</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -217,13 +217,13 @@ export default function SubmissionsPage() {
                       </div>
                       <div className="min-w-0">
                         <h3 className="font-extrabold text-slate-800 text-xs truncate leading-snug">{sub.studentName}</h3>
-                        <p className="text-[9px] font-mono font-bold text-slate-400">ID: {sub.studentId}</p>
+                        <p className="text-[9px] font-mono font-bold text-slate-500">ID: {sub.studentId}</p>
                       </div>
                     </div>
 
                     <button
                       onClick={() => handleDelete(sub.id)}
-                      className="p-2 text-slate-200 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition rounded"
+                      className="p-2 text-slate-500 hover:text-rose-600 transition rounded"
                       title="Delete Submissions"
                     >
                       <Trash2 size={14} />
@@ -236,7 +236,7 @@ export default function SubmissionsPage() {
                       <span className="text-[8px] bg-slate-200/60 text-slate-500 border border-slate-300/40 px-2 py-0.5 rounded font-black tracking-wider uppercase">
                         {sub.courseName}
                       </span>
-                      <span className="text-[9px] text-slate-400 font-medium">{dateStr}</span>
+                      <span className="text-[9px] text-slate-500 font-medium">{dateStr}</span>
                     </div>
                     <h4 className="font-bold text-slate-700 text-xs mt-1 truncate">{sub.moduleTitle}</h4>
                   </div>
@@ -244,7 +244,7 @@ export default function SubmissionsPage() {
                   {/* Student Remarks */}
                   {sub.notes && (
                     <div className="text-[11px] text-slate-500 leading-normal font-medium pl-1 border-l-2 border-slate-200">
-                      <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Student Notes</span>
+                      <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest block mb-0.5">Student Notes</span>
                       {sub.notes}
                     </div>
                   )}
@@ -257,16 +257,16 @@ export default function SubmissionsPage() {
                       <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-wider">
                         <div className="flex items-center gap-1">
                           <MessageSquare size={10} className={sub.status === 'needs_revision' ? 'text-rose-500' : 'text-emerald-500'} />
-                          <span className={sub.status === 'needs_revision' ? 'text-rose-600' : 'text-emerald-600'}>
+                          <span className={sub.status === 'needs_revision' ? 'text-rose-600' : 'text-emerald-700'}>
                             {sub.status === 'needs_revision' ? 'Revision Requested' : 'Feedback / Reviewed'}
                           </span>
                         </div>
-                        {sub.reviewedBy && <span className="text-slate-400 font-medium normal-case">by {sub.reviewedBy}</span>}
+                        {sub.reviewedBy && <span className="text-slate-500 font-medium normal-case">by {sub.reviewedBy}</span>}
                       </div>
                       {sub.feedback ? (
                         <p className="text-[10px] text-slate-600 font-medium leading-relaxed">{sub.feedback}</p>
                       ) : (
-                        <p className="text-[10px] text-slate-400 italic font-medium">No remarks provided.</p>
+                        <p className="text-[10px] text-slate-500 italic font-medium">No remarks provided.</p>
                       )}
                     </div>
                   )}
@@ -287,7 +287,7 @@ export default function SubmissionsPage() {
                     onClick={() => openReviewDialog(sub)}
                     className={`px-3.5 py-2 rounded-xl text-[9px] font-black tracking-wider uppercase transition-all flex items-center gap-1 ${
                       sub.status === 'pending'
-                        ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-sm'
+                        ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-sm'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
                     }`}
                   >
@@ -307,11 +307,11 @@ export default function SubmissionsPage() {
             <div className="flex items-center justify-between mb-5 border-b border-slate-100 pb-3">
               <div>
                 <h2 className="text-sm font-black text-slate-800 uppercase tracking-wider">Review Student Work</h2>
-                <p className="text-[10px] text-slate-400 mt-0.5">Evaluate {reviewModal.studentName}'s link</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">Evaluate {reviewModal.studentName}'s link</p>
               </div>
-              <button
+              <button aria-label="Close"
                 onClick={() => setReviewModal(null)}
-                className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition"
+                className="p-1.5 text-slate-500 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition"
               >
                 <X size={18} />
               </button>
@@ -319,14 +319,14 @@ export default function SubmissionsPage() {
 
             <form onSubmit={handleReview} className="space-y-4 font-sans">
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Review Outcome *</label>
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Review Outcome *</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setStatusVal('reviewed')}
                     className={`flex items-center justify-center gap-1.5 p-3 rounded-xl border transition-all ${
                       statusVal === 'reviewed'
-                        ? 'bg-emerald-500 border-transparent text-white font-bold shadow-lg shadow-emerald-500/10'
+                        ? 'bg-emerald-600 border-transparent text-white font-bold shadow-lg shadow-emerald-500/10'
                         : 'bg-slate-50 border-transparent text-slate-500 hover:bg-slate-100'
                     }`}
                   >
@@ -350,7 +350,7 @@ export default function SubmissionsPage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Feedback / Remarks</label>
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Feedback / Remarks</label>
                 <textarea
                   value={feedback}
                   onChange={e => setFeedback(e.target.value)}

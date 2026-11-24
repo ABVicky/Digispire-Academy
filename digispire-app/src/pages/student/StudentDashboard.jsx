@@ -194,7 +194,7 @@ export default function StudentDashboard() {
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-48 gap-3">
       <div className="animate-spin rounded-full h-8 w-8 border-3 border-[#1E3A5F] border-t-transparent" />
-      <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Loading Dashboard...</p>
+      <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Loading Dashboard...</p>
     </div>
   );
 
@@ -319,7 +319,7 @@ export default function StudentDashboard() {
 
                     <button
                       onClick={(e) => dismissAnnouncement(ann.id, e)}
-                      className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-black/5 transition cursor-pointer shrink-0"
+                      className="text-slate-500 hover:text-slate-700 p-1.5 rounded-lg hover:bg-black/5 transition cursor-pointer shrink-0"
                       title="Dismiss alert banner"
                       aria-label="Dismiss announcement"
                     >
@@ -382,7 +382,7 @@ export default function StudentDashboard() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Class Attendance</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Class Attendance</p>
               <p className="text-sm font-bold text-slate-800 mt-0.5">Scan Classroom QR Code</p>
             </div>
             <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center text-[#1E3A5F]">
@@ -402,7 +402,7 @@ export default function StudentDashboard() {
           <Layers size={14} className="text-[#1E3A5F]" /> My Batches
         </h2>
         {data.enrolledBatches.length === 0 ? (
-          <p className="text-xs text-slate-400 py-3 italic">No active batch enrolled.</p>
+          <p className="text-xs text-slate-500 py-3 italic">No active batch enrolled.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             {data.enrolledBatches.map(b => (
@@ -412,7 +412,7 @@ export default function StudentDashboard() {
                   <p className="text-[10px] text-slate-500 font-medium mt-0.5">
                     Time: {b.startTime || '09:00'} – {b.endTime || '11:00'}
                   </p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">
+                  <p className="text-[10px] text-slate-500 mt-0.5">
                     Teacher: {b.educator || 'Faculty Lead'}
                   </p>
                 </div>
@@ -429,7 +429,7 @@ export default function StudentDashboard() {
           <Calendar size={14} className="text-[#1E3A5F]" /> Upcoming Classes
         </h2>
         {data.upcomingClasses.length === 0 ? (
-          <p className="text-xs text-slate-400 py-3 italic">No classes scheduled for today or tomorrow.</p>
+          <p className="text-xs text-slate-500 py-3 italic">No classes scheduled for today or tomorrow.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             {data.upcomingClasses.map(c => (
@@ -468,7 +468,7 @@ export default function StudentDashboard() {
                   <User size={16} />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">My Mentor</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">My Mentor</span>
                   <h3 className="font-bold text-slate-800 text-xs truncate mt-0.5">{data.mentor.name}</h3>
                   <div className="mt-1 space-y-0.5 text-[10px] text-slate-500">
                     {data.mentor.email && <p className="flex items-center gap-1.5 truncate"><Mail size={10} /> {data.mentor.email}</p>}
@@ -483,7 +483,7 @@ export default function StudentDashboard() {
                   <GraduationCap size={16} />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Teacher</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Teacher</span>
                   <h3 className="font-bold text-slate-800 text-xs truncate mt-0.5">{inst.name}</h3>
                   <div className="mt-1 space-y-0.5 text-[10px] text-slate-500">
                     {inst.email && <p className="flex items-center gap-1.5 truncate"><Mail size={10} /> {inst.email}</p>}
@@ -513,7 +513,7 @@ export default function StudentDashboard() {
                 <Megaphone size={16} className="text-[#1E3A5F]" />
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">Official Notice Archive</h3>
               </div>
-              <button onClick={() => setShowAllAnnouncementsModal(false)} className="p-1 text-slate-400 hover:text-slate-600 rounded">
+              <button aria-label="Close" onClick={() => setShowAllAnnouncementsModal(false)} className="p-1 text-slate-500 hover:text-slate-600 rounded">
                 <X size={16} />
               </button>
             </div>
@@ -531,7 +531,7 @@ export default function StudentDashboard() {
               </div>
 
               {data.announcements.length === 0 ? (
-                <p className="text-xs text-slate-400 py-6 text-center italic">No broadcast announcements recorded.</p>
+                <p className="text-xs text-slate-500 py-6 text-center italic">No broadcast announcements recorded.</p>
               ) : (
                 data.announcements.map(ann => {
                   const isDismissed = dismissedIds.includes(ann.id);
@@ -550,15 +550,15 @@ export default function StudentDashboard() {
                           }`}>
                             {ann.priority}
                           </span>
-                          <span className="text-[10px] text-slate-400">{dateStr}</span>
+                          <span className="text-[10px] text-slate-500">{dateStr}</span>
                         </div>
                         {isDismissed && (
-                          <span className="text-[9px] font-bold text-slate-400 uppercase">Dismissed</span>
+                          <span className="text-[9px] font-bold text-slate-500 uppercase">Dismissed</span>
                         )}
                       </div>
                       <h4 className="font-bold text-xs text-slate-800">{ann.title}</h4>
                       <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line">{ann.message}</p>
-                      <p className="text-[10px] text-slate-400 pt-1">Author: {ann.authorName} ({ann.authorRole})</p>
+                      <p className="text-[10px] text-slate-500 pt-1">Author: {ann.authorName} ({ann.authorRole})</p>
                     </div>
                   );
                 })

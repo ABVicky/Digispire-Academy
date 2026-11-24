@@ -32,7 +32,7 @@ function getPacingStatus(actualProgress, expectedProgress) {
     return {
       label: 'Completed',
       badgeClass: 'bg-emerald-500/10 text-emerald-700 border-emerald-200/80',
-      pillClass: 'bg-emerald-500 text-white',
+      pillClass: 'bg-emerald-600 text-white',
       icon: Award
     };
   }
@@ -458,7 +458,7 @@ export default function CourseCompletionReportPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#255A84] to-[#1a4261] text-white flex items-center justify-center shadow-md shadow-[#255A84]/20">
+            <div className="h-10 w-10 shrink-0 rounded-2xl bg-gradient-to-br from-[#255A84] to-[#1a4261] text-white flex items-center justify-center shadow-md shadow-[#255A84]/20">
               <Award size={22} />
             </div>
             <div>
@@ -515,27 +515,27 @@ export default function CourseCompletionReportPage() {
           </div>
           <div>
             <p className="text-2xl font-extrabold text-slate-800 leading-none">{totalStudentsCount}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Enrolled Students</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Enrolled Students</p>
           </div>
         </div>
 
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100/80 flex items-center gap-3.5 hover:shadow-md transition">
-          <div className="h-11 w-11 rounded-xl bg-amber-50 text-[#F48B1F] flex items-center justify-center shrink-0 font-bold">
+          <div className="h-11 w-11 rounded-xl bg-amber-50 text-[#C2410C] flex items-center justify-center shrink-0 font-bold">
             <GraduationCap size={20} />
           </div>
           <div>
             <p className="text-2xl font-extrabold text-slate-800 leading-none">{avgProgress}%</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Average Completion</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Average Completion</p>
           </div>
         </div>
 
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100/80 flex items-center gap-3.5 hover:shadow-md transition">
-          <div className="h-11 w-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 font-bold">
+          <div className="h-11 w-11 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 font-bold">
             <CheckCircle2 size={20} />
           </div>
           <div>
             <p className="text-2xl font-extrabold text-slate-800 leading-none">{onTrackCount}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">On Track / Ahead</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">On Track / Ahead</p>
           </div>
         </div>
 
@@ -545,17 +545,17 @@ export default function CourseCompletionReportPage() {
           </div>
           <div>
             <p className="text-2xl font-extrabold text-slate-800 leading-none">{behindCount}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Needs Pacing Support</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Needs Pacing Support</p>
           </div>
         </div>
       </div>
 
       {/* ── Toolbar Filters ── */}
       <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
-        <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+        <div className="flex flex-col 2xl:flex-row gap-3 items-stretch 2xl:items-center">
           {/* Search Box */}
           <div className="relative flex-1">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
               type="text"
               placeholder="Search by student name, ID, email or phone..."
@@ -564,9 +564,9 @@ export default function CourseCompletionReportPage() {
               className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all"
             />
             {search && (
-              <button
+              <button aria-label="Clear search"
                 onClick={() => setSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600"
               >
                 <X size={14} />
               </button>
@@ -579,6 +579,7 @@ export default function CourseCompletionReportPage() {
             <select
               value={selectedCourseId}
               onChange={(e) => setSelectedCourseId(e.target.value)}
+              aria-label="Filter by course"
               className="px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all truncate"
             >
               <option value="all">All Courses</option>
@@ -591,12 +592,13 @@ export default function CourseCompletionReportPage() {
             <select
               value={selectedBatchId}
               onChange={(e) => setSelectedBatchId(e.target.value)}
+              aria-label="Filter by batch"
               className="px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all truncate"
             >
               <option value="all">All Batches</option>
-              <option value="morning">Morning Batch</option>
-              <option value="evening">Evening Batch</option>
-              <option value="internship">Internship Track</option>
+              {[['morning', 'Morning Batch'], ['evening', 'Evening Batch'], ['internship', 'Internship Track']]
+                .filter(([id]) => !batches.some(b => b.id === id))
+                .map(([id, name]) => <option key={id} value={id}>{name}</option>)}
               {batches.map(b => (
                 <option key={b.id} value={b.id}>{b.name}</option>
               ))}
@@ -606,6 +608,7 @@ export default function CourseCompletionReportPage() {
             <select
               value={selectedMentorId}
               onChange={(e) => setSelectedMentorId(e.target.value)}
+              aria-label="Filter by mentor"
               className="px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all truncate"
             >
               <option value="all">All Mentors</option>
@@ -618,6 +621,7 @@ export default function CourseCompletionReportPage() {
             <select
               value={selectedPacing}
               onChange={(e) => setSelectedPacing(e.target.value)}
+              aria-label="Filter by pacing"
               className="px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all truncate"
             >
               <option value="all">All Pacing Statuses</option>
@@ -631,7 +635,7 @@ export default function CourseCompletionReportPage() {
 
         {hasActiveFilters && (
           <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
-            <span className="text-slate-400 font-medium">Showing {filteredStudents.length} matching students</span>
+            <span className="text-slate-500 font-medium">Showing {filteredStudents.length} matching students</span>
             <button
               onClick={handleResetFilters}
               className="text-[#255A84] font-bold hover:underline flex items-center gap-1"
@@ -647,10 +651,10 @@ export default function CourseCompletionReportPage() {
       {loading ? (
         <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center flex flex-col items-center justify-center gap-3">
           <div className="animate-spin rounded-full h-8 w-8 border-4 border-[#255A84] border-t-transparent" />
-          <p className="text-xs text-slate-400 font-bold">Loading completion and time pacing analytics...</p>
+          <p className="text-xs text-slate-500 font-bold">Loading completion and time pacing analytics...</p>
         </div>
       ) : filteredStudents.length === 0 ? (
-        <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center text-slate-400 text-xs font-semibold space-y-2">
+        <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center text-slate-500 text-xs font-semibold space-y-2">
           <p className="text-base font-bold text-slate-700">No Student Records Found</p>
           <p>Try adjusting your search query or filter dropdown selections.</p>
         </div>
@@ -666,7 +670,7 @@ export default function CourseCompletionReportPage() {
               >
                 {/* Header info */}
                 <div className="space-y-3">
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-[#255A84] to-[#1a4261] text-white font-bold text-sm flex items-center justify-center shadow-md overflow-hidden shrink-0">
                         {student.photoURL ? (
@@ -679,7 +683,7 @@ export default function CourseCompletionReportPage() {
                         <h3 className="font-bold text-slate-800 text-sm truncate group-hover:text-[#255A84] transition-colors">
                           {student.name}
                         </h3>
-                        <p className="text-[10px] font-mono text-slate-400 font-bold">{student.studentId || 'ID Pending'}</p>
+                        <p className="text-[10px] font-mono text-slate-500 font-bold">{student.studentId || 'ID Pending'}</p>
                       </div>
                     </div>
 
@@ -692,11 +696,11 @@ export default function CourseCompletionReportPage() {
                   {/* Course & Mentor details */}
                   <div className="bg-slate-50/80 p-2.5 rounded-xl border border-slate-100/60 flex items-center justify-between text-xs">
                     <div className="min-w-0">
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Course Track</p>
+                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Course Track</p>
                       <p className="font-bold text-slate-800 text-xs truncate mt-0.5">{student.courseName}</p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Mentor</p>
+                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Mentor</p>
                       <p className="font-semibold text-slate-700 text-xs mt-0.5">{student.mentorName}</p>
                     </div>
                   </div>
@@ -705,7 +709,7 @@ export default function CourseCompletionReportPage() {
                   <div className="space-y-1.5 pt-1">
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-extrabold text-slate-800">{student.actualProgress}% Completed</span>
-                      <span className="text-[10px] font-semibold text-slate-400">
+                      <span className="text-[10px] font-semibold text-slate-500">
                         Target: {student.expectedProgress}% ({student.daysElapsed}d active)
                       </span>
                     </div>
@@ -724,7 +728,7 @@ export default function CourseCompletionReportPage() {
                   <div className="space-y-1.5 pt-2 border-t border-slate-100">
                     <div className="flex items-center justify-between text-[11px]">
                       <span className="font-bold text-slate-700">Module Breakdown</span>
-                      <span className="font-semibold text-[#F48B1F]">
+                      <span className="font-semibold text-[#C2410C]">
                         {student.completedModulesCount} of {student.totalModulesCount} Done
                       </span>
                     </div>
@@ -732,8 +736,8 @@ export default function CourseCompletionReportPage() {
                     <div className="flex flex-wrap gap-1.5">
                       {student.moduleStats.map((mod, idx) => {
                         let dotClass = 'bg-slate-200 text-slate-600 border-slate-300';
-                        if (mod.status === 'completed') dotClass = 'bg-emerald-500 text-white border-emerald-600';
-                        else if (mod.status === 'in_progress') dotClass = 'bg-amber-500 text-white border-amber-600';
+                        if (mod.status === 'completed') dotClass = 'bg-emerald-600 text-white border-emerald-600';
+                        else if (mod.status === 'in_progress') dotClass = 'bg-amber-600 text-white border-amber-600';
 
                         return (
                           <div
@@ -772,7 +776,7 @@ export default function CourseCompletionReportPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[900px]">
               <thead>
-                <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">
                   <th className="px-5 py-3.5">Student Details</th>
                   <th className="px-4 py-3.5">Track & Mentor</th>
                   <th className="px-4 py-3.5">Module Completion Status</th>
@@ -797,7 +801,7 @@ export default function CourseCompletionReportPage() {
                           </div>
                           <div className="min-w-0">
                             <p className="font-bold text-slate-800 text-xs truncate">{student.name}</p>
-                            <p className="text-[10px] font-mono text-slate-400 font-bold">{student.studentId || 'N/A'}</p>
+                            <p className="text-[10px] font-mono text-slate-500 font-bold">{student.studentId || 'N/A'}</p>
                           </div>
                         </div>
                       </td>
@@ -805,7 +809,7 @@ export default function CourseCompletionReportPage() {
                       {/* Track & Mentor */}
                       <td className="px-4 py-4">
                         <p className="text-xs font-bold text-slate-800 truncate">{student.courseName}</p>
-                        <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Mentor: {student.mentorName}</p>
+                        <p className="text-[10px] text-slate-500 font-semibold mt-0.5">Mentor: {student.mentorName}</p>
                       </td>
 
                       {/* Module Completion Status */}
@@ -814,7 +818,7 @@ export default function CourseCompletionReportPage() {
                           <span className="text-xs font-extrabold text-slate-800">
                             {student.completedModulesCount} / {student.totalModulesCount}
                           </span>
-                          <span className="text-[10px] text-slate-400 font-medium">Modules Completed</span>
+                          <span className="text-[10px] text-slate-500 font-medium">Modules Completed</span>
                         </div>
                         <div className="flex items-center gap-1 mt-1.5">
                           {student.moduleStats.map((mod, idx) => (
@@ -835,7 +839,7 @@ export default function CourseCompletionReportPage() {
                         <div className="space-y-1">
                           <div className="flex items-center justify-between text-xs">
                             <span className="font-extrabold text-slate-800">{student.actualProgress}% Done</span>
-                            <span className="text-[10px] text-slate-400">Target: {student.expectedProgress}%</span>
+                            <span className="text-[10px] text-slate-500">Target: {student.expectedProgress}%</span>
                           </div>
                           <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/50">
                             <div
@@ -933,9 +937,9 @@ export default function CourseCompletionReportPage() {
                   <span>Reset</span>
                 </button>
 
-                <button
+                <button aria-label="Close"
                   onClick={() => setInspectStudentId(null)}
-                  className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-200/60 transition cursor-pointer ml-1"
+                  className="p-1.5 text-slate-500 hover:text-slate-700 rounded-xl hover:bg-slate-200/60 transition cursor-pointer ml-1"
                 >
                   <X size={20} />
                 </button>
@@ -960,7 +964,7 @@ export default function CourseCompletionReportPage() {
                 className={`py-3 border-b-2 transition-all cursor-pointer ${
                   activeModalTab === 'modules'
                     ? 'border-[#255A84] text-[#255A84]'
-                    : 'border-transparent text-slate-400 hover:text-slate-600'
+                    : 'border-transparent text-slate-500 hover:text-slate-600'
                 }`}
               >
                 Module-by-Module Progress ({currentInspectStudent.completedModulesCount}/{currentInspectStudent.totalModulesCount})
@@ -970,7 +974,7 @@ export default function CourseCompletionReportPage() {
                 className={`py-3 border-b-2 transition-all cursor-pointer ${
                   activeModalTab === 'pacing'
                     ? 'border-[#255A84] text-[#255A84]'
-                    : 'border-transparent text-slate-400 hover:text-slate-600'
+                    : 'border-transparent text-slate-500 hover:text-slate-600'
                 }`}
               >
                 Time & Pacing Analytics
@@ -992,7 +996,7 @@ export default function CourseCompletionReportPage() {
                   </div>
 
                   {currentInspectStudent.moduleStats.length === 0 ? (
-                    <p className="text-xs text-slate-400 italic text-center py-8">No modules defined for this course track.</p>
+                    <p className="text-xs text-slate-500 italic text-center py-8">No modules defined for this course track.</p>
                   ) : (
                     currentInspectStudent.moduleStats.map((mod, idx) => {
                       const isModUpdating = updatingTarget === `module-${mod.id}`;
@@ -1060,7 +1064,7 @@ export default function CourseCompletionReportPage() {
                           {/* Individual Topic Pills */}
                           {mod.topics.length > 0 && (
                             <div className="pt-2 border-t border-slate-200/60 space-y-1.5">
-                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                                 Topics ({mod.completedTopics}/{mod.totalTopics}) · Click to toggle
                               </p>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -1081,7 +1085,7 @@ export default function CourseCompletionReportPage() {
                                     >
                                       <div className={`h-4 w-4 rounded-md flex items-center justify-center shrink-0 border transition-colors ${
                                         top.isCompleted
-                                          ? 'bg-emerald-500 border-emerald-600 text-white'
+                                          ? 'bg-emerald-600 border-emerald-600 text-white'
                                           : 'bg-white border-slate-300 text-transparent hover:border-slate-400'
                                       }`}>
                                         {isTopicUpdating ? (
@@ -1108,22 +1112,22 @@ export default function CourseCompletionReportPage() {
                   <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 space-y-4">
                     <div className="flex items-center justify-between border-b border-slate-200/60 pb-3">
                       <div>
-                        <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Joining Date</p>
+                        <p className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Joining Date</p>
                         <p className="text-sm font-bold text-slate-800 mt-0.5">{currentInspectStudent.joiningDate || 'Not Specified'}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Time Active</p>
-                        <p className="text-sm font-bold text-[#F48B1F] mt-0.5">{currentInspectStudent.daysElapsed} Days Elapsed</p>
+                        <p className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Time Active</p>
+                        <p className="text-sm font-bold text-[#C2410C] mt-0.5">{currentInspectStudent.daysElapsed} Days Elapsed</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 pt-1">
                       <div className="bg-white p-3 rounded-xl border border-slate-100">
-                        <p className="text-[10px] text-slate-400 font-bold uppercase">Actual Completion</p>
+                        <p className="text-[10px] text-slate-500 font-bold uppercase">Actual Completion</p>
                         <p className="text-xl font-extrabold text-slate-800 mt-1">{currentInspectStudent.actualProgress}%</p>
                       </div>
                       <div className="bg-white p-3 rounded-xl border border-slate-100">
-                        <p className="text-[10px] text-slate-400 font-bold uppercase">Target Time Pace</p>
+                        <p className="text-[10px] text-slate-500 font-bold uppercase">Target Time Pace</p>
                         <p className="text-xl font-extrabold text-slate-800 mt-1">{currentInspectStudent.expectedProgress}%</p>
                       </div>
                     </div>
@@ -1141,7 +1145,7 @@ export default function CourseCompletionReportPage() {
 
             {/* Footer */}
             <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-              <span className="text-xs text-slate-400 font-medium">
+              <span className="text-xs text-slate-500 font-medium">
                 Changes saved automatically to student academic record
               </span>
               <button

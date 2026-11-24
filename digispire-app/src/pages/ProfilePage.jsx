@@ -177,16 +177,16 @@ export default function ProfilePage() {
         <button
           type="button"
           onClick={() => { setActiveTab('general'); setIsFlipped(false); }}
-          className={`flex-1 py-2.5 px-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`flex-1 py-2.5 px-1 rounded-lg text-[11px] sm:text-xs font-bold uppercase sm:tracking-wider whitespace-nowrap transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
             activeTab === 'general' ? 'bg-[#1E3A5F] text-white shadow-2xs' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
-          <User size={13} /> Official Profile
+          <User size={13} className="shrink-0" /> Profile
         </button>
         <button
           type="button"
           onClick={() => { setActiveTab('idcard'); setIsFlipped(false); }}
-          className={`flex-1 py-2.5 px-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`flex-1 py-2.5 px-1 rounded-lg text-[11px] sm:text-xs font-bold uppercase sm:tracking-wider whitespace-nowrap transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
             activeTab === 'idcard' ? 'bg-[#1E3A5F] text-white shadow-2xs' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -195,7 +195,7 @@ export default function ProfilePage() {
         <button
           type="button"
           onClick={() => { setActiveTab('security'); setIsFlipped(false); }}
-          className={`flex-1 py-2.5 px-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+          className={`flex-1 py-2.5 px-1 rounded-lg text-[11px] sm:text-xs font-bold uppercase sm:tracking-wider whitespace-nowrap transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
             activeTab === 'security' ? 'bg-[#1E3A5F] text-white shadow-2xs' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -267,20 +267,20 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 pt-5 border-t border-slate-100">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-slate-600">
-                    <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100">
+                    <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 border border-slate-100">
                       <Phone size={15} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">Registered Phone</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-none">Registered Phone</p>
                       <p className="text-xs font-semibold mt-1">{userProfile?.phone || 'Not provided'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-slate-600">
-                    <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100">
+                    <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 border border-slate-100">
                       <Mail size={15} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">Email Address</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-none">Email Address</p>
                       <p className="text-xs font-semibold mt-1">{userProfile?.email || 'Not provided'}</p>
                     </div>
                   </div>
@@ -288,36 +288,36 @@ export default function ProfilePage() {
 
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-slate-600">
-                    <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100">
+                    <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 border border-slate-100">
                       <GraduationCap size={15} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-none">
                         {userProfile?.role === 'admin' ? 'Position' : 'Enrolled Course Track'}
                       </p>
                       <p className="text-xs font-semibold mt-1">{userProfile?.course || (userProfile?.role === 'admin' ? 'Faculty Lead' : 'General Track')}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-slate-600">
-                    <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100">
+                    <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 border border-slate-100">
                       <User size={15} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">Batch Allocation</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-none">Batch Allocation</p>
                       <p className="text-xs font-semibold mt-1">
-                        {userProfile?.batchId} {userProfile?.isIntern ? ' (Internship)' : ''}
+                        <span className="capitalize">{userProfile?.batchId || '—'}</span>{userProfile?.isIntern ? ' (Internship)' : ''}
                       </p>
                     </div>
                   </div>
                   {mentor && (
                     <div className="flex items-center gap-3 text-slate-600 pt-2 border-t border-slate-100">
-                      <div className="h-8 w-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 border border-emerald-100">
+                      <div className="h-8 w-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-700 shrink-0 border border-emerald-100">
                         <User size={15} />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">Assigned Academic Advisor</p>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-none">Assigned Academic Advisor</p>
                         <p className="text-xs font-semibold mt-1">{mentor.name}</p>
-                        <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
+                        <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
                           {mentor.email} {mentor.phone && `· ${mentor.phone}`}
                         </p>
                       </div>
@@ -532,7 +532,7 @@ export default function ProfilePage() {
                   New Password <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <Key size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Key size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                   <input
                     required
                     type="password"
@@ -550,7 +550,7 @@ export default function ProfilePage() {
                   Confirm New Password <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <Key size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Key size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                   <input
                     required
                     type="password"

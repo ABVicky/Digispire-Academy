@@ -138,7 +138,7 @@ export default function StudentSubmissionsPage() {
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-48 gap-3">
       <div className="animate-spin rounded-full h-8 w-8 border-3 border-[#1E3A5F] border-t-transparent" />
-      <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Loading Assignments...</p>
+      <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Loading Assignments...</p>
     </div>
   );
 
@@ -248,7 +248,7 @@ export default function StudentSubmissionsPage() {
             <div className="text-center py-12 bg-slate-50 rounded-xl border border-slate-200">
               <LinkIcon size={28} className="mx-auto mb-2 text-slate-300" />
               <p className="text-xs text-slate-500 font-bold">No Deliverables Submitted</p>
-              <p className="text-[10px] text-slate-400 mt-0.5 max-w-xs mx-auto">Select an academic module on the left to submit project work.</p>
+              <p className="text-[10px] text-slate-500 mt-0.5 max-w-xs mx-auto">Select an academic module on the left to submit project work.</p>
             </div>
           ) : (
             <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1 custom-scrollbar">
@@ -265,7 +265,7 @@ export default function StudentSubmissionsPage() {
                           {sub.courseName}
                         </span>
                         <h3 className="font-bold text-slate-800 text-xs truncate">{sub.moduleTitle}</h3>
-                        <p className="text-[10px] text-slate-400 mt-0.5 font-mono">Submitted: {dateStr}</p>
+                        <p className="text-[10px] text-slate-500 mt-0.5 font-mono">Submitted: {dateStr}</p>
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0">
@@ -288,7 +288,7 @@ export default function StudentSubmissionsPage() {
                         {sub.status === 'pending' && (
                           <button
                             onClick={() => handleDelete(sub.id)}
-                            className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
+                            className="p-1 text-slate-500 hover:text-rose-600 rounded transition-colors"
                             title="Retract Submission"
                           >
                             <Trash2 size={13} />
@@ -299,7 +299,7 @@ export default function StudentSubmissionsPage() {
 
                     {sub.notes && (
                       <div className="p-2 bg-white rounded border border-slate-200/60 text-[11px] text-slate-600 leading-normal">
-                        <span className="font-bold text-slate-400 uppercase text-[8px] block mb-0.5">Student Remarks:</span>
+                        <span className="font-bold text-slate-500 uppercase text-[8px] block mb-0.5">Student Remarks:</span>
                         {sub.notes}
                       </div>
                     )}
@@ -326,7 +326,7 @@ export default function StudentSubmissionsPage() {
                         {sub.feedback ? (
                           <p className="text-xs text-slate-700 font-normal leading-relaxed">{sub.feedback}</p>
                         ) : (
-                          <p className="text-xs text-slate-400 italic">Evaluated with satisfactory completion.</p>
+                          <p className="text-xs text-slate-500 italic">Evaluated with satisfactory completion.</p>
                         )}
                       </div>
                     )}

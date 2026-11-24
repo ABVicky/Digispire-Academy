@@ -761,7 +761,7 @@ export default function AttendancePage() {
   return (
     <div className="space-y-5 pb-12 font-sans">
       {/* ─── Page Header with Live Broadcast Pulse ─── */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-100/80 shadow-sm">
+      <div className="flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-100/80 shadow-sm">
         <div>
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#255A84] to-[#1a4261] text-white flex items-center justify-center shadow-md shadow-[#255A84]/20 shrink-0">
@@ -790,8 +790,8 @@ export default function AttendancePage() {
         </div>
 
         {/* Tab Switcher & Log Action */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <div className="bg-slate-100 p-1 rounded-2xl flex items-center gap-1 overflow-x-auto no-scrollbar max-w-full shrink-0">
+        <div className="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-2 min-w-0">
+          <div className="bg-slate-100 p-1 rounded-2xl flex items-center gap-1 overflow-x-auto no-scrollbar max-w-full min-w-0">
             {[
               { id: 'live', label: 'Live', fullLabel: 'Live Broadcaster', icon: QrCode },
               { id: 'schedules', label: 'Schedules', fullLabel: 'Class Schedules', icon: Settings },
@@ -817,7 +817,7 @@ export default function AttendancePage() {
 
           <button
             onClick={() => { triggerHaptic('light'); setShowManualModal(true); }}
-            className="flex items-center justify-center gap-1.5 px-4 py-2 sm:py-2.5 bg-[#255A84] hover:bg-[#1a4261] text-white rounded-xl text-xs font-bold transition shadow-md shadow-[#255A84]/20 active:scale-95 cursor-pointer w-full sm:w-auto shrink-0"
+            className="flex items-center justify-center gap-1.5 px-4 py-2 sm:py-2.5 bg-[#255A84] hover:bg-[#1a4261] text-white rounded-xl text-xs font-bold transition shadow-md shadow-[#255A84]/20 active:scale-95 cursor-pointer w-full xl:w-auto shrink-0"
           >
             <Plus size={15} />
             <span>Log Manual Entry</span>
@@ -831,8 +831,8 @@ export default function AttendancePage() {
           {/* Left Broadcaster Card */}
           <div className="lg:col-span-1 bg-white rounded-2xl border border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col justify-between space-y-5">
             <div>
-              <div className="flex justify-between items-center pb-3.5 border-b border-slate-100 mb-4">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-wrap justify-between items-center gap-2 pb-3.5 border-b border-slate-100 mb-4">
+                <div className="flex items-center gap-2 whitespace-nowrap">
                   <div className="p-1.5 bg-blue-50 text-[#255A84] rounded-lg">
                     <QrCode size={18} />
                   </div>
@@ -845,7 +845,7 @@ export default function AttendancePage() {
                   disabled={!!qrData}
                   value={broadcastBatch}
                   onChange={e => setBroadcastBatch(e.target.value)}
-                  className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider bg-slate-50 border border-slate-200/80 rounded-xl text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all cursor-pointer disabled:opacity-60 max-w-[130px]"
+                  className="px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider bg-slate-50 border border-slate-200/80 rounded-xl text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all cursor-pointer disabled:opacity-60 max-w-[170px]" aria-label="Batch for this session"
                 >
                   {batches.length === 0 ? (
                     <>
@@ -870,7 +870,7 @@ export default function AttendancePage() {
                   </div>
 
                   <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-1">
-                    <p className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">Active Verification Code</p>
+                    <p className="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">Active Verification Code</p>
                     <p className="text-2xl sm:text-3xl font-black text-slate-800 tracking-widest font-mono text-[#255A84]">{qrData.sessionId}</p>
                   </div>
 
@@ -903,7 +903,7 @@ export default function AttendancePage() {
 
                   {/* Quick Manual Check-in */}
                   <form onSubmit={handleQuickCheckIn} className="pt-3 border-t border-slate-100 space-y-2 text-left">
-                    <label className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Quick Student Check-in</label>
+                    <label className="block text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">Quick Student Check-in</label>
                     <div className="flex gap-2">
                       <select
                         value={quickStudentId}
@@ -978,7 +978,7 @@ export default function AttendancePage() {
                           <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Topics Credit Synced</label>
                           <div className="mt-1 max-h-32 overflow-y-auto no-scrollbar border border-slate-200/60 rounded-2xl p-2 bg-slate-50/70 space-y-1">
                             {topics.filter(t => t.moduleId === selectedModule).length === 0 ? (
-                              <p className="text-xs text-slate-400 p-2 text-center">No topics configured in this module.</p>
+                              <p className="text-xs text-slate-500 p-2 text-center">No topics configured in this module.</p>
                             ) : (
                               topics.filter(t => t.moduleId === selectedModule).map(topic => (
                                 <label key={topic.id} className="flex items-center gap-2 px-2.5 py-1.5 hover:bg-white rounded-xl cursor-pointer transition-colors border border-transparent hover:border-slate-100">
@@ -1039,14 +1039,14 @@ export default function AttendancePage() {
                   <h2 className="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider truncate">
                     Live Attendance Feed
                   </h2>
-                  <p className="text-[10px] text-slate-400 font-medium">Real-time check-in stream</p>
+                  <p className="text-[10px] text-slate-500 font-medium">Real-time check-in stream</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
                 {/* Real-time search filter */}
                 <div className="relative flex-1 sm:w-48">
-                  <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500" />
                   <input
                     type="text"
                     value={feedSearch}
@@ -1055,9 +1055,9 @@ export default function AttendancePage() {
                     className="w-full pl-8 pr-2.5 py-1 text-[11px] bg-slate-50 border border-slate-200/80 rounded-xl focus:bg-white focus:border-[#255A84] focus:outline-none transition-all placeholder-slate-400"
                   />
                   {feedSearch && (
-                    <button
+                    <button aria-label="Clear search"
                       onClick={() => setFeedSearch('')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600"
                     >
                       <X size={12} />
                     </button>
@@ -1072,17 +1072,17 @@ export default function AttendancePage() {
 
             <div className="overflow-y-auto max-h-[500px] flex-1">
               {loadingFeed && records.length === 0 ? (
-                <div className="py-16 flex flex-col items-center justify-center gap-2 text-slate-400 text-xs font-bold">
+                <div className="py-16 flex flex-col items-center justify-center gap-2 text-slate-500 text-xs font-bold">
                   <div className="animate-spin h-6 w-6 border-2 border-[#255A84] border-t-transparent rounded-full" />
                   Syncing live stream feed...
                 </div>
               ) : filteredRecords.length === 0 ? (
-                <div className="py-16 text-center text-slate-400 space-y-2">
+                <div className="py-16 text-center text-slate-500 space-y-2">
                   <Users size={40} className="mx-auto opacity-20 text-slate-500" />
                   <p className="text-sm font-bold text-slate-700">
                     {feedSearch ? 'No matching check-ins' : 'No Check-in Logs Today'}
                   </p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     {feedSearch ? 'Try a different search query' : 'Student check-ins will appear here in real-time as they scan.'}
                   </p>
                 </div>
@@ -1099,13 +1099,13 @@ export default function AttendancePage() {
                             </div>
                             <div className="min-w-0">
                               <p className="font-bold text-slate-800 text-xs truncate">{record.name}</p>
-                              <p className="text-[10px] font-mono text-slate-400 font-bold">{record.studentId}</p>
+                              <p className="text-[10px] font-mono text-slate-500 font-bold">{record.studentId}</p>
                             </div>
                           </div>
 
                           <button
                             onClick={() => deleteRecord(record.id)}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition shrink-0"
+                            className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition shrink-0"
                             title="Remove log"
                           >
                             <Trash2 size={15} />
@@ -1122,7 +1122,7 @@ export default function AttendancePage() {
                           </span>
 
                           <span className="text-[10px] font-mono text-slate-500 font-semibold flex items-center gap-1">
-                            <Clock size={11} className="text-slate-400" />
+                            <Clock size={11} className="text-slate-500" />
                             {record.timestamp?.toDate ? record.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
                           </span>
                         </div>
@@ -1138,10 +1138,10 @@ export default function AttendancePage() {
                   </div>
 
                   {/* DESKTOP TABLE VIEW (>= md) */}
-                  <div className="hidden md:block">
+                  <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                        <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">
                           <th className="px-5 py-3">Student</th>
                           <th className="px-4 py-3">Track / Batch</th>
                           <th className="px-4 py-3">Curriculum Topic</th>
@@ -1159,7 +1159,7 @@ export default function AttendancePage() {
                                 </div>
                                 <div className="min-w-0">
                                   <p className="font-bold text-slate-800 text-xs truncate">{record.name}</p>
-                                  <p className="text-[10px] font-mono text-slate-400 font-bold">{record.studentId}</p>
+                                  <p className="text-[10px] font-mono text-slate-500 font-bold">{record.studentId}</p>
                                 </div>
                               </div>
                             </td>
@@ -1180,19 +1180,19 @@ export default function AttendancePage() {
                                   <p className="text-xs font-bold text-slate-800">
                                     {courses.find(c => c.id === record.coveredCourse)?.name || record.coveredCourse}
                                   </p>
-                                  <p className="text-[10px] text-slate-400 font-medium">
+                                  <p className="text-[10px] text-slate-500 font-medium">
                                     {modules.find(m => m.id === record.coveredModule)?.title || record.coveredModule}
                                     {record.coveredTopics?.length > 0 && ` • ${record.coveredTopics.length} Topics`}
                                   </p>
                                 </div>
                               ) : (
-                                <span className="text-xs text-slate-400 italic">General Check-in</span>
+                                <span className="text-xs text-slate-500 italic">General Check-in</span>
                               )}
                             </td>
 
                             <td className="px-4 py-3.5 text-slate-500 font-medium">
                               <div className="flex items-center gap-1 text-xs">
-                                <Clock size={12} className="text-slate-400" />
+                                <Clock size={12} className="text-slate-500" />
                                 <span className="font-mono text-slate-700 font-bold">
                                   {record.timestamp?.toDate ? record.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
                                 </span>
@@ -1202,7 +1202,7 @@ export default function AttendancePage() {
                             <td className="px-4 py-3.5 text-right">
                               <button
                                 onClick={() => deleteRecord(record.id)}
-                                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                                className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
                                 title="Remove log"
                               >
                                 <Trash2 size={15} />
@@ -1229,12 +1229,12 @@ export default function AttendancePage() {
                 <h2 className="text-xs font-black text-slate-700 uppercase tracking-widest flex items-center gap-2">
                   <Settings size={15} className="text-[#255A84]" /> Scheduling Configurations
                 </h2>
-                <p className="text-[11px] text-slate-400 mt-1">Modify recurring weekly schedules, hours, and batch settings</p>
+                <p className="text-[11px] text-slate-500 mt-1">Modify recurring weekly schedules, hours, and batch settings</p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowCreateBatchModal(true)}
-                className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-sm transition active:scale-95 cursor-pointer w-full sm:w-auto"
+                className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-sm transition active:scale-95 cursor-pointer w-full sm:w-auto"
               >
                 <Plus size={13} />
                 Create New Batch
@@ -1277,17 +1277,17 @@ export default function AttendancePage() {
                 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Start Time</label>
-                    <input type="time" value={schedForm.startTime} onChange={e => setSchedForm(f => ({ ...f, startTime: e.target.value }))} className="input-premium" />
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Start Time</label>
+                    <input type="time" value={schedForm.startTime} onChange={e => setSchedForm(f => ({ ...f, startTime: e.target.value }))} className="input-premium px-2 text-xs" />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">End Time</label>
-                    <input type="time" value={schedForm.endTime} onChange={e => setSchedForm(f => ({ ...f, endTime: e.target.value }))} className="input-premium" />
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">End Time</label>
+                    <input type="time" value={schedForm.endTime} onChange={e => setSchedForm(f => ({ ...f, endTime: e.target.value }))} className="input-premium px-2 text-xs" />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Educator / Teacher *</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Educator / Teacher *</label>
                   <select
                     required
                     value={schedForm.educator}
@@ -1302,14 +1302,14 @@ export default function AttendancePage() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Weekly Class Days</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Weekly Class Days</label>
                   <div className="days-grid">
                     {DAYS_OF_WEEK.map(day => {
                       const isActive = schedForm.weeklyDays.includes(day.value);
                       return (
                         <button
                           key={day.value} type="button" onClick={() => toggleDayOfWeek(day.value)}
-                          className={`py-2.5 rounded-xl border text-[10px] font-bold uppercase tracking-wider transition-all flex flex-col items-center justify-center gap-1 ${
+                          className={`py-2.5 rounded-lg border text-[10px] font-bold uppercase transition-all flex flex-col items-center justify-center gap-1 ${
                             isActive
                               ? 'bg-[#255A84] text-white border-transparent shadow-md shadow-[#255A84]/10'
                               : 'bg-slate-50 text-slate-500 border-transparent hover:bg-slate-100'
@@ -1323,14 +1323,14 @@ export default function AttendancePage() {
                 </div>
 
                 <div className="flex gap-3 mt-2">
-                  <button type="submit" className="flex-1 py-4 btn-primary-premium">
-                    Save Configurations
+                  <button type="submit" className="flex-1 py-4 btn-primary-premium whitespace-nowrap">
+                    Save Changes
                   </button>
                   {schedBatch && (
                     <button
                       type="button"
                       onClick={handleDeleteBatch}
-                      className="px-4 py-4 border border-rose-200 text-rose-500 hover:bg-rose-50 hover:text-rose-600 rounded-xl text-xs font-bold uppercase tracking-wider transition active:scale-95 cursor-pointer shrink-0"
+                      className="px-4 py-4 border border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-600 rounded-xl text-xs font-bold uppercase tracking-wider transition active:scale-95 cursor-pointer shrink-0"
                     >
                       Delete
                     </button>
@@ -1340,28 +1340,28 @@ export default function AttendancePage() {
             </div>
 
             {/* Right Column: Special Exceptions (Makeup & Temporary Schedules) */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-6 min-w-0">
               {/* Makeup Sessions */}
               <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-50 pb-2 flex items-center justify-between">
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-50 pb-2 flex items-center justify-between gap-3">
                   <span>Makeup Classes / Extra Sessions</span>
-                  <span className="text-[11px] text-slate-400 font-medium">Adds scheduled session on custom date</span>
+                  <span className="text-[11px] text-slate-500 font-medium">Adds scheduled session on custom date</span>
                 </h3>
 
-                <form onSubmit={handleAddMakeupClass} className="grid grid-cols-1 sm:grid-cols-4 gap-3 mt-4 items-end">
+                <form onSubmit={handleAddMakeupClass} className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 items-end">
                   <div className="sm:col-span-1">
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Date</label>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">Date</label>
                     <input required type="date" value={makeupForm.date} onChange={e => setMakeupForm(f => ({ ...f, date: e.target.value }))} className="input-premium py-2 text-xs" />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Time</label>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">Time</label>
                     <div className="flex gap-1">
                       <input required type="time" value={makeupForm.startTime} onChange={e => setMakeupForm(f => ({ ...f, startTime: e.target.value }))} className="input-premium py-2 px-1 text-center text-xs" />
                       <input required type="time" value={makeupForm.endTime} onChange={e => setMakeupForm(f => ({ ...f, endTime: e.target.value }))} className="input-premium py-2 px-1 text-center text-xs" />
                     </div>
                   </div>
                   <div className="sm:col-span-1">
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Reason / Notes</label>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">Reason / Notes</label>
                     <input required type="text" value={makeupForm.reason} onChange={e => setMakeupForm(f => ({ ...f, reason: e.target.value }))} placeholder="e.g. Syllabus recovery" className="input-premium py-2 text-xs" />
                   </div>
                   <button type="submit" className="py-2.5 btn-primary-premium flex items-center justify-center gap-1">
@@ -1371,15 +1371,15 @@ export default function AttendancePage() {
 
                 <div className="mt-6 space-y-2 max-h-48 overflow-y-auto no-scrollbar">
                   {batches.find(b => b.id === schedBatch)?.makeupClasses?.length === 0 ? (
-                    <p className="text-xs text-slate-400 italic py-2">No makeup sessions scheduled</p>
+                    <p className="text-xs text-slate-500 italic py-2">No makeup sessions scheduled</p>
                   ) : (
                     batches.find(b => b.id === schedBatch)?.makeupClasses?.map((make, idx) => (
                       <div key={idx} className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex justify-between items-center text-xs">
                         <div>
                           <p className="font-bold text-slate-800">{make.date}</p>
-                          <p className="text-[11px] text-slate-400 mt-0.5">{make.startTime} - {make.endTime} {make.reason ? `· ${make.reason}` : ''}</p>
+                          <p className="text-[11px] text-slate-500 mt-0.5">{make.startTime} - {make.endTime} {make.reason ? `· ${make.reason}` : ''}</p>
                         </div>
-                        <button onClick={() => handleRemoveMakeup(make)} className="p-1.5 text-slate-400 hover:text-red-500 rounded-lg transition">
+                        <button onClick={() => handleRemoveMakeup(make)} aria-label="Remove makeup class" className="p-1.5 text-slate-500 hover:text-red-500 rounded-lg transition">
                           <Trash2 size={14} />
                         </button>
                       </div>
@@ -1392,23 +1392,23 @@ export default function AttendancePage() {
               <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
                 <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-50 pb-2 flex items-center justify-between">
                   <span>Temporary Schedule Changes</span>
-                  <span className="text-[11px] text-slate-400 font-medium">Overrides regular class hours for a single day</span>
+                  <span className="text-[11px] text-slate-500 font-medium">Overrides regular class hours for a single day</span>
                 </h3>
 
-                <form onSubmit={handleAddTempSchedule} className="grid grid-cols-1 sm:grid-cols-4 gap-3 mt-4 items-end">
+                <form onSubmit={handleAddTempSchedule} className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 items-end">
                   <div className="sm:col-span-1">
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Date</label>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">Date</label>
                     <input required type="date" value={tempForm.date} onChange={e => setTempForm(f => ({ ...f, date: e.target.value }))} className="input-premium py-2 text-xs" />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Time</label>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">Time</label>
                     <div className="flex gap-1">
                       <input required type="time" value={tempForm.startTime} onChange={e => setTempForm(f => ({ ...f, startTime: e.target.value }))} className="input-premium py-2 px-1 text-center text-xs" />
                       <input required type="time" value={tempForm.endTime} onChange={e => setTempForm(f => ({ ...f, endTime: e.target.value }))} className="input-premium py-2 px-1 text-center text-xs" />
                     </div>
                   </div>
                   <div className="sm:col-span-1">
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Reason / Notes</label>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">Reason / Notes</label>
                     <input required type="text" value={tempForm.reason} onChange={e => setTempForm(f => ({ ...f, reason: e.target.value }))} placeholder="e.g. Exam slot" className="input-premium py-2 text-xs" />
                   </div>
                   <button type="submit" className="py-2.5 btn-primary-premium flex items-center justify-center gap-1">
@@ -1418,15 +1418,15 @@ export default function AttendancePage() {
 
                 <div className="mt-6 space-y-2 max-h-48 overflow-y-auto no-scrollbar">
                   {batches.find(b => b.id === schedBatch)?.temporarySchedules?.length === 0 ? (
-                    <p className="text-xs text-slate-400 italic py-2">No overrides registered</p>
+                    <p className="text-xs text-slate-500 italic py-2">No overrides registered</p>
                   ) : (
                     batches.find(b => b.id === schedBatch)?.temporarySchedules?.map((temp, idx) => (
                       <div key={idx} className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex justify-between items-center text-xs">
                         <div>
                           <p className="font-bold text-slate-800">{temp.date}</p>
-                          <p className="text-[11px] text-slate-400 mt-0.5">{temp.startTime} - {temp.endTime} {temp.reason ? `· ${temp.reason}` : ''}</p>
+                          <p className="text-[11px] text-slate-500 mt-0.5">{temp.startTime} - {temp.endTime} {temp.reason ? `· ${temp.reason}` : ''}</p>
                         </div>
-                        <button onClick={() => handleRemoveTemp(temp)} className="p-1.5 text-slate-400 hover:text-red-500 rounded-lg transition">
+                        <button onClick={() => handleRemoveTemp(temp)} aria-label="Remove schedule change" className="p-1.5 text-slate-500 hover:text-red-500 rounded-lg transition">
                           <Trash2 size={14} />
                         </button>
                       </div>
@@ -1448,7 +1448,7 @@ export default function AttendancePage() {
               <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
                 <Calendar size={18} className="text-yellow-500" /> Academy-Wide Holidays
               </h2>
-              <p className="text-xs text-slate-400 mt-1">Excludes class sessions from calculation on all batch operations</p>
+              <p className="text-xs text-slate-500 mt-1">Excludes class sessions from calculation on all batch operations</p>
             </div>
 
             <form onSubmit={handleAddHoliday} className="flex flex-col sm:flex-row gap-3 pt-2">
@@ -1461,15 +1461,15 @@ export default function AttendancePage() {
 
             <div className="overflow-y-auto max-h-[300px] border border-slate-50 rounded-xl mt-4 divide-y divide-slate-100">
               {holidays.length === 0 ? (
-                <p className="text-xs text-slate-400 p-8 text-center italic">No holidays logged</p>
+                <p className="text-xs text-slate-500 p-8 text-center italic">No holidays logged</p>
               ) : (
                 holidays.map(h => (
                   <div key={h.id} className="p-4 flex justify-between items-center hover:bg-slate-50 transition-colors">
                     <div>
                       <p className="font-bold text-slate-800 text-xs">{h.title}</p>
-                      <p className="text-[11px] text-slate-400 font-mono mt-0.5">{h.date}</p>
+                      <p className="text-[11px] text-slate-500 font-mono mt-0.5">{h.date}</p>
                     </div>
-                    <button onClick={() => handleDeleteHoliday(h.id)} className="p-2 text-slate-400 hover:text-red-500 rounded-lg transition">
+                    <button onClick={() => handleDeleteHoliday(h.id)} aria-label="Remove holiday" className="p-2 text-slate-500 hover:text-red-500 rounded-lg transition">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -1484,7 +1484,7 @@ export default function AttendancePage() {
               <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
                 <ShieldAlert size={18} className="text-rose-500" /> Cancelled Classes Log
               </h2>
-              <p className="text-xs text-slate-400 mt-1">Logs unexpected day cancellations for specific or all batches</p>
+              <p className="text-xs text-slate-500 mt-1">Logs unexpected day cancellations for specific or all batches</p>
             </div>
 
             <form onSubmit={handleAddCancellation} className="space-y-3 pt-2">
@@ -1507,17 +1507,17 @@ export default function AttendancePage() {
 
             <div className="overflow-y-auto max-h-[300px] border border-slate-50 rounded-xl mt-4 divide-y divide-slate-100">
               {cancellations.length === 0 ? (
-                <p className="text-xs text-slate-400 p-8 text-center italic">No cancellations logged</p>
+                <p className="text-xs text-slate-500 p-8 text-center italic">No cancellations logged</p>
               ) : (
                 cancellations.map(c => (
                   <div key={c.id} className="p-4 flex justify-between items-center hover:bg-slate-50 transition-colors">
                     <div>
                       <p className="font-bold text-slate-800 text-xs">{c.reason}</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
-                        <span className="font-mono">{c.date}</span> · <span className="uppercase font-bold text-slate-400">{c.batchId} batch</span>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        <span className="font-mono">{c.date}</span> · <span className="uppercase font-bold text-slate-500">{c.batchId} batch</span>
                       </p>
                     </div>
-                    <button onClick={() => handleDeleteCancellation(c.id)} className="p-2 text-slate-400 hover:text-red-500 rounded-lg transition">
+                    <button onClick={() => handleDeleteCancellation(c.id)} aria-label="Remove cancellation" className="p-2 text-slate-500 hover:text-red-500 rounded-lg transition">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -1548,7 +1548,7 @@ export default function AttendancePage() {
               <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
                 <UserCheck size={18} className="text-[#255A84]" /> Student Logs Inspector
               </h2>
-              <p className="text-xs text-slate-400 mt-1">Audit individual student attendance calendar, logs, and computations</p>
+              <p className="text-xs text-slate-500 mt-1">Audit individual student attendance calendar, logs, and computations</p>
             </div>
             
             <div className="flex flex-wrap gap-3 items-center">
@@ -1557,7 +1557,7 @@ export default function AttendancePage() {
                   <button
                     onClick={() => setInspectTrack('academic')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition cursor-pointer ${
-                      inspectTrack === 'academic' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                      inspectTrack === 'academic' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-600'
                     }`}
                   >
                     Academic
@@ -1565,7 +1565,7 @@ export default function AttendancePage() {
                   <button
                     onClick={() => setInspectTrack('internship')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition cursor-pointer ${
-                      inspectTrack === 'internship' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                      inspectTrack === 'internship' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-600'
                     }`}
                   >
                     Internship
@@ -1610,12 +1610,12 @@ export default function AttendancePage() {
           </div>
 
           {!inspectStudentId ? (
-            <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-12 text-center text-slate-400">
+            <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-12 text-center text-slate-500">
               <Users size={40} className="mx-auto mb-3 opacity-20" />
               <p className="text-xs font-bold">Select a student from the dropdown above to audit their calendar logs</p>
             </div>
           ) : !selectedStudent ? (
-            <p className="text-xs text-slate-400">Student record not found</p>
+            <p className="text-xs text-slate-500">Student record not found</p>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Computation Engine Details */}
@@ -1632,48 +1632,48 @@ export default function AttendancePage() {
                     </div>
                     <div>
                       <h3 className="font-bold text-slate-800 text-sm">{selectedStudent.name}</h3>
-                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{selectedStudent.studentId} · {studentBatchIds.join(', ')}</p>
+                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">{selectedStudent.studentId} · {studentBatchIds.join(', ')}</p>
                     </div>
                   </div>
 
                   <div className="border-t border-slate-50 pt-4 space-y-2 text-xs font-medium text-slate-600">
-                    <p><span className="text-slate-400">Date Enrolled:</span> {selectedStudent.joiningDate || 'N/A'}</p>
-                    <p><span className="text-slate-400">Course Track:</span> {selectedStudent.course || 'General Digital Marketing'}</p>
-                    <p><span className="text-slate-400">Phone Code:</span> {selectedStudent.phone || 'N/A'}</p>
+                    <p><span className="text-slate-500">Date Enrolled:</span> {selectedStudent.joiningDate || 'N/A'}</p>
+                    <p><span className="text-slate-500">Course Track:</span> {selectedStudent.course || 'General Digital Marketing'}</p>
+                    <p><span className="text-slate-500">Phone Code:</span> {selectedStudent.phone || 'N/A'}</p>
                   </div>
                 </div>
 
                 {/* Computation Result stats */}
                 {inspectedCalc && (
                   <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
-                    <h4 className="text-[11px] font-black uppercase tracking-wider text-slate-400">Calculated Metrics</h4>
+                    <h4 className="text-[11px] font-black uppercase tracking-wider text-slate-500">Calculated Metrics</h4>
                     
                     <div className="flex items-end gap-2">
                       <span className={`text-4xl font-black ${
                         inspectedCalc.attendancePercentage >= 75 ? 'text-emerald-500' :
-                        inspectedCalc.attendancePercentage >= 50 ? 'text-[#F48B1F]' : 'text-rose-500'
+                        inspectedCalc.attendancePercentage >= 50 ? 'text-[#C2410C]' : 'text-rose-600'
                       }`}>
                         {inspectedCalc.attendancePercentage}%
                       </span>
-                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Score Rate</span>
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Score Rate</span>
                     </div>
  
                     <div className="grid grid-cols-2 gap-3 pt-2 text-xs">
                       <div className="p-3 bg-slate-50 rounded-xl text-center">
                         <p className="text-slate-700 font-bold text-base">{inspectedCalc.presentClasses}</p>
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Present</p>
+                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">Present</p>
                       </div>
                       <div className="p-3 bg-slate-50 rounded-xl text-center">
                         <p className="text-slate-700 font-bold text-base">{inspectedCalc.eligibleClasses}</p>
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Eligible Classes</p>
+                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">Eligible Classes</p>
                       </div>
                       <div className="p-3 bg-slate-50 rounded-xl text-center">
                         <p className="text-slate-700 font-bold text-base">{inspectedCalc.leaveClasses}</p>
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Leaves</p>
+                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">Leaves</p>
                       </div>
                       <div className="p-3 bg-slate-50 rounded-xl text-center">
                         <p className="text-slate-700 font-bold text-base">{inspectedCalc.holidaysCount}</p>
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Holidays</p>
+                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">Holidays</p>
                       </div>
                     </div>
  
@@ -1681,7 +1681,7 @@ export default function AttendancePage() {
                       <AlertTriangle size={14} className="shrink-0 mt-0.5" />
                       <span>
                         Calculations generated dynamically using parameters:<br />
-                        <strong>Eligible = Scheduled Since Joining ({inspectedCalc.eligibleClasses}) - Holidays ({inspectedCalc.holidaysCount}) - Cancellations ({inspectedCalc.cancelledClassesCount})</strong>
+                        <strong>Eligible = Scheduled Since Joining ({inspectedCalc.eligibleClasses}) - Holidays ({inspectedCalc.holidaysCount}) - Cancellations ({inspectedCalc.cancelledCount})</strong>
                       </span>
                     </div>
                   </div>
@@ -1720,12 +1720,13 @@ export default function AttendancePage() {
                 <h3 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
                   <UserCheck size={18} className="text-[#255A84]" /> Log Manual Attendance
                 </h3>
-                <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Select a student and date to record attendance</p>
+                <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Select a student and date to record attendance</p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowManualModal(false)}
-                className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition"
+                aria-label="Close"
+                className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-600 transition"
               >
                 <X size={18} />
               </button>
@@ -1735,7 +1736,7 @@ export default function AttendancePage() {
             <form onSubmit={handleSubmitManualAttendance} className="p-6 space-y-4">
               {/* Student */}
               <div>
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Student *</label>
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Student *</label>
                 <select
                   required
                   value={manualForm.studentId}
@@ -1767,7 +1768,7 @@ export default function AttendancePage() {
               {/* Date & Status */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Date *</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Date *</label>
                   <input
                     required
                     type="date"
@@ -1777,7 +1778,7 @@ export default function AttendancePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Status *</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Status *</label>
                   <select
                     required
                     value={manualForm.status}
@@ -1795,7 +1796,7 @@ export default function AttendancePage() {
               {/* Track & Batch Row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Track *</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Track *</label>
                   <select
                     required
                     value={manualForm.track}
@@ -1809,7 +1810,7 @@ export default function AttendancePage() {
 
                 {manualForm.studentId && (
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Enrolled Batch *</label>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Enrolled Batch *</label>
                     <select
                       required
                       value={manualForm.batchId}
@@ -1836,11 +1837,11 @@ export default function AttendancePage() {
               {/* Credits & Topics Sync (Present status only and not internship) */}
               {manualForm.status === 'present' && manualForm.track !== 'internship' && (
                 <div className="space-y-4 pt-4 border-t border-slate-100">
-                  <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Credits & Topics Sync (Optional)</h4>
+                  <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Credits & Topics Sync (Optional)</h4>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Course</label>
+                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Course</label>
                       <select
                         value={manualForm.courseId}
                         onChange={e => setManualForm(prev => ({ ...prev, courseId: e.target.value, moduleId: '', topicIds: [] }))}
@@ -1852,7 +1853,7 @@ export default function AttendancePage() {
                     </div>
                     
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Module</label>
+                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Module</label>
                       <select
                         value={manualForm.moduleId}
                         onChange={e => setManualForm(prev => ({ ...prev, moduleId: e.target.value, topicIds: [] }))}
@@ -1869,10 +1870,10 @@ export default function AttendancePage() {
 
                   {manualForm.moduleId && (
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Topics Cover</label>
+                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Topics Cover</label>
                       <div className="max-h-36 overflow-y-auto no-scrollbar border border-slate-100 rounded-xl p-2 bg-slate-50/50 space-y-1">
                         {topics.filter(t => t.moduleId === manualForm.moduleId).length === 0 ? (
-                          <p className="text-xs text-slate-400 p-2 text-center">No topics found in this module.</p>
+                          <p className="text-xs text-slate-500 p-2 text-center">No topics found in this module.</p>
                         ) : (
                           topics.filter(t => t.moduleId === manualForm.moduleId).map(topic => (
                             <label key={topic.id} className="flex items-start gap-2.5 px-2 py-1.5 hover:bg-white rounded-lg cursor-pointer transition border border-transparent hover:border-slate-100">
@@ -1929,12 +1930,13 @@ export default function AttendancePage() {
                 <h3 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
                   <Plus size={18} className="text-emerald-500" /> Create New Batch
                 </h3>
-                <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Initialize a new academic or training batch profile</p>
+                <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Initialize a new academic or training batch profile</p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowCreateBatchModal(false)}
-                className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition"
+                aria-label="Close"
+                className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-600 transition"
               >
                 <X size={18} />
               </button>
@@ -1945,7 +1947,7 @@ export default function AttendancePage() {
               {/* Name & ID */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Batch Name *</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Batch Name *</label>
                   <input
                     required
                     type="text"
@@ -1964,7 +1966,7 @@ export default function AttendancePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Batch Code / ID *</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Batch Code / ID *</label>
                   <input
                     required
                     type="text"
@@ -1979,7 +1981,7 @@ export default function AttendancePage() {
               {/* Start & End Times */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Start Time *</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Start Time *</label>
                   <input
                     required
                     type="time"
@@ -1989,7 +1991,7 @@ export default function AttendancePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">End Time *</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">End Time *</label>
                   <input
                     required
                     type="time"
@@ -2002,7 +2004,7 @@ export default function AttendancePage() {
 
               {/* Educator selection */}
               <div>
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Educator / Teacher *</label>
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Educator / Teacher *</label>
                 <select
                   required
                   value={newBatchForm.educator}
@@ -2018,7 +2020,7 @@ export default function AttendancePage() {
 
               {/* Weekly Days selection */}
               <div>
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Weekly Class Days</label>
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Weekly Class Days</label>
                 <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
                   {DAYS_OF_WEEK.map(day => {
                     const isActive = newBatchForm.weeklyDays.includes(day.value);
@@ -2059,7 +2061,7 @@ export default function AttendancePage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition active:scale-95 cursor-pointer"
+                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition active:scale-95 cursor-pointer"
                 >
                   Create Batch
                 </button>

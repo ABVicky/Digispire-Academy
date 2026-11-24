@@ -150,7 +150,7 @@ export default function AnnouncementNotificationWatcher() {
     <>
       {/* ── 1. One-Click Permission Request Banner (if default) ── */}
       {showPermissionBanner && permissionState === 'default' && (
-        <div className="fixed top-3 right-3 left-3 sm:left-auto sm:w-96 z-50 bg-[#1E3A5F] text-white p-3.5 rounded-xl shadow-xl border border-slate-700 flex items-start gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="mb-4 bg-[#1E3A5F] text-white p-3.5 rounded-xl shadow-sm border border-slate-700 flex items-start gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="h-8 w-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
             <Bell size={16} className="text-amber-300" />
           </div>
@@ -174,7 +174,7 @@ export default function AnnouncementNotificationWatcher() {
               </button>
             </div>
           </div>
-          <button onClick={dismissPermissionPrompt} className="text-slate-400 hover:text-white p-1">
+          <button onClick={dismissPermissionPrompt} aria-label="Dismiss" className="text-slate-400 hover:text-white p-1">
             <X size={14} />
           </button>
         </div>
@@ -223,7 +223,7 @@ export default function AnnouncementNotificationWatcher() {
                 }`}>
                   {toastNotif.priority === 'urgent' ? 'Urgent Alert' : toastNotif.priority === 'important' ? 'Important Notice' : 'Campus Broadcast'}
                 </span>
-                <button
+                <button aria-label="Close"
                   onClick={(e) => {
                     e.stopPropagation();
                     setToastNotif(null);

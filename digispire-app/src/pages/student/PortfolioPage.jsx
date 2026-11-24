@@ -89,7 +89,7 @@ export default function PortfolioPage() {
             <Briefcase size={40} />
           </div>
           <h3 className="text-lg font-bold text-slate-800">No Projects Yet</h3>
-          <p className="text-sm text-slate-400 mt-2 max-w-[240px] mx-auto">Start building your portfolio by adding your campaign links.</p>
+          <p className="text-sm text-slate-500 mt-2 max-w-[240px] mx-auto">Start building your portfolio by adding your campaign links.</p>
           <button 
             onClick={() => setShowAdd(true)}
             className="mt-8 px-8 py-3.5 bg-[#255A84] text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-[#255A84]/20"
@@ -113,14 +113,14 @@ export default function PortfolioPage() {
                 </div>
                 <div className="mt-4">
                   <h3 className="font-bold text-slate-800 text-base">{p.title}</h3>
-                  <p className="text-xs text-slate-400 mt-1 font-medium">{typeInfo.label}</p>
+                  <p className="text-xs text-slate-500 mt-1 font-medium">{typeInfo.label}</p>
                   {p.description && <p className="text-xs text-slate-500 mt-3 line-clamp-2 leading-relaxed">{p.description}</p>}
                 </div>
                 <a 
                   href={p.url} target="_blank" rel="noopener noreferrer"
                   className="mt-6 flex items-center justify-between p-3 bg-slate-50 rounded-xl group/link"
                 >
-                  <div className="flex items-center gap-2 text-slate-400 min-w-0">
+                  <div className="flex items-center gap-2 text-slate-500 min-w-0">
                     <Globe size={14} />
                     <span className="text-[11px] font-bold truncate uppercase tracking-wider">
                       {(() => {
@@ -148,7 +148,7 @@ export default function PortfolioPage() {
 
             <form onSubmit={handleAdd} className="space-y-6">
               <div>
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Project Category</label>
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Project Category</label>
                 <div className="grid grid-cols-2 gap-2">
                   {PROJECT_TYPES.map(t => (
                     <button
@@ -165,7 +165,7 @@ export default function PortfolioPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Project Title</label>
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Project Title</label>
                 <input 
                   required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
                   placeholder="e.g. My Website SEO Audit"
@@ -174,7 +174,7 @@ export default function PortfolioPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Live URL (Drive/Website)</label>
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Live URL (Drive/Website)</label>
                 <input 
                   required type="url" value={form.url} onChange={e => setForm({ ...form, url: e.target.value })}
                   placeholder="https://docs.google.com/..."
@@ -183,7 +183,7 @@ export default function PortfolioPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Brief Description (Optional)</label>
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Brief Description (Optional)</label>
                 <textarea 
                   value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
                   rows="3" placeholder="Key highlights of your campaign..."

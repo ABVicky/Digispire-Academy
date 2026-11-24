@@ -76,7 +76,7 @@ export default function CommunityPortfolioPage() {
       ) : filtered.length === 0 ? (
         <div className="py-20 text-center">
           <Award size={48} className="mx-auto text-slate-200 mb-4" />
-          <p className="text-slate-400 font-medium text-sm">No projects published in this category yet.</p>
+          <p className="text-slate-500 font-medium text-sm">No projects published in this category yet.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-2">
@@ -89,7 +89,7 @@ export default function CommunityPortfolioPage() {
                     <typeInfo.icon size={24} />
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{typeInfo.label}</span>
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">{typeInfo.label}</span>
                     <span className="text-[11px] font-bold text-[#255A84] mt-1 flex items-center gap-1">
                       <User size={12} /> {p.studentName || 'Marketer'}
                     </span>
@@ -104,10 +104,10 @@ export default function CommunityPortfolioPage() {
                     href={p.url} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-2 group/link"
                   >
-                    <div className="h-8 w-8 bg-slate-50 text-slate-400 rounded-lg flex items-center justify-center group-hover/link:text-[#255A84] group-hover/link:bg-[#255A84]/5 transition-colors">
+                    <div className="h-8 w-8 bg-slate-50 text-slate-500 rounded-lg flex items-center justify-center group-hover/link:text-[#255A84] group-hover/link:bg-[#255A84]/5 transition-colors">
                       <Globe size={14} />
                     </div>
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest truncate max-w-[120px]">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest truncate max-w-[120px]">
                       {(() => {
                         try { return new URL(p.url).hostname; }
                         catch { return 'View Live'; }

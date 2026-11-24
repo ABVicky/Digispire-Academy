@@ -62,7 +62,7 @@ export function EmailPreviewFrame({ subject, html, meta, loading = false, height
   return (
     <div className="rounded-2xl border border-slate-200 overflow-hidden bg-white shadow-xs">
       <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 space-y-0.5">
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Email preview</p>
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Email preview</p>
         <p className="text-sm font-bold text-slate-800 break-words">{subject || '—'}</p>
         {meta ? <p className="text-[11px] text-slate-500 font-medium break-words">{meta}</p> : null}
       </div>
@@ -75,7 +75,7 @@ export function EmailPreviewFrame({ subject, html, meta, loading = false, height
         {html ? (
           <iframe title="Email preview" sandbox="" srcDoc={html} className="w-full block bg-white" style={{ height }} />
         ) : (
-          <div className="flex items-center justify-center text-xs text-slate-400 font-semibold" style={{ height: 160 }}>No preview yet</div>
+          <div className="flex items-center justify-center text-xs text-slate-500 font-semibold" style={{ height: 160 }}>No preview yet</div>
         )}
       </div>
     </div>

@@ -89,11 +89,11 @@ export default function AttendanceCalendar({
   const getStatusColor = (status) => {
     switch (status) {
       case 'present':
-        return 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm shadow-emerald-500/20';
+        return 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm shadow-emerald-500/20';
       case 'absent':
-        return 'bg-rose-500 text-white hover:bg-rose-600 shadow-sm shadow-rose-500/20';
+        return 'bg-rose-600 text-white hover:bg-rose-700 shadow-sm shadow-rose-500/20';
       case 'leave':
-        return 'bg-amber-500 text-white hover:bg-amber-600 shadow-sm shadow-amber-500/20';
+        return 'bg-amber-600 text-white hover:bg-amber-700 shadow-sm shadow-amber-500/20';
       case 'holiday':
         return 'bg-yellow-500 text-slate-800 hover:bg-yellow-600 shadow-sm shadow-yellow-500/10';
       case 'makeup':
@@ -101,7 +101,7 @@ export default function AttendanceCalendar({
       case 'cancelled':
         return 'bg-slate-300 text-slate-600 line-through hover:bg-slate-400';
       default:
-        return 'bg-slate-50 text-slate-400 hover:bg-slate-100 border border-slate-100/50';
+        return 'bg-slate-50 text-slate-500 hover:bg-slate-100 border border-slate-100/50';
     }
   };
 
@@ -157,7 +157,7 @@ export default function AttendanceCalendar({
               type="button"
               onClick={() => setViewMode('monthly')}
               className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
-                viewMode === 'monthly' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                viewMode === 'monthly' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-600'
               }`}
             >
               Month
@@ -166,7 +166,7 @@ export default function AttendanceCalendar({
               type="button"
               onClick={() => setViewMode('weekly')}
               className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
-                viewMode === 'weekly' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                viewMode === 'weekly' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-600'
               }`}
             >
               Week
@@ -174,13 +174,13 @@ export default function AttendanceCalendar({
           </div>
 
           <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl">
-            <button onClick={handlePrev} className="p-1.5 hover:bg-white rounded-xl transition text-slate-400">
+            <button onClick={handlePrev} aria-label="Previous" className="p-1.5 hover:bg-white rounded-xl transition text-slate-500">
               <ChevronLeft size={16} />
             </button>
             <span className="text-[11px] font-bold text-slate-700 min-w-[125px] text-center uppercase tracking-widest">
               {viewMode === 'monthly' ? `${MONTHS[month]} ${year}` : getWeekHeaderText()}
             </span>
-            <button onClick={handleNext} className="p-1.5 hover:bg-white rounded-xl transition text-slate-400">
+            <button onClick={handleNext} aria-label="Next" className="p-1.5 hover:bg-white rounded-xl transition text-slate-500">
               <ChevronRight size={16} />
             </button>
           </div>
@@ -191,7 +191,7 @@ export default function AttendanceCalendar({
       <div>
         <div className="grid grid-cols-7 gap-2 text-center mb-2">
           {WEEKDAYS.map(day => (
-            <span key={day} className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+            <span key={day} className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">
               {day}
             </span>
           ))}
@@ -226,17 +226,17 @@ export default function AttendanceCalendar({
       </div>
 
       {/* Color Legend */}
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 pt-4 border-t border-slate-50 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 pt-4 border-t border-slate-50 text-[11px] font-bold uppercase tracking-widest text-slate-500">
         <div className="flex items-center gap-2">
-          <span className="h-3.5 w-3.5 rounded-lg bg-emerald-500 shadow-sm shadow-emerald-500/10 block shrink-0" />
+          <span className="h-3.5 w-3.5 rounded-lg bg-emerald-600 shadow-sm shadow-emerald-500/10 block shrink-0" />
           <span>Present</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="h-3.5 w-3.5 rounded-lg bg-rose-500 shadow-sm shadow-rose-500/10 block shrink-0" />
+          <span className="h-3.5 w-3.5 rounded-lg bg-rose-600 shadow-sm shadow-rose-500/10 block shrink-0" />
           <span>Absent</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="h-3.5 w-3.5 rounded-lg bg-amber-500 shadow-sm shadow-amber-500/10 block shrink-0" />
+          <span className="h-3.5 w-3.5 rounded-lg bg-amber-600 shadow-sm shadow-amber-500/10 block shrink-0" />
           <span>Leave</span>
         </div>
         <div className="flex items-center gap-2">
@@ -258,20 +258,20 @@ export default function AttendanceCalendar({
         <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100/60 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Selected Day Details</p>
+              <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Selected Day Details</p>
               <p className="text-sm font-bold text-slate-800 mt-1">
                 {new Date(dayDetails.date).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </p>
             </div>
             
             <span className={`px-3 py-1 rounded-xl text-[11px] font-black uppercase tracking-widest border ${
-              dayDetails.status === 'present' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+              dayDetails.status === 'present' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
               dayDetails.status === 'absent' ? 'bg-rose-50 text-rose-600 border-rose-100' :
               dayDetails.status === 'leave' ? 'bg-amber-50 text-amber-600 border-amber-100' :
               dayDetails.status === 'holiday' ? 'bg-yellow-50 text-yellow-600 border-yellow-100' :
               dayDetails.status === 'makeup' ? 'bg-blue-50 text-blue-600 border-blue-100' :
               dayDetails.status === 'cancelled' ? 'bg-slate-100 text-slate-500 border-slate-200' :
-              'bg-slate-100 text-slate-400 border-transparent'
+              'bg-slate-100 text-slate-500 border-transparent'
             }`}>
               {dayDetails.status === 'no-class' ? 'No Class' : dayDetails.status}
             </span>
@@ -279,7 +279,7 @@ export default function AttendanceCalendar({
 
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-600 font-medium">
             <div className="flex items-center gap-2.5">
-              <Clock size={15} className="text-slate-400 shrink-0" />
+              <Clock size={15} className="text-slate-500 shrink-0" />
               <span>{dayDetails.timing}</span>
             </div>
 
@@ -353,13 +353,13 @@ export default function AttendanceCalendar({
 
           {onUpdateStatus && dayDetails.status !== 'no-class' && (
             <div className="mt-4 pt-4 border-t border-slate-200/60 space-y-2">
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Admin Actions</p>
+              <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Admin Actions</p>
               <div className="flex flex-wrap gap-2 pt-1">
                 <button
                   onClick={() => onUpdateStatus(dayDetails.date, 'present')}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition active:scale-95 cursor-pointer ${
                     dayDetails.status === 'present'
-                      ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/20'
+                      ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
@@ -379,7 +379,7 @@ export default function AttendanceCalendar({
                   onClick={() => onUpdateStatus(dayDetails.date, 'leave')}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition active:scale-95 cursor-pointer ${
                     dayDetails.status === 'leave'
-                      ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/20'
+                      ? 'bg-amber-600 text-white shadow-sm shadow-amber-500/20'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
@@ -389,7 +389,7 @@ export default function AttendanceCalendar({
                   onClick={() => onUpdateStatus(dayDetails.date, 'absent')}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition active:scale-95 cursor-pointer ${
                     dayDetails.status === 'absent'
-                      ? 'bg-rose-500 text-white shadow-sm shadow-rose-500/20'
+                      ? 'bg-rose-600 text-white shadow-sm shadow-rose-500/20'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >

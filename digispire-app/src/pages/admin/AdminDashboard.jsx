@@ -28,8 +28,8 @@ function StatCard({ icon: Icon, label, value, color, colorBg, description }) {
       </div>
       <div className="min-w-0">
         <p className="text-xl font-black text-slate-800 leading-none tracking-tight">{value}</p>
-        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 truncate">{label}</p>
-        {description && <p className="text-[10px] text-slate-300 mt-0.5 hidden sm:block">{description}</p>}
+        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide mt-1 leading-tight">{label}</p>
+        {description && <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block lg:hidden 2xl:block">{description}</p>}
       </div>
     </div>
   );
@@ -45,12 +45,12 @@ function StudentCardMobile({ student, batches, onOpenIdCard }) {
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-bold text-slate-800 text-sm truncate">{student.name}</p>
-          <p className="text-[10px] font-mono font-bold text-slate-400 uppercase mt-0.5">{student.studentId}</p>
+          <p className="text-[10px] font-mono font-bold text-slate-500 uppercase mt-0.5">{student.studentId}</p>
         </div>
         <button 
           type="button"
           onClick={() => onOpenIdCard && onOpenIdCard(student)}
-          className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-[#255A84] transition active:scale-90 shrink-0 cursor-pointer"
+          className="h-8 w-8 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500 hover:text-[#255A84] transition active:scale-90 shrink-0 cursor-pointer"
           title="Inspect ID Card"
         >
           <CreditCard size={14} />
@@ -404,7 +404,7 @@ export default function AdminDashboard() {
     <div className="flex items-center justify-center h-64">
       <div className="flex flex-col items-center gap-3">
         <div className="animate-spin rounded-full h-10 w-10 border-4 border-[#255A84] border-t-transparent" />
-        <p className="text-slate-400 text-xs font-bold uppercase tracking-widest animate-pulse">Loading...</p>
+        <p className="text-slate-500 text-xs font-bold uppercase tracking-widest animate-pulse">Loading...</p>
       </div>
     </div>
   );
@@ -489,24 +489,24 @@ export default function AdminDashboard() {
           <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">
             {viewMode === 'admin' ? 'Administrator Console' : 'Educator Workspace'}
           </h1>
-          <p className="text-slate-400 text-xs mt-0.5 font-medium">
+          <p className="text-slate-500 text-xs mt-0.5 font-medium">
             {new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+        <div className="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:items-center sm:flex-wrap sm:justify-end">
           {/* View switcher – admins only */}
           {userProfile?.role === 'admin' && (
-            <div className="flex bg-slate-100 p-1 rounded-2xl shrink-0">
+            <div className="col-span-2 flex bg-slate-100 p-1 rounded-2xl shrink-0 [&>button]:flex-1">
               <button
                 onClick={() => setToggleMode('admin')}
-                className={`px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${viewMode === 'admin' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                className={`px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${viewMode === 'admin' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-600'}`}
               >
                 Admin
               </button>
               <button
                 onClick={() => setToggleMode('educator')}
-                className={`px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${viewMode === 'educator' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                className={`px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${viewMode === 'educator' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-600'}`}
               >
                 Educator
               </button>
@@ -515,7 +515,7 @@ export default function AdminDashboard() {
 
           <Link
             to="/admin/announcements"
-            className="flex items-center gap-1.5 px-3.5 py-2.5 bg-[#1E3A5F] hover:bg-[#2B5282] text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+            className="flex items-center justify-center gap-1.5 px-2 sm:px-3.5 py-2.5 min-h-[42px] whitespace-nowrap bg-[#1E3A5F] hover:bg-[#2B5282] text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition active:scale-95 cursor-pointer shrink-0"
           >
             <Megaphone size={13} />
             Broadcast Notice
@@ -523,7 +523,7 @@ export default function AdminDashboard() {
 
           <button
             onClick={() => setShowShareModal(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+            className="flex items-center justify-center gap-1.5 px-2 sm:px-3.5 py-2.5 whitespace-nowrap bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition active:scale-95 cursor-pointer shrink-0"
           >
             <Share2 size={13} />
             WhatsApp Report
@@ -539,7 +539,7 @@ export default function AdminDashboard() {
           {/* Stat Cards — 2 col mobile, 3 col sm, 5 col lg */}
           <div className="stat-grid lg:grid-cols-5">
             <StatCard icon={Users} label="Total Students" value={totalStudents} colorBg="bg-blue-50" color="text-blue-600" description="Total registrations" />
-            <StatCard icon={Sparkles} label="Active Students" value={activeStudents} colorBg="bg-emerald-50" color="text-emerald-600" description="Enrolled in batches" />
+            <StatCard icon={Sparkles} label="Active Students" value={activeStudents} colorBg="bg-emerald-50" color="text-emerald-700" description="Enrolled in batches" />
             <StatCard icon={Layers} label="Batches" value={totalBatches} colorBg="bg-purple-50" color="text-purple-600" description="Active course groups" />
             <StatCard icon={CalendarCheck} label="Classes Today" value={todayClassesCount} colorBg="bg-orange-50" color="text-orange-500" description="Scheduled today" />
             <StatCard icon={Clock} label="Check-ins Today" value={attendanceTodayCount} colorBg="bg-indigo-50" color="text-indigo-600" description="Logged entries" />
@@ -560,7 +560,7 @@ export default function AdminDashboard() {
             <div className="data-table-wrap hidden md:block">
               <table className="w-full text-sm table-as-cards" style={{ display: 'table' }}>
                 <thead>
-                  <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left">
+                  <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-widest text-slate-500 text-left">
                     <th className="px-5 py-3">Student</th>
                     <th className="px-4 py-3">Student ID</th>
                     <th className="px-4 py-3">Admitted</th>
@@ -569,7 +569,7 @@ export default function AdminDashboard() {
                 </thead>
                 <tbody className="divide-y divide-slate-50 font-medium text-slate-700">
                   {recentAdmissions.length === 0 ? (
-                    <tr><td colSpan="4" className="py-8 text-center text-slate-400 text-xs">No recent students found</td></tr>
+                    <tr><td colSpan="4" className="py-8 text-center text-slate-500 text-xs">No recent students found</td></tr>
                   ) : (
                     recentAdmissions.map(student => (
                       <tr key={student.id} className="hover:bg-slate-50/50 transition-colors">
@@ -579,7 +579,7 @@ export default function AdminDashboard() {
                             <button 
                               type="button"
                               onClick={() => handleOpenIdCard(student)}
-                              className="p-1 text-slate-400 hover:text-[#255A84] rounded hover:bg-slate-100 transition duration-200 cursor-pointer"
+                              className="p-1 text-slate-500 hover:text-[#255A84] rounded hover:bg-slate-100 transition duration-200 cursor-pointer"
                               title="Inspect ID Card"
                             >
                               <CreditCard size={13} />
@@ -604,7 +604,7 @@ export default function AdminDashboard() {
             {/* Mobile Card List */}
             <div className="p-4 md:hidden">
               {recentAdmissions.length === 0 ? (
-                <p className="text-center text-slate-400 text-xs py-6">No recent students found</p>
+                <p className="text-center text-slate-500 text-xs py-6">No recent students found</p>
               ) : (
                 <div className="cards-list" style={{ display: 'flex' }}>
                   {recentAdmissions.map(student => (
@@ -641,7 +641,7 @@ export default function AdminDashboard() {
           <div className="stat-grid">
             <StatCard icon={CalendarCheck} label="Classes Today" value={todayClassesCount} colorBg="bg-blue-50" color="text-blue-600" description="Scheduled today" />
             <StatCard icon={AlertCircle} label="Attendance Due" value={attendancePendingList.length} colorBg="bg-amber-50" color="text-amber-600" description="Unverified codes" />
-            <StatCard icon={TrendingUp} label="Check-ins" value={attendanceTodayCount} colorBg="bg-emerald-50" color="text-emerald-600" description="Today's logs" />
+            <StatCard icon={TrendingUp} label="Check-ins" value={attendanceTodayCount} colorBg="bg-emerald-50" color="text-emerald-700" description="Today's logs" />
           </div>
 
           {/* Today + Tomorrow Classes Grid */}
@@ -652,7 +652,7 @@ export default function AdminDashboard() {
                 <Clock size={15} className="text-[#255A84]" /> Today's Classes
               </h2>
               {todayClassesList.length === 0 ? (
-                <p className="text-xs text-slate-400 py-4 text-center italic">No classes today.</p>
+                <p className="text-xs text-slate-500 py-4 text-center italic">No classes today.</p>
               ) : (
                 todayClassesList.map(cls => {
                   const isPending = attendancePendingList.some(p => p.id === cls.id);
@@ -660,10 +660,10 @@ export default function AdminDashboard() {
                     <div key={cls.id} className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between gap-3">
                       <div className="min-w-0">
                         <p className="font-bold text-slate-800 text-sm truncate">{cls.name}</p>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5 truncate">{cls.time} · {cls.educator}</p>
+                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5 truncate">{cls.time} · {cls.educator}</p>
                       </div>
                       <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border shrink-0 ${
-                        isPending ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                        isPending ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100'
                       }`}>
                         {isPending ? 'Pending' : 'Done'}
                       </span>
@@ -679,15 +679,15 @@ export default function AdminDashboard() {
                 <Calendar size={15} className="text-purple-500" /> Tomorrow's Classes
               </h2>
               {tomorrowClasses.length === 0 ? (
-                <p className="text-xs text-slate-400 py-4 text-center italic">No classes tomorrow.</p>
+                <p className="text-xs text-slate-500 py-4 text-center italic">No classes tomorrow.</p>
               ) : (
                 tomorrowClasses.map(cls => (
                   <div key={cls.id} className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between gap-3">
                     <div className="min-w-0">
                       <p className="font-bold text-slate-800 text-sm truncate">{cls.name}</p>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{cls.time}</p>
+                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">{cls.time}</p>
                     </div>
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider shrink-0">{cls.educator}</span>
+                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider shrink-0">{cls.educator}</span>
                   </div>
                 ))
               )}
@@ -707,7 +707,7 @@ export default function AdminDashboard() {
                     <div key={batch.id} className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between gap-2">
                       <div className="min-w-0">
                         <p className="font-bold text-slate-700 text-xs truncate">{batch.name || batch.id}</p>
-                        <p className="text-[10px] text-slate-400 font-medium mt-0.5">{batch.startTime}–{batch.endTime}</p>
+                        <p className="text-[10px] text-slate-500 font-medium mt-0.5">{batch.startTime}–{batch.endTime}</p>
                       </div>
                       <span className="h-9 w-9 rounded-xl bg-[#255A84] text-white flex items-center justify-center font-black text-sm shadow-sm shrink-0">
                         {count}
@@ -723,21 +723,21 @@ export default function AdminDashboard() {
 
       {/* WhatsApp Share Modal */}
       {showShareModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto" onClick={() => setShowShareModal(false)}>
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-xl w-full max-w-4xl overflow-hidden flex flex-col my-8 animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4" onClick={() => setShowShareModal(false)}>
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-xl w-full max-w-4xl max-h-[92dvh] overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
             {/* Header */}
-            <div className="flex justify-between items-center px-6 py-4 border-b border-slate-50">
+            <div className="flex justify-between items-center px-4 sm:px-6 py-4 border-b border-slate-100 shrink-0">
               <div>
                 <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">WhatsApp Attendance Reporter</h2>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Generate and share structured attendance updates</p>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Generate and share structured attendance updates</p>
               </div>
-              <button onClick={() => setShowShareModal(false)} className="p-2 text-slate-400 hover:text-slate-600 transition">
+              <button onClick={() => setShowShareModal(false)} aria-label="Close" className="p-2 text-slate-500 hover:text-slate-600 transition">
                 <X size={18} />
               </button>
             </div>
 
             {/* Body */}
-            <div className="p-6 overflow-y-auto max-h-[75vh]">
+            <div className="p-4 sm:p-6 overflow-y-auto flex-1 min-h-0">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 {/* Left Panel: Verification & Configuration */}
@@ -745,7 +745,7 @@ export default function AdminDashboard() {
                   {/* Date & Batch Pickers */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Report Date</label>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Report Date</label>
                       <input
                         type="date"
                         value={shareDate}
@@ -754,7 +754,7 @@ export default function AdminDashboard() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Select Batch</label>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Select Batch</label>
                       <select
                         value={shareBatchId}
                         onChange={handleBatchChange}
@@ -779,11 +779,11 @@ export default function AdminDashboard() {
                     </div>
 
                     {currLoading ? (
-                      <div className="py-2 text-center text-xs text-slate-400">Loading curriculum data...</div>
+                      <div className="py-2 text-center text-xs text-slate-500">Loading curriculum data...</div>
                     ) : (
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Course</label>
+                          <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Course</label>
                           <select
                             value={selCourseId}
                             onChange={e => { setSelCourseId(e.target.value); setSelModuleId(''); setSelTopicIds([]); }}
@@ -797,7 +797,7 @@ export default function AdminDashboard() {
                         </div>
 
                         <div>
-                          <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Module</label>
+                          <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Module</label>
                           <select
                             disabled={!selCourseId}
                             value={selModuleId}
@@ -813,10 +813,10 @@ export default function AdminDashboard() {
 
                         {selModuleId && (
                           <div className="col-span-2">
-                            <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Topics Completed</label>
+                            <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Topics Completed</label>
                             <div className="max-h-24 overflow-y-auto border border-slate-200/50 rounded-lg p-2 bg-white text-[11px]">
                               {topics.filter(t => t.moduleId === selModuleId).length === 0 ? (
-                                <p className="text-[10px] text-slate-400 italic">No topics found in this module.</p>
+                                <p className="text-[10px] text-slate-500 italic">No topics found in this module.</p>
                               ) : (
                                 topics.filter(t => t.moduleId === selModuleId).map(topic => {
                                   const isChecked = selTopicIds.includes(topic.id);
@@ -851,7 +851,7 @@ export default function AdminDashboard() {
                       {detailsLoading ? (
                         <div className="animate-spin h-3.5 w-3.5 border-2 border-slate-400 border-t-transparent rounded-full" />
                       ) : (
-                        <span className="text-[10px] font-bold text-slate-400">{shareAttendance.length} logs found</span>
+                        <span className="text-[10px] font-bold text-slate-500">{shareAttendance.length} logs found</span>
                       )}
                     </div>
 
@@ -860,7 +860,7 @@ export default function AdminDashboard() {
                         type="button"
                         onClick={() => setActiveShareTab('present')}
                         className={`flex-1 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all ${
-                          activeShareTab === 'present' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                          activeShareTab === 'present' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-600'
                         }`}
                       >
                         Attended ({attendedList.length})
@@ -869,7 +869,7 @@ export default function AdminDashboard() {
                         type="button"
                         onClick={() => setActiveShareTab('absent')}
                         className={`flex-1 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all ${
-                          activeShareTab === 'absent' ? 'bg-white text-rose-500 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                          activeShareTab === 'absent' ? 'bg-white text-rose-500 shadow-sm' : 'text-slate-500 hover:text-slate-600'
                         }`}
                       >
                         Absent ({absentList.length})
@@ -878,7 +878,7 @@ export default function AdminDashboard() {
                         type="button"
                         onClick={() => setActiveShareTab('leave')}
                         className={`flex-1 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all ${
-                          activeShareTab === 'leave' ? 'bg-white text-amber-500 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                          activeShareTab === 'leave' ? 'bg-white text-amber-500 shadow-sm' : 'text-slate-500 hover:text-slate-600'
                         }`}
                       >
                         Leave ({leaveList.length})
@@ -887,10 +887,10 @@ export default function AdminDashboard() {
 
                     <div className="max-h-36 overflow-y-auto pr-1 text-xs space-y-1">
                       {detailsLoading ? (
-                        <p className="text-center text-slate-400 italic py-4">Fetching logs...</p>
+                        <p className="text-center text-slate-500 italic py-4">Fetching logs...</p>
                       ) : activeShareTab === 'present' ? (
                         attendedList.length === 0 ? (
-                          <p className="text-center text-slate-400 italic py-4">No students attended.</p>
+                          <p className="text-center text-slate-500 italic py-4">No students attended.</p>
                         ) : (
                           attendedList.map((name, i) => (
                             <div key={i} className="flex items-center justify-between p-1.5 bg-emerald-50/50 border border-emerald-100/30 rounded-lg text-emerald-800 text-[11px] font-semibold">
@@ -901,7 +901,7 @@ export default function AdminDashboard() {
                         )
                       ) : activeShareTab === 'absent' ? (
                         absentList.length === 0 ? (
-                          <p className="text-center text-slate-400 italic py-4">No students absent.</p>
+                          <p className="text-center text-slate-500 italic py-4">No students absent.</p>
                         ) : (
                           absentList.map((name, i) => (
                             <div key={i} className="flex items-center justify-between p-1.5 bg-rose-50/50 border border-rose-100/30 rounded-lg text-rose-800 text-[11px] font-semibold">
@@ -912,7 +912,7 @@ export default function AdminDashboard() {
                         )
                       ) : (
                         leaveList.length === 0 ? (
-                          <p className="text-center text-slate-400 italic py-4">No students on leave.</p>
+                          <p className="text-center text-slate-500 italic py-4">No students on leave.</p>
                         ) : (
                           leaveList.map((name, i) => (
                             <div key={i} className="flex items-center justify-between p-1.5 bg-amber-50/50 border border-amber-100/30 rounded-lg text-amber-800 text-[11px] font-semibold">
@@ -930,13 +930,13 @@ export default function AdminDashboard() {
                 <div className="flex flex-col h-full space-y-3">
                   <div className="flex-1 flex flex-col min-h-0">
                     <div className="flex items-center justify-between mb-1.5">
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">WhatsApp Message Preview (Editable)</label>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">WhatsApp Message Preview (Editable)</label>
                       <button
                         type="button"
                         onClick={handleCopy}
                         className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg border transition active:scale-95 cursor-pointer ${
                           copied
-                            ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                             : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
                         }`}
                       >
@@ -946,7 +946,7 @@ export default function AdminDashboard() {
 
                     {detailsLoading ? (
                       <div className="flex-1 min-h-[300px] bg-slate-50 rounded-xl flex items-center justify-center border border-slate-100">
-                        <div className="flex flex-col items-center gap-2 text-slate-400 text-xs">
+                        <div className="flex flex-col items-center gap-2 text-slate-500 text-xs">
                           <div className="animate-spin h-5 w-5 border-2 border-[#255A84] border-t-transparent rounded-full" />
                           <span>Generating live summary...</span>
                         </div>
@@ -973,7 +973,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Footer */}
-            <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50 border-t border-slate-100">
+            <div className="flex justify-end gap-2 px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 border-t border-slate-100 shrink-0">
               <button
                 onClick={() => setShowShareModal(false)}
                 className="px-4 py-2 border border-slate-200 text-slate-500 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-100 active:scale-95 transition"
@@ -985,7 +985,7 @@ export default function AdminDashboard() {
                 onClick={handleSaveAndShare}
                 className="flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition active:scale-95 cursor-pointer"
               >
-                <Share2 size={13} />
+                <Share2 size={13} /> Share on WhatsApp
               </button>
             </div>
           </div>

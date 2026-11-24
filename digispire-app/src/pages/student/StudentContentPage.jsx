@@ -344,7 +344,7 @@ export default function StudentContentPage() {
               }`}
             >
               <span>All Courses</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
                 filterCourse === 'all' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
               }`}>
                 {contents.length}
@@ -366,7 +366,7 @@ export default function StudentContentPage() {
                 >
                   <span>{course.name}</span>
                   {count > 0 && (
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
                       isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
                     }`}>
                       {count}
@@ -381,7 +381,7 @@ export default function StudentContentPage() {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           {/* Search Input */}
           <div className="relative flex-1">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
               type="text"
               value={search}
@@ -390,9 +390,9 @@ export default function StudentContentPage() {
               className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all"
             />
             {search && (
-              <button
+              <button aria-label="Clear search"
                 onClick={() => setSearch('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600 p-0.5"
               >
                 <X size={13} />
               </button>
@@ -404,6 +404,7 @@ export default function StudentContentPage() {
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
+              aria-label="Sort by"
               className="flex-1 sm:flex-initial px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all cursor-pointer"
             >
               <option value="newest">🕒 Newest</option>
@@ -468,7 +469,7 @@ export default function StudentContentPage() {
                 {TabIcon && <TabIcon size={12} className={isActive && tab.id === 'bookmarks' ? 'fill-white' : ''} />}
                 <span>{tab.label}</span>
                 {typeof tab.count === 'number' && (
-                  <span className={`text-[10px] font-black px-1.5 py-0.2 rounded-full ${
+                  <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${
                     isActive ? 'bg-white/20 text-white' : 'bg-slate-200/80 text-slate-600'
                   }`}>
                     {tab.count}
@@ -498,17 +499,17 @@ export default function StudentContentPage() {
       {loading ? (
         <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center flex flex-col items-center justify-center gap-3 shadow-xs">
           <div className="animate-spin rounded-full h-8 w-8 border-3 border-[#255A84] border-t-transparent" />
-          <p className="text-xs text-slate-400 font-bold">Loading materials...</p>
+          <p className="text-xs text-slate-500 font-bold">Loading materials...</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-12 px-4 text-slate-400 bg-white rounded-2xl border border-slate-100 shadow-xs space-y-2.5">
-          <div className="h-12 w-12 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-1">
+        <div className="text-center py-12 px-4 text-slate-500 bg-white rounded-2xl border border-slate-100 shadow-xs space-y-2.5">
+          <div className="h-12 w-12 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center mx-auto mb-1">
             {activeTab === 'bookmarks' ? (
               <Star size={24} className="text-amber-400" />
             ) : activeTab === 'completed' ? (
               <CheckCircle2 size={24} className="text-emerald-500" />
             ) : (
-              <BookOpen size={24} className="text-slate-400" />
+              <BookOpen size={24} className="text-slate-500" />
             )}
           </div>
           <h3 className="font-extrabold text-sm sm:text-base text-slate-800">
@@ -604,7 +605,7 @@ export default function StudentContentPage() {
                 >
                   <Star size={15} fill={bookmarks.includes(previewMedia.id) ? 'currentColor' : 'none'} />
                 </button>
-                <button
+                <button aria-label="Close"
                   onClick={() => setPreviewMedia(null)}
                   className="p-1.5 sm:p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
                 >
@@ -818,7 +819,7 @@ function StudentResourceCard({
                   </span>
                 )}
               </div>
-              <p className="text-[10px] text-slate-400 font-medium truncate">
+              <p className="text-[10px] text-slate-500 font-medium truncate">
                 {type === 'pdf' ? 'Printable Study Material' :
                  type === 'gdrive' ? 'Shared Worksheets & Files' :
                  domain}
@@ -831,7 +832,7 @@ function StudentResourceCard({
             className={`p-1.5 rounded-lg transition shrink-0 ${
               isBookmarked 
                 ? 'bg-amber-50 text-[#F48B1F] border border-amber-200' 
-                : 'text-slate-400 hover:text-[#F48B1F] hover:bg-white/80 border border-transparent'
+                : 'text-slate-500 hover:text-[#F48B1F] hover:bg-white/80 border border-transparent'
             }`}
             title={isBookmarked ? 'Saved to Bookmarks' : 'Bookmark'}
           >
@@ -889,8 +890,8 @@ function StudentResourceCard({
             title="Copy Resource Link"
             className={`p-1.5 rounded-lg border transition ${
               copiedId === item.id 
-                ? 'bg-emerald-50 text-emerald-600 border-emerald-200' 
-                : 'bg-white text-slate-400 border-slate-200 hover:text-slate-700 hover:bg-slate-100'
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                : 'bg-white text-slate-500 border-slate-200 hover:text-slate-700 hover:bg-slate-100'
             }`}
           >
             {copiedId === item.id ? <Check size={13} /> : <Copy size={13} />}
@@ -946,7 +947,7 @@ function StudentResourceListItem({
         <button
           onClick={() => onToggleCompleted(item.id, item.title)}
           className={`p-0.5 rounded-lg transition shrink-0 mt-1 ${
-            isCompleted ? 'text-emerald-600' : 'text-slate-300 hover:text-emerald-600'
+            isCompleted ? 'text-emerald-700' : 'text-slate-300 hover:text-emerald-600'
           }`}
           title={isCompleted ? 'Completed' : 'Mark as Done'}
         >
@@ -964,7 +965,7 @@ function StudentResourceListItem({
 
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded-full border ${
+            <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full border ${
               type === 'pdf' ? 'bg-rose-50 text-rose-700 border-rose-200' :
               type === 'video' ? 'bg-purple-50 text-purple-700 border-purple-200' :
               type === 'gdrive' ? 'bg-sky-50 text-sky-700 border-sky-200' :
@@ -973,12 +974,12 @@ function StudentResourceListItem({
               {typeLabel(type)}
             </span>
             {courseName && (
-              <span className="text-[9px] font-bold text-[#255A84] bg-blue-50 px-1.5 py-0.2 rounded">
+              <span className="text-[9px] font-bold text-[#255A84] bg-blue-50 px-1.5 py-0.5 rounded">
                 {courseName}
               </span>
             )}
             {item.isPinned && (
-              <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 flex items-center gap-0.5">
+              <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 flex items-center gap-0.5">
                 <Pin size={8} fill="currentColor" /> Pinned
               </span>
             )}
@@ -989,7 +990,7 @@ function StudentResourceListItem({
           >
             {item.title}
           </h4>
-          {item.description && <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">{item.description}</p>}
+          {item.description && <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">{item.description}</p>}
         </div>
       </div>
 
@@ -997,7 +998,7 @@ function StudentResourceListItem({
         <button
           onClick={() => onBookmark(item.id)}
           className={`p-1.5 rounded-lg transition ${
-            isBookmarked ? 'bg-amber-50 text-amber-500 border border-amber-200' : 'text-slate-400 hover:text-amber-500 hover:bg-slate-100'
+            isBookmarked ? 'bg-amber-50 text-amber-500 border border-amber-200' : 'text-slate-500 hover:text-amber-500 hover:bg-slate-100'
           }`}
           title="Bookmark"
         >
@@ -1007,7 +1008,7 @@ function StudentResourceListItem({
         <button
           onClick={(e) => onCopyLink(item, e)}
           className={`p-1.5 rounded-lg border transition ${
-            copiedId === item.id ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-white text-slate-400 border-slate-200 hover:text-slate-800'
+            copiedId === item.id ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white text-slate-500 border-slate-200 hover:text-slate-800'
           }`}
           title="Copy Link"
         >

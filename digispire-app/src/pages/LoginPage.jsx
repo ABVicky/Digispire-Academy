@@ -119,32 +119,32 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => handleTabSwitch('admin')}
-              className={`py-2.5 px-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              className={`py-2.5 px-1.5 sm:px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wide sm:tracking-wider whitespace-nowrap rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
                 tab === 'admin' 
                   ? 'bg-[#1E3A5F] text-white shadow-sm border border-slate-600/50' 
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <ShieldCheck size={14} />
+              <ShieldCheck size={14} className="shrink-0 hidden min-[360px]:block" />
               <span>Teachers & Staff</span>
             </button>
             <button
               type="button"
               onClick={() => handleTabSwitch('student')}
-              className={`py-2.5 px-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              className={`py-2.5 px-1.5 sm:px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wide sm:tracking-wider whitespace-nowrap rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
                 tab === 'student' 
                   ? 'bg-[#C2410C] text-white shadow-sm border border-orange-500/50' 
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <GraduationCap size={14} />
+              <GraduationCap size={14} className="shrink-0 hidden min-[360px]:block" />
               <span>Students</span>
             </button>
           </div>
 
           <div className="p-6 sm:p-8">
             {error && (
-              <div className="mb-5 p-3.5 bg-rose-950/60 border border-rose-800/80 rounded-xl text-rose-300 text-xs font-medium flex items-start gap-3">
+              <div role="alert" className="mb-5 p-3.5 bg-rose-950/60 border border-rose-800/80 rounded-xl text-rose-300 text-xs font-medium flex items-start gap-3">
                 <Shield size={16} className="text-rose-400 shrink-0 mt-0.5" />
                 <span className="leading-relaxed">{error}</span>
               </div>
@@ -186,12 +186,12 @@ export default function LoginPage() {
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full pl-10 pr-10 py-2.5 bg-[#0F172A] border border-slate-600 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-[#38BDF8] focus:ring-1 focus:ring-[#38BDF8] transition"
+                      className="w-full pl-10 pr-12 py-2.5 bg-[#0F172A] border border-slate-600 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-[#38BDF8] focus:ring-1 focus:ring-[#38BDF8] transition"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition p-1 cursor-pointer z-20"
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition p-1 cursor-pointer z-20"
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -245,12 +245,12 @@ export default function LoginPage() {
                       value={studentPassword}
                       onChange={e => setStudentPassword(e.target.value)}
                       placeholder="Enter your password"
-                      className="w-full pl-10 pr-10 py-2.5 bg-[#0F172A] border border-slate-600 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-[#FB923C] focus:ring-1 focus:ring-[#FB923C] transition"
+                      className="w-full pl-10 pr-12 py-2.5 bg-[#0F172A] border border-slate-600 rounded-xl text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-[#FB923C] focus:ring-1 focus:ring-[#FB923C] transition"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition p-1 cursor-pointer z-20"
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition p-1 cursor-pointer z-20"
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}

@@ -368,7 +368,7 @@ export default function ContentPage() {
               }`}
             >
               <span>All Courses</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
                 filterCourse === 'all' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
               }`}>
                 {contents.length}
@@ -390,7 +390,7 @@ export default function ContentPage() {
                 >
                   <span>{course.name}</span>
                   {count > 0 && (
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
                       isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
                     }`}>
                       {count}
@@ -405,7 +405,7 @@ export default function ContentPage() {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           {/* Search Input */}
           <div className="relative flex-1">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
               type="text"
               value={search}
@@ -414,9 +414,9 @@ export default function ContentPage() {
               className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all"
             />
             {search && (
-              <button
+              <button aria-label="Clear search"
                 onClick={() => setSearch('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600 p-0.5"
               >
                 <X size={13} />
               </button>
@@ -428,6 +428,7 @@ export default function ContentPage() {
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
+              aria-label="Sort by"
               className="flex-1 sm:flex-initial px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 focus:bg-white focus:border-[#255A84] focus:outline-none transition-all cursor-pointer"
             >
               <option value="newest">🕒 Newest</option>
@@ -461,7 +462,7 @@ export default function ContentPage() {
               >
                 <span>{tab.label}</span>
                 {typeof tab.count === 'number' && (
-                  <span className={`text-[10px] font-black px-1.5 py-0.2 rounded-full ${
+                  <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${
                     isActive ? 'bg-white/20 text-white' : 'bg-slate-200/80 text-slate-600'
                   }`}>
                     {tab.count}
@@ -491,11 +492,11 @@ export default function ContentPage() {
       {loading ? (
         <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center flex flex-col items-center justify-center gap-3 shadow-xs">
           <div className="animate-spin rounded-full h-8 w-8 border-3 border-[#255A84] border-t-transparent" />
-          <p className="text-xs text-slate-400 font-bold">Loading media library...</p>
+          <p className="text-xs text-slate-500 font-bold">Loading media library...</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center text-slate-400 text-xs font-semibold space-y-2.5 shadow-xs">
-          <div className="h-12 w-12 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-1">
+        <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center text-slate-500 text-xs font-semibold space-y-2.5 shadow-xs">
+          <div className="h-12 w-12 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center mx-auto mb-1">
             <BookOpen size={24} />
           </div>
           <h3 className="text-sm sm:text-base font-extrabold text-slate-700">No Resources Found</h3>
@@ -649,7 +650,7 @@ export default function ContentPage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-[10px] text-slate-400 font-medium truncate">
+                        <p className="text-[10px] text-slate-500 font-medium truncate">
                           {type === 'pdf' ? 'Printable Study Material' :
                            type === 'gdrive' ? 'Shared Worksheets & Files' :
                            domain}
@@ -663,7 +664,7 @@ export default function ContentPage() {
                       className={`p-1.5 rounded-lg transition shrink-0 ${
                         item.isPinned 
                           ? 'bg-amber-50 text-amber-500 border border-amber-200' 
-                          : 'text-slate-400 hover:text-amber-500 hover:bg-white/80 border border-transparent'
+                          : 'text-slate-500 hover:text-amber-500 hover:bg-white/80 border border-transparent'
                       }`}
                     >
                       <Pin size={14} fill={item.isPinned ? 'currentColor' : 'none'} />
@@ -700,7 +701,7 @@ export default function ContentPage() {
 
                 {/* ── CARD FOOTER ACTIONS ── */}
                 <div className="px-3.5 sm:px-4 py-2.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between gap-1.5 text-xs mt-auto">
-                  <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1">
+                  <span className="text-[10px] font-bold text-slate-500 flex items-center gap-1">
                     <Eye size={11} /> {item.clicks || 0} views
                   </span>
 
@@ -718,8 +719,8 @@ export default function ContentPage() {
                       title="Copy Link"
                       className={`p-1.5 rounded-lg border transition ${
                         copiedId === item.id 
-                          ? 'bg-emerald-50 text-emerald-600 border-emerald-200' 
-                          : 'bg-white text-slate-400 border-slate-200 hover:text-slate-700 hover:bg-slate-100'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                          : 'bg-white text-slate-500 border-slate-200 hover:text-slate-700 hover:bg-slate-100'
                       }`}
                     >
                       {copiedId === item.id ? <Check size={13} /> : <Copy size={13} />}
@@ -728,7 +729,7 @@ export default function ContentPage() {
                     <button
                       onClick={(e) => { e.stopPropagation(); openEdit(item); }}
                       title="Edit"
-                      className="p-1.5 bg-white text-slate-400 border border-slate-200 rounded-lg hover:text-[#255A84] hover:bg-blue-50 transition"
+                      className="p-1.5 bg-white text-slate-500 border border-slate-200 rounded-lg hover:text-[#255A84] hover:bg-blue-50 transition"
                     >
                       <Pencil size={13} />
                     </button>
@@ -736,7 +737,7 @@ export default function ContentPage() {
                     <button
                       onClick={(e) => { e.stopPropagation(); setDeleteConfirm(item.id); }}
                       title="Delete"
-                      className="p-1.5 bg-white text-slate-400 border border-slate-200 rounded-lg hover:text-rose-600 hover:bg-rose-50 transition"
+                      className="p-1.5 bg-white text-slate-500 border border-slate-200 rounded-lg hover:text-rose-600 hover:bg-rose-50 transition"
                     >
                       <Trash2 size={13} />
                     </button>
@@ -752,7 +753,7 @@ export default function ContentPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[700px]">
               <thead>
-                <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">
                   <th className="px-4 py-3">Resource Title</th>
                   <th className="px-3 py-3">Type & Track</th>
                   <th className="px-3 py-3">Topic Tag</th>
@@ -788,7 +789,7 @@ export default function ContentPage() {
                           <div className="min-w-0 max-w-xs">
                             <p className="font-bold text-slate-800 truncate text-xs">{item.title}</p>
                             {item.description && (
-                              <p className="text-[10px] text-slate-400 truncate mt-0.5">{item.description}</p>
+                              <p className="text-[10px] text-slate-500 truncate mt-0.5">{item.description}</p>
                             )}
                           </div>
                         </div>
@@ -796,7 +797,7 @@ export default function ContentPage() {
 
                       <td className="px-3 py-3">
                         <div className="space-y-0.5">
-                          <span className={`inline-block px-1.5 py-0.2 rounded-full text-[8px] font-black border ${typeBadgeStyle(type)}`}>
+                          <span className={`inline-block px-1.5 py-0.5 rounded-full text-[8px] font-black border ${typeBadgeStyle(type)}`}>
                             {typeLabel(type)}
                           </span>
                           {courseName && (
@@ -817,7 +818,7 @@ export default function ContentPage() {
 
                       <td className="px-3 py-3">
                         <span className="font-bold text-slate-700 flex items-center gap-1 text-[11px]">
-                          <Eye size={11} className="text-slate-400" />
+                          <Eye size={11} className="text-slate-500" />
                           {item.clicks || 0}
                         </span>
                       </td>
@@ -827,7 +828,7 @@ export default function ContentPage() {
                           {getEmbedUrl(item.fileUrl || item.url) && (
                             <button
                               onClick={() => setPreviewMedia(item)}
-                              className="p-1 text-slate-400 hover:text-[#255A84] hover:bg-blue-50 rounded-lg transition"
+                              className="p-1 text-slate-500 hover:text-[#255A84] hover:bg-blue-50 rounded-lg transition"
                               title="Preview"
                             >
                               <Maximize2 size={13} />
@@ -837,28 +838,28 @@ export default function ContentPage() {
                             href={item.fileUrl || item.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1 text-slate-400 hover:text-[#255A84] hover:bg-blue-50 rounded-lg transition"
+                            className="p-1 text-slate-500 hover:text-[#255A84] hover:bg-blue-50 rounded-lg transition"
                             title="Open Link"
                           >
                             <ExternalLink size={13} />
                           </a>
                           <button
                             onClick={(e) => handleCopyLink(item, e)}
-                            className="p-1 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition"
+                            className="p-1 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition"
                             title="Copy Link"
                           >
                             {copiedId === item.id ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
                           </button>
                           <button
                             onClick={() => openEdit(item)}
-                            className="p-1 text-slate-400 hover:text-[#255A84] hover:bg-blue-50 rounded-lg transition"
+                            className="p-1 text-slate-500 hover:text-[#255A84] hover:bg-blue-50 rounded-lg transition"
                             title="Edit"
                           >
                             <Pencil size={13} />
                           </button>
                           <button
                             onClick={() => setDeleteConfirm(item.id)}
-                            className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                            className="p-1 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
                             title="Delete"
                           >
                             <Trash2 size={13} />
@@ -891,7 +892,7 @@ export default function ContentPage() {
                   <h3 className="font-bold text-xs sm:text-sm text-slate-100 truncate mt-0.5">{previewMedia.title}</h3>
                 </div>
               </div>
-              <button
+              <button aria-label="Close"
                 onClick={() => setPreviewMedia(null)}
                 className="p-1.5 sm:p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
               >
@@ -957,10 +958,10 @@ export default function ContentPage() {
                   <h2 className="font-extrabold text-slate-800 text-sm sm:text-base">
                     {editingId ? 'Edit Study Material' : 'Publish Study Material'}
                   </h2>
-                  <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium">Link video lectures, drive folders, or PDF notes</p>
+                  <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium">Link video lectures, drive folders, or PDF notes</p>
                 </div>
               </div>
-              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600 transition p-1 rounded-lg">
+              <button aria-label="Close" onClick={() => setShowModal(false)} className="text-slate-500 hover:text-slate-600 transition p-1 rounded-lg">
                 <X size={18} />
               </button>
             </div>
@@ -1038,7 +1039,7 @@ export default function ContentPage() {
 
                 <div>
                   <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-                    Topic Tag <span className="normal-case text-slate-400 font-normal">(optional)</span>
+                    Topic Tag <span className="normal-case text-slate-500 font-normal">(optional)</span>
                   </label>
                   <input
                     value={form.subject}
@@ -1052,7 +1053,7 @@ export default function ContentPage() {
               {/* Description */}
               <div>
                 <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-                  Description <span className="normal-case text-slate-400 font-normal">(optional)</span>
+                  Description <span className="normal-case text-slate-500 font-normal">(optional)</span>
                 </label>
                 <textarea
                   value={form.description}

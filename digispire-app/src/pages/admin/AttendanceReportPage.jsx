@@ -389,7 +389,7 @@ export default function AttendanceReportPage() {
         type="button"
         disabled={!s.active}
         onClick={e => { e.stopPropagation(); toggleSelected(s.id); }}
-        className={`p-1 rounded-md transition ${s.active ? 'text-slate-400 hover:text-[#255A84]' : 'text-slate-200 cursor-not-allowed'}`}
+        className={`p-1 rounded-md transition ${s.active ? 'text-slate-500 hover:text-[#255A84]' : 'text-slate-200 cursor-not-allowed'}`}
         aria-label={isOn ? `Deselect ${s.name}` : `Select ${s.name}`}
         title={s.active ? 'Select for email' : 'Inactive students cannot be emailed'}
       >
@@ -403,7 +403,7 @@ export default function AttendanceReportPage() {
       <div className="section-header">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Attendance Ledger</h1>
-          <p className="text-xs text-slate-400 font-medium mt-0.5">Auto-computed statistics for regular and internship tracks</p>
+          <p className="text-xs text-slate-500 font-medium mt-0.5">Auto-computed statistics for regular and internship tracks</p>
         </div>
         <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
           <button onClick={() => window.print()} className="flex items-center gap-2 btn-outline-premium px-4 py-2.5">
@@ -421,13 +421,13 @@ export default function AttendanceReportPage() {
         <div className="flex bg-slate-100 p-1 rounded-2xl w-full sm:w-fit">
           <button
             onClick={() => switchTrack('academic')}
-            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all ${reportType === 'academic' ? 'bg-[#255A84] text-white shadow-md' : 'text-slate-400'}`}
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all ${reportType === 'academic' ? 'bg-[#255A84] text-white shadow-md' : 'text-slate-500'}`}
           >
             <GraduationCap size={13} /> Academic
           </button>
           <button
             onClick={() => switchTrack('internship')}
-            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all ${reportType === 'internship' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400'}`}
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all ${reportType === 'internship' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-500'}`}
           >
             <Briefcase size={13} /> Internship
           </button>
@@ -439,7 +439,7 @@ export default function AttendanceReportPage() {
             <select
               value={selectedBatchId}
               onChange={e => { setSelectedBatchId(e.target.value); clearSelection(); }}
-              className="select-premium text-xs font-bold text-slate-600 sm:min-w-[150px] cursor-pointer"
+              className="select-premium text-xs font-bold text-slate-600 sm:w-56! cursor-pointer" aria-label="Filter by batch"
             >
               <option value="all">All Batches</option>
               {batches.filter(b => b.id !== 'internship').map(b => (
@@ -449,7 +449,7 @@ export default function AttendanceReportPage() {
           )}
 
           {/* Search */}
-          <div className="relative flex-1">
+          <div className="relative flex-1 min-w-0">
             <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300" />
             <input
               type="text" value={search} onChange={e => setSearch(e.target.value)}
@@ -462,7 +462,7 @@ export default function AttendanceReportPage() {
         {/* Highlight thresholds & email selection (web only) */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pt-3 border-t border-slate-100 print:hidden">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400"><Flag size={12} /> Highlight</span>
+            <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-slate-500"><Flag size={12} /> Highlight</span>
             <ThresholdInput label="Below" value={thresholds.lowAttendancePct} min={1} max={100} suffix="%" onChange={v => updateThreshold('lowAttendancePct', v)} />
             <ThresholdInput label="" value={thresholds.consecutiveAbsences} min={1} max={60} suffix="+ absent in a row" onChange={v => updateThreshold('consecutiveAbsences', v)} />
             <ThresholdInput label="" value={thresholds.frequentAbsences} min={1} max={60} suffix={`+ absences in ${thresholds.frequentWindowDays} days`} onChange={v => updateThreshold('frequentAbsences', v)} />
@@ -486,7 +486,7 @@ export default function AttendanceReportPage() {
         {loading ? (
           <div className="py-20 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-[#255A84] border-t-transparent rounded-full" /></div>
         ) : filteredReport.length === 0 ? (
-          <div className="py-20 text-center text-slate-400">
+          <div className="py-20 text-center text-slate-500">
             <Users size={48} className="mx-auto mb-3 opacity-10" />
             <p className="text-xs font-bold uppercase tracking-widest">No data for this track</p>
           </div>
@@ -496,7 +496,7 @@ export default function AttendanceReportPage() {
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                     {emailEnabled && <th className="w-10 pl-4 py-4 print:hidden"></th>}
                     <th className="text-left px-6 py-4">Student</th>
                     <th className="text-center px-4 py-4">Eligible</th>
@@ -513,27 +513,27 @@ export default function AttendanceReportPage() {
                       {emailEnabled && <td className="pl-4 py-3.5 print:hidden">{renderSelectBox(s)}</td>}
                       <td className="px-6 py-3.5">
                         <div className="flex items-center gap-3">
-                          <div className={`h-9 w-9 rounded-xl flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0 overflow-hidden ${reportType === 'internship' ? 'bg-emerald-500' : 'bg-[#255A84]'}`}>
+                          <div className={`h-9 w-9 rounded-xl flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0 overflow-hidden ${reportType === 'internship' ? 'bg-emerald-600' : 'bg-[#255A84]'}`}>
                             {s.photoURL ? <img src={s.photoURL} alt={s.name} className="h-full w-full object-cover" /> : <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1 bg-white" />}
                           </div>
                           <div className="min-w-0">
                             <p className="font-bold text-slate-800 text-sm truncate">{s.name}</p>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{s.studentId}</p>
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{s.studentId}</p>
                             <FlagChips s={s} thresholds={thresholds} />
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-3.5 text-center font-bold text-slate-500 text-sm">{s.totalHeld}</td>
-                      <td className="px-4 py-3.5 text-center font-bold text-emerald-600 text-sm">{s.attended}</td>
-                      <td className="px-4 py-3.5 text-center font-bold text-amber-500 text-sm">{s.leaves}</td>
-                      <td className="px-4 py-3.5 text-center font-bold text-red-400 text-sm">{s.absent}</td>
+                      <td className="px-4 py-3.5 text-center font-bold text-emerald-700 text-sm">{s.attended}</td>
+                      <td className="px-4 py-3.5 text-center font-bold text-amber-700 text-sm">{s.leaves}</td>
+                      <td className="px-4 py-3.5 text-center font-bold text-red-600 text-sm">{s.absent}</td>
                       <td className="px-4 py-3.5 text-center">
-                        <span className={`text-sm font-black ${s.percentage >= 75 ? 'text-emerald-600' : s.percentage >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
+                        <span className={`text-sm font-black ${s.percentage >= 75 ? 'text-emerald-700' : s.percentage >= 50 ? 'text-amber-700' : 'text-red-600'}`}>
                           {s.percentage}%
                         </span>
                       </td>
                       <td className="px-6 py-3.5 text-right">
-                        <span className="inline-flex items-center gap-1.5 bg-slate-50 group-hover:bg-blue-50 text-slate-400 group-hover:text-[#255A84] px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all">
+                        <span className="inline-flex items-center gap-1.5 bg-slate-50 group-hover:bg-blue-50 text-slate-500 group-hover:text-[#255A84] px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all">
                           <CalendarDays size={12} /> Audit
                         </span>
                       </td>
@@ -556,18 +556,18 @@ export default function AttendanceReportPage() {
                 >
                   <div className="flex items-center gap-3">
                     {emailEnabled && renderSelectBox(s)}
-                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden ${reportType === 'internship' ? 'bg-emerald-500' : 'bg-[#255A84]'}`}>
+                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden ${reportType === 'internship' ? 'bg-emerald-600' : 'bg-[#255A84]'}`}>
                       {s.photoURL ? <img src={s.photoURL} alt={s.name} className="h-full w-full object-cover" /> : <img src="/logo.png" alt="Logo" className="h-full w-full object-contain p-1 bg-white" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-slate-800 text-sm truncate">{s.name}</p>
-                      <p className="text-[10px] font-mono font-bold text-slate-400 uppercase">{s.studentId}</p>
+                      <p className="text-[10px] font-mono font-bold text-slate-500 uppercase">{s.studentId}</p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className={`text-lg font-black ${s.percentage >= 75 ? 'text-emerald-500' : s.percentage >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>
+                      <p className={`text-lg font-black ${s.percentage >= 75 ? 'text-emerald-500' : s.percentage >= 50 ? 'text-amber-700' : 'text-rose-600'}`}>
                         {s.percentage}%
                       </p>
-                      <p className="text-[10px] text-slate-400 font-medium">{s.attended}/{s.totalHeld} present</p>
+                      <p className="text-[10px] text-slate-500 font-medium">{s.attended}/{s.totalHeld} present</p>
                     </div>
                   </div>
                   <FlagChips s={s} thresholds={thresholds} />
@@ -575,10 +575,10 @@ export default function AttendanceReportPage() {
                   <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                     <div className={`h-full rounded-full ${s.percentage >= 75 ? 'bg-emerald-500' : s.percentage >= 50 ? 'bg-amber-400' : 'bg-rose-400'}`} style={{ width: `${s.percentage}%` }} />
                   </div>
-                  <div className="flex gap-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    <span className="text-emerald-600">{s.attended} present</span>
-                    <span className="text-amber-500">{s.leaves} leaves</span>
-                    <span className="text-red-400">{s.absent} missed</span>
+                  <div className="flex gap-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                    <span className="text-emerald-700">{s.attended} present</span>
+                    <span className="text-amber-700">{s.leaves} leaves</span>
+                    <span className="text-red-600">{s.absent} missed</span>
                     <span className="ml-auto flex items-center gap-0.5 text-[#255A84]"><CalendarDays size={11} /> View Log</span>
                   </div>
                 </div>
@@ -612,18 +612,18 @@ export default function AttendanceReportPage() {
                 <h2 className="text-xl font-bold text-slate-800">Student Attendance Audit</h2>
                 <p className="text-xs font-bold text-[#255A84] uppercase tracking-wider mt-0.5">{inspectStudent.name} ({inspectStudent.studentId})</p>
               </div>
-              <button onClick={() => setInspectStudent(null)} className="p-2 text-slate-400 hover:text-slate-600 transition"><X size={20} /></button>
+              <button aria-label="Close" onClick={() => setInspectStudent(null)} className="p-2 text-slate-500 hover:text-slate-600 transition"><X size={20} /></button>
             </div>
 
             <div className="modal-body-premium grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Profile/Metrics Info */}
               <div className="md:col-span-1 space-y-4">
                 <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                  <h3 className="text-[11px] font-black uppercase tracking-wider text-slate-400">Computation Profile</h3>
+                  <h3 className="text-[11px] font-black uppercase tracking-wider text-slate-500">Computation Profile</h3>
                   <div className="mt-3 text-xs space-y-2 text-slate-600 font-medium">
-                    <p><span className="text-slate-400">Joining Date:</span> {inspectStudent.joiningDate || 'N/A'}</p>
-                    <p><span className="text-slate-400">Batch Assignment:</span> {inspectStudent.batchId || 'morning'}</p>
-                    <p><span className="text-slate-400">Track Type:</span> <span className="uppercase font-bold text-[#255A84]">{reportType}</span></p>
+                    <p><span className="text-slate-500">Joining Date:</span> {inspectStudent.joiningDate || 'N/A'}</p>
+                    <p><span className="text-slate-500">Batch Assignment:</span> {inspectStudent.batchId || 'morning'}</p>
+                    <p><span className="text-slate-500">Track Type:</span> <span className="uppercase font-bold text-[#255A84]">{reportType}</span></p>
                     {!inspectStudent.active && <p className="font-bold text-slate-500">Inactive — no emails are sent</p>}
                   </div>
                 </div>
@@ -632,17 +632,17 @@ export default function AttendanceReportPage() {
                   <p className="text-[11px] font-bold text-[#255A84] uppercase tracking-widest">Calculated Attendance Rate</p>
                   <p className={`text-5xl font-black ${
                     inspectStudent.percentage >= 75 ? 'text-emerald-500' :
-                    inspectStudent.percentage >= 50 ? 'text-[#F48B1F]' : 'text-rose-500'
+                    inspectStudent.percentage >= 50 ? 'text-[#C2410C]' : 'text-rose-600'
                   }`}>{inspectStudent.percentage}%</p>
 
                   <div className="grid grid-cols-2 gap-2 text-slate-600 pt-2 font-medium">
                     <div className="p-2.5 bg-white rounded-xl border border-slate-100">
                       <span className="text-sm font-bold text-slate-800 block">{inspectStudent.attended}</span>
-                      <span className="text-[11px] text-slate-400 uppercase tracking-wider">Present</span>
+                      <span className="text-[11px] text-slate-500 uppercase tracking-wider">Present</span>
                     </div>
                     <div className="p-2.5 bg-white rounded-xl border border-slate-100">
                       <span className="text-sm font-bold text-slate-800 block">{inspectStudent.totalHeld}</span>
-                      <span className="text-[11px] text-slate-400 uppercase tracking-wider">Eligible</span>
+                      <span className="text-[11px] text-slate-500 uppercase tracking-wider">Eligible</span>
                     </div>
                   </div>
                 </div>

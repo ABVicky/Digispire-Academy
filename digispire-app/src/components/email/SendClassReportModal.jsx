@@ -9,7 +9,7 @@ import { formatDateTime, tsMillis } from '../../utils/emailFormat';
 import { checkEmail, classSessionDocId } from '../../utils/studentReport';
 import { EmailPreviewFrame, EmailStatusBadge, ErrorNotice, ModalPortal, SkippedRecipients, TestModeBadge } from './EmailBits';
 
-const label = 'block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1';
+const label = 'block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1';
 
 export default function SendClassReportModal({ batchId, date, staff = [], courses = [], modules = [], topics = [], onClose }) {
   const [data, setData] = useState(null);
@@ -138,7 +138,7 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
               {data?.batch?.name || batchId} · {data?.dateLabel || date}
             </p>
           </div>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 transition" aria-label="Close"><X size={20} /></button>
+          <button onClick={onClose} className="p-2 text-slate-500 hover:text-slate-600 transition" aria-label="Close"><X size={20} /></button>
         </div>
 
         <div className="modal-body-premium">
@@ -160,7 +160,7 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
                     { icon: Users, k: 'Present', v: `${data.attendance.present} / ${data.attendance.enrolled}${data.attendance.guests ? ` +${data.attendance.guests}` : ''}` },
                   ].map(({ icon: Icon, k, v }) => (
                     <div key={k} className="p-3 rounded-xl bg-slate-50 border border-slate-100 min-w-0">
-                      <p className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-slate-400"><Icon size={11} /> {k}</p>
+                      <p className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-slate-500"><Icon size={11} /> {k}</p>
                       <p className="text-xs font-bold text-slate-800 mt-1 break-words">{v}</p>
                     </div>
                   ))}
@@ -192,7 +192,7 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
                     )}
                   </div>
                 ) : (
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 ml-1">Not sent yet</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Not sent yet</p>
                 )}
 
                 {/* Faculty */}
@@ -223,20 +223,20 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
                       })}
                     </div>
                   ) : (
-                    <p className="text-xs text-slate-400 ml-1">No topics selected.</p>
+                    <p className="text-xs text-slate-500 ml-1">No topics selected.</p>
                   )}
                   <div className="rounded-xl border border-slate-200 p-3 space-y-2 bg-slate-50/50">
                     <select value={activeCourseId} onChange={e => setCourseId(e.target.value)} className="select-premium text-xs cursor-pointer">
                       {courses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                     <div className="max-h-52 overflow-y-auto space-y-2 pr-1">
-                      {courseModules.length === 0 && <p className="text-xs text-slate-400">No modules in this course.</p>}
+                      {courseModules.length === 0 && <p className="text-xs text-slate-500">No modules in this course.</p>}
                       {courseModules.map(m => {
                         const modTopics = topics.filter(t => t.moduleId === m.id).sort((a, b) => (a.order || 0) - (b.order || 0));
                         if (!modTopics.length) return null;
                         return (
                           <div key={m.id}>
-                            <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">{m.title}</p>
+                            <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">{m.title}</p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                               {modTopics.map(t => (
                                 <label key={t.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white cursor-pointer text-xs font-semibold text-slate-600">
@@ -250,7 +250,7 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
                       })}
                     </div>
                   </div>
-                  <p className="text-[11px] text-slate-400 ml-1">Topics you add are marked complete for the students who were present.</p>
+                  <p className="text-[11px] text-slate-500 ml-1">Topics you add are marked complete for the students who were present.</p>
                   <textarea
                     value={form.topicsNote}
                     onChange={e => setForm(f => ({ ...f, topicsNote: e.target.value }))}
@@ -293,15 +293,15 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
                       </button>
                       {open && (
                         <ul className="max-h-40 overflow-y-auto divide-y divide-slate-50">
-                          {a.recipients.length === 0 && <li className="py-1.5 text-xs text-slate-400">Nobody</li>}
+                          {a.recipients.length === 0 && <li className="py-1.5 text-xs text-slate-500">Nobody</li>}
                           {a.recipients.map(r => (
                             <li key={r.uid || r.email} className="py-1.5 flex items-center justify-between gap-2 text-xs">
                               <span className="font-semibold text-slate-700 truncate">
                                 {r.name}
-                                {r.guest ? <span className="ml-1 text-[10px] text-slate-400">(other batch)</span> : null}
+                                {r.guest ? <span className="ml-1 text-[10px] text-slate-500">(other batch)</span> : null}
                                 {r.status === 'leave' ? <span className="ml-1 text-[10px] text-amber-600">(on leave)</span> : null}
                               </span>
-                              <span className="text-slate-400 truncate">{r.email}</span>
+                              <span className="text-slate-500 truncate">{r.email}</span>
                             </li>
                           ))}
                         </ul>
@@ -310,19 +310,19 @@ export default function SendClassReportModal({ batchId, date, staff = [], course
                     </div>
                   );
                 })}
-                <p className="text-[11px] text-slate-400 ml-1 -mt-2">Both emails go in BCC with our own address in To, so students never see each other’s email.</p>
+                <p className="text-[11px] text-slate-500 ml-1 -mt-2">Both emails go in BCC with our own address in To, so students never see each other’s email.</p>
 
                 {/* CC */}
                 {ccAddress && (
                   <label className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 bg-white cursor-pointer">
                     <input type="checkbox" checked={cc} onChange={e => setCc(e.target.checked)} className="rounded border-slate-300 text-[#255A84] focus:ring-[#255A84]" />
-                    <span className="text-xs font-semibold text-slate-700">CC <span className="font-bold">{ccAddress}</span> <span className="text-slate-400 font-medium">(one copy of each email)</span></span>
+                    <span className="text-xs font-semibold text-slate-700">CC <span className="font-bold">{ccAddress}</span> <span className="text-slate-500 font-medium">(one copy of each email)</span></span>
                   </label>
                 )}
                 {educatorEmail && (
                   <label className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 bg-white cursor-pointer -mt-2">
                     <input type="checkbox" checked={ccEducator} onChange={e => setCcEducator(e.target.checked)} className="rounded border-slate-300 text-[#255A84] focus:ring-[#255A84]" />
-                    <span className="text-xs font-semibold text-slate-700">CC <span className="font-bold">{educatorEmail}</span> <span className="text-slate-400 font-medium">(faculty who took the class)</span></span>
+                    <span className="text-xs font-semibold text-slate-700">CC <span className="font-bold">{educatorEmail}</span> <span className="text-slate-500 font-medium">(faculty who took the class)</span></span>
                   </label>
                 )}
 

@@ -27,21 +27,21 @@ export default function EmailHistoryList({ studentUid }) {
 
   return (
     <div className="bg-white rounded-xl border border-slate-100 p-4 space-y-3">
-      <h3 className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-slate-400">
+      <h3 className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-slate-500">
         <History size={13} /> Email history ({sorted.length})
       </h3>
       {error ? (
         <p className="text-xs text-amber-700 font-semibold">{error}</p>
       ) : sorted.length === 0 ? (
-        <p className="text-xs text-slate-400">No emails sent to this student yet.</p>
+        <p className="text-xs text-slate-500">No emails sent to this student yet.</p>
       ) : (
         <ul className="divide-y divide-slate-50">
           {visible.map(m => (
             <li key={m.id} className="py-2 flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-xs font-bold text-slate-700 truncate">{emailTypeLabel(m.type)}{m.month ? ` · ${m.month}` : ''}{m.sessionDate ? ` · ${m.batchName || ''} ${m.sessionDate}` : ''}</p>
-                <p className="text-[11px] text-slate-400 truncate">{m.subject}</p>
-                <p className="text-[10px] text-slate-400">
+                <p className="text-[11px] text-slate-500 truncate">{m.subject}</p>
+                <p className="text-[10px] text-slate-500">
                   {formatDateTime(m.sentAt || m.createdAt)} · by {m.createdBy?.name || '—'}{m.isResend ? ' · resend' : ''}
                 </p>
                 {m.status === 'failed' && m.lastError && <p className="text-[10px] text-rose-600 truncate">{m.lastError}</p>}

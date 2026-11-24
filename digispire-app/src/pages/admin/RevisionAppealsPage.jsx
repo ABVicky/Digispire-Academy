@@ -86,7 +86,7 @@ export default function RevisionAppealsPage() {
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-64 gap-3">
       <div className="animate-spin rounded-full h-8 w-8 border-4 border-[#255A84] border-t-transparent" />
-      <p className="text-xs text-slate-400 font-medium">Loading revision appeals...</p>
+      <p className="text-xs text-slate-500 font-medium">Loading revision appeals...</p>
     </div>
   );
 
@@ -106,7 +106,7 @@ export default function RevisionAppealsPage() {
           </div>
           <div>
             <p className="text-2xl font-bold text-slate-800">{appeals.length}</p>
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Total Requests</p>
+            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Total Requests</p>
           </div>
         </div>
 
@@ -116,17 +116,17 @@ export default function RevisionAppealsPage() {
           </div>
           <div>
             <p className="text-2xl font-bold text-slate-800">{pendingCount}</p>
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Pending Action</p>
+            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Pending Action</p>
           </div>
         </div>
 
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition">
-          <div className="h-12 w-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+          <div className="h-12 w-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
             <CheckCircle2 size={20} />
           </div>
           <div>
             <p className="text-2xl font-bold text-slate-800">{resolvedCount}</p>
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Resolved</p>
+            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Resolved</p>
           </div>
         </div>
       </div>
@@ -152,7 +152,7 @@ export default function RevisionAppealsPage() {
 
         {/* Search */}
         <div className="relative w-full md:w-72">
-          <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
           <input
             type="text"
             placeholder="Search student or course..."
@@ -165,10 +165,10 @@ export default function RevisionAppealsPage() {
 
       {/* Appeals List */}
       {filteredAppeals.length === 0 ? (
-        <div className="text-center py-16 text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200 shadow-sm">
+        <div className="text-center py-16 text-slate-500 bg-white rounded-2xl border border-dashed border-slate-200 shadow-sm">
           <History size={48} className="mx-auto mb-3 opacity-20" />
           <p className="font-bold">No revision requests found.</p>
-          <p className="text-xs text-slate-400 mt-1">Requests matching current filters will appear here.</p>
+          <p className="text-xs text-slate-500 mt-1">Requests matching current filters will appear here.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -187,7 +187,7 @@ export default function RevisionAppealsPage() {
                     <div>
                       <p className="font-bold text-slate-800 text-sm leading-none">{appeal.studentName}</p>
                       <div className="flex items-center gap-2 mt-1.5">
-                        <span className="text-[11px] font-bold text-slate-400 uppercase font-mono tracking-wider">{appeal.studentId}</span>
+                        <span className="text-[11px] font-bold text-slate-500 uppercase font-mono tracking-wider">{appeal.studentId}</span>
                         <span className="text-slate-200">·</span>
                         <span className="text-[11px] font-bold text-[#255A84] uppercase tracking-wider">{appeal.studentBatch} Batch</span>
                       </div>
@@ -204,7 +204,7 @@ export default function RevisionAppealsPage() {
                         <CheckCircle2 size={8} /> Resolved
                       </span>
                     )}
-                    <span className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
+                    <span className="text-[11px] font-medium text-slate-500 flex items-center gap-1">
                       <Calendar size={10} /> {appeal.createdAt ? new Date(appeal.createdAt.seconds * 1000).toLocaleDateString('en-IN') : 'N/A'}
                     </span>
                   </div>
@@ -213,7 +213,7 @@ export default function RevisionAppealsPage() {
                 {/* Subject of Appeal */}
                 <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100 space-y-2">
                   <div className="flex items-center gap-2">
-                    <BookMarked size={12} className="text-slate-400" />
+                    <BookMarked size={12} className="text-slate-500" />
                     <span className="text-xs text-slate-500 font-medium">Course:</span>
                     <span className="text-xs text-slate-800 font-bold">{appeal.courseName}</span>
                   </div>
@@ -224,14 +224,14 @@ export default function RevisionAppealsPage() {
                       <History size={12} className="text-[#255A84] mt-0.5" />
                     )}
                     <div className="min-w-0">
-                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
                         {appeal.type === 'module' ? 'Module' : 'Topic'} Revision Requested
                       </span>
                       <p className="text-xs text-slate-800 font-bold mt-0.5 truncate">
                         {appeal.type === 'module' ? appeal.moduleTitle : appeal.topicTitle}
                       </p>
                       {appeal.type === 'topic' && (
-                        <p className="text-[11px] text-slate-400 font-semibold mt-0.5 uppercase tracking-wide">
+                        <p className="text-[11px] text-slate-500 font-semibold mt-0.5 uppercase tracking-wide">
                           Module: {appeal.moduleTitle}
                         </p>
                       )}
@@ -242,7 +242,7 @@ export default function RevisionAppealsPage() {
                 {/* Notes by student */}
                 {appeal.notes ? (
                   <div className="space-y-1">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1">
                       <MessageSquare size={10} /> Student Notes
                     </span>
                     <div className="bg-amber-50/30 border border-amber-100/50 rounded-xl p-3 text-xs text-slate-600 italic">
@@ -250,20 +250,20 @@ export default function RevisionAppealsPage() {
                     </div>
                   </div>
                 ) : (
-                  <p className="text-[11px] text-slate-400 italic">No notes provided by student.</p>
+                  <p className="text-[11px] text-slate-500 italic">No notes provided by student.</p>
                 )}
 
                 {/* Resolution Details */}
                 {appeal.status === 'resolved' && (
                   <div className="border-t border-slate-100 pt-4 space-y-2">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1">
                       <CheckCircle2 size={10} className="text-emerald-500" /> Resolution Details
                     </span>
                     <div className="bg-emerald-50/20 border border-emerald-100/40 rounded-xl p-3 text-xs text-slate-600 space-y-1.5">
                       {appeal.feedback && (
                         <p className="font-medium text-slate-700 italic">"{appeal.feedback}"</p>
                       )}
-                      <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">
+                      <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">
                         Resolved by {appeal.resolvedBy} on {appeal.resolvedAt ? new Date(appeal.resolvedAt.seconds * 1000).toLocaleDateString('en-IN') : 'N/A'}
                       </p>
                     </div>
@@ -276,13 +276,13 @@ export default function RevisionAppealsPage() {
                 <div className="flex gap-2 mt-6 pt-4 border-t border-slate-100">
                   <button
                     onClick={() => setResolveModal(appeal)}
-                    className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm shadow-emerald-500/10"
+                    className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm shadow-emerald-500/10"
                   >
                     <Check size={14} /> Mark as Resolved
                   </button>
                   <button
                     onClick={() => handleDelete(appeal.id)}
-                    className="px-3.5 py-2.5 border border-slate-200 hover:bg-red-50 hover:border-red-200 hover:text-red-500 active:scale-95 text-slate-400 rounded-xl transition"
+                    className="px-3.5 py-2.5 border border-slate-200 hover:bg-red-50 hover:border-red-200 hover:text-red-500 active:scale-95 text-slate-500 rounded-xl transition"
                     title="Delete Request"
                   >
                     <Trash2 size={14} />
@@ -300,13 +300,13 @@ export default function RevisionAppealsPage() {
             <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div>
                 <h3 className="font-bold text-slate-800 text-sm">Resolve Revision Appeal</h3>
-                <p className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider mt-0.5">
+                <p className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider mt-0.5">
                   Confirm Revision Session Completed
                 </p>
               </div>
-              <button 
+              <button aria-label="Clear search" 
                 onClick={() => { setResolveModal(null); setFeedback(''); }}
-                className="h-8 w-8 rounded-full bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-600 transition active:scale-95"
+                className="h-8 w-8 rounded-full bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-600 transition active:scale-95"
               >
                 <X size={16} />
               </button>
@@ -319,7 +319,7 @@ export default function RevisionAppealsPage() {
               </div>
  
               <div className="space-y-1.5">
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest">
                   Resolution Notes / Educator Feedback (Optional)
                 </label>
                 <textarea
@@ -341,7 +341,7 @@ export default function RevisionAppealsPage() {
                 <button
                   type="submit"
                   disabled={processing}
-                  className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+                  className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
                 >
                   {processing ? (
                     <>

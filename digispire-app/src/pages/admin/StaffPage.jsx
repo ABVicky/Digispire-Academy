@@ -156,7 +156,7 @@ export default function StaffPage() {
       <div className="section-header">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Staff Management</h1>
-          <p className="text-xs text-slate-400 font-medium mt-0.5">Add admins and educators, manage their roles and access</p>
+          <p className="text-xs text-slate-500 font-medium mt-0.5">Add admins and educators, manage their roles and access</p>
         </div>
         <button onClick={openAdd} className="btn-primary-premium px-4 py-2.5 self-start sm:self-auto">
           <Plus size={16} /> Add Staff
@@ -164,32 +164,32 @@ export default function StaffPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex items-center gap-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 min-w-0">
           <div className="h-10 w-10 bg-slate-50 rounded-xl flex items-center justify-center shrink-0">
             <Users size={18} className="text-slate-500" />
           </div>
           <div>
             <p className="text-xl font-black text-slate-800 leading-none">{staff.length}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Total</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide sm:tracking-widest mt-1">Total</p>
           </div>
         </div>
-        <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex items-center gap-3">
+        <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 min-w-0">
           <div className="h-10 w-10 bg-red-50 rounded-xl flex items-center justify-center shrink-0">
             <Shield size={18} className="text-red-500" />
           </div>
           <div>
             <p className="text-xl font-black text-slate-800 leading-none">{adminCount}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Admins</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide sm:tracking-widest mt-1">Admins</p>
           </div>
         </div>
-        <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex items-center gap-3">
+        <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 min-w-0">
           <div className="h-10 w-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
             <GraduationCap size={18} className="text-blue-500" />
           </div>
           <div>
             <p className="text-xl font-black text-slate-800 leading-none">{educatorCount}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Faculty</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide sm:tracking-widest mt-1">Faculty</p>
           </div>
         </div>
       </div>
@@ -197,7 +197,7 @@ export default function StaffPage() {
       {/* Search + Filter */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3">
         <div className="relative">
-          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
           <input
             type="text"
             value={search}
@@ -228,7 +228,7 @@ export default function StaffPage() {
             <div className="animate-spin h-8 w-8 border-4 border-[#255A84] border-t-transparent rounded-full" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-20 text-center text-slate-400">
+          <div className="py-20 text-center text-slate-500">
             <Users size={40} className="mx-auto mb-3 opacity-20" />
             <p className="text-sm font-bold">No staff found</p>
             <p className="text-xs text-slate-300 mt-1">Add your first admin or educator</p>
@@ -239,7 +239,7 @@ export default function StaffPage() {
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                     <th className="text-left px-6 py-4">Staff Member</th>
                     <th className="text-left px-4 py-4">Role</th>
                     <th className="text-left px-4 py-4">Contact</th>
@@ -260,7 +260,7 @@ export default function StaffPage() {
                             </div>
                             <div className="min-w-0">
                               <p className="font-bold text-slate-800 text-sm truncate">{member.name}</p>
-                              <p className="text-[10px] text-slate-400 font-medium truncate">{member.email}</p>
+                              <p className="text-[10px] text-slate-500 font-medium truncate">{member.email}</p>
                             </div>
                           </div>
                         </td>
@@ -274,17 +274,18 @@ export default function StaffPage() {
                           <p className="text-xs text-slate-500 font-medium">{member.phone || '—'}</p>
                         </td>
                         <td className="px-6 py-3.5 text-right">
-                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
+                          <div className="flex items-center justify-end gap-2">
+                            <button aria-label="Edit"
                               onClick={() => openEdit(member)}
-                              className="p-2 hover:bg-blue-50 text-slate-400 hover:text-[#255A84] rounded-lg transition border border-slate-200 active:scale-90"
+                              className="p-2 hover:bg-blue-50 text-slate-500 hover:text-[#255A84] rounded-lg transition border border-slate-200 active:scale-90"
                             >
                               <Pencil size={14} />
                             </button>
                             <button
+                              aria-label="Remove"
                               onClick={() => handleDelete(member)}
                               disabled={deleting === member.id}
-                              className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-lg transition border border-slate-200 active:scale-90 disabled:opacity-50"
+                              className="p-2 hover:bg-red-50 text-slate-500 hover:text-red-500 rounded-lg transition border border-slate-200 active:scale-90 disabled:opacity-50"
                             >
                               {deleting === member.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
                             </button>
@@ -311,17 +312,18 @@ export default function StaffPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-slate-800 text-sm truncate">{member.name}</p>
-                        <p className="text-[10px] text-slate-400 font-medium truncate">{member.email}</p>
-                        {member.phone && <p className="text-[10px] text-slate-400 mt-0.5">{member.phone}</p>}
+                        <p className="text-[10px] text-slate-500 font-medium truncate">{member.email}</p>
+                        {member.phone && <p className="text-[10px] text-slate-500 mt-0.5">{member.phone}</p>}
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
-                        <button
+                        <button aria-label="Edit"
                           onClick={() => openEdit(member)}
                           className="h-8 w-8 flex items-center justify-center bg-slate-100 hover:bg-blue-50 text-slate-500 hover:text-[#255A84] rounded-lg transition active:scale-90 border border-slate-200"
                         >
                           <Pencil size={13} />
                         </button>
                         <button
+                          aria-label="Remove"
                           onClick={() => handleDelete(member)}
                           disabled={deleting === member.id}
                           className="h-8 w-8 flex items-center justify-center bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-500 rounded-lg transition active:scale-90 disabled:opacity-50 border border-slate-200"
@@ -350,7 +352,7 @@ export default function StaffPage() {
               <h2 className="text-lg font-bold text-slate-800">
                 {editingId ? 'Edit Staff Member' : 'Add New Staff'}
               </h2>
-              <button onClick={() => setShowModal(false)} className="p-2 text-slate-400 hover:text-slate-600 transition rounded-lg">
+              <button aria-label="Close" onClick={() => setShowModal(false)} className="p-2 text-slate-500 hover:text-slate-600 transition rounded-lg">
                 <X size={20} />
               </button>
             </div>
@@ -360,9 +362,9 @@ export default function StaffPage() {
 
                 {/* Name */}
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Full Name *</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Full Name *</label>
                   <div className="relative">
-                    <Users size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Users size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                     <input
                       required
                       value={form.name}
@@ -375,11 +377,11 @@ export default function StaffPage() {
 
                 {/* Email */}
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">
                     Email Address * {editingId && <span className="text-[10px] normal-case text-slate-300">(cannot be changed)</span>}
                   </label>
                   <div className="relative">
-                    <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                     <input
                       required
                       type="email"
@@ -387,16 +389,16 @@ export default function StaffPage() {
                       value={form.email}
                       onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                       placeholder="educator@digispire.in"
-                      className={`input-premium pl-10 ${editingId ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : ''}`}
+                      className={`input-premium pl-10 ${editingId ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 </div>
 
                 {/* Phone */}
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Phone Number</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Phone Number</label>
                   <div className="relative">
-                    <Phone size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Phone size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                     <input
                       type="tel"
                       value={form.phone}
@@ -410,9 +412,9 @@ export default function StaffPage() {
                 {/* Password – only for new staff */}
                 {!editingId && (
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Set Password *</label>
+                    <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Set Password *</label>
                     <div className="relative">
-                      <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                       <input
                         required
                         type="password"
@@ -428,7 +430,7 @@ export default function StaffPage() {
 
                 {/* Role Selection */}
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Role & Access Level *</label>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Role & Access Level *</label>
                   <div className="space-y-2">
                     {ROLES.map(role => (
                       <button
@@ -442,13 +444,13 @@ export default function StaffPage() {
                         }`}
                       >
                         <div className={`h-9 w-9 rounded-lg flex items-center justify-center shrink-0 ${
-                          form.role === role.id ? 'bg-[#255A84] text-white' : 'bg-slate-100 text-slate-400'
+                          form.role === role.id ? 'bg-[#255A84] text-white' : 'bg-slate-100 text-slate-500'
                         }`}>
                           <role.icon size={16} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className={`text-xs font-bold ${form.role === role.id ? 'text-[#255A84]' : 'text-slate-700'}`}>{role.label}</p>
-                          <p className="text-[10px] text-slate-400 mt-0.5">{role.description}</p>
+                          <p className="text-[10px] text-slate-500 mt-0.5">{role.description}</p>
                         </div>
                         {form.role === role.id && (
                           <div className="h-5 w-5 rounded-full bg-[#255A84] flex items-center justify-center shrink-0">

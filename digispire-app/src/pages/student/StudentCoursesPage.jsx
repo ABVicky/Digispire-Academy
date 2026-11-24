@@ -106,7 +106,7 @@ export default function StudentCoursesPage() {
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-48 gap-3">
       <div className="animate-spin rounded-full h-8 w-8 border-3 border-[#1E3A5F] border-t-transparent" />
-      <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Loading Courses...</p>
+      <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Loading Courses...</p>
     </div>
   );
 
@@ -124,7 +124,7 @@ export default function StudentCoursesPage() {
       </div>
 
       {courses.length === 0 ? (
-        <div className="text-center py-16 text-slate-400 bg-white rounded-xl border border-slate-200">
+        <div className="text-center py-16 text-slate-500 bg-white rounded-xl border border-slate-200">
           <BookOpen size={40} className="mx-auto mb-3 opacity-30" />
           <p className="font-bold text-sm">No courses added yet.</p>
         </div>
@@ -156,7 +156,7 @@ export default function StudentCoursesPage() {
                       <span className="text-[11px] font-mono font-bold text-slate-600 shrink-0">{progress}%</span>
                     </div>
                   </div>
-                  <div className="h-7 w-7 rounded-md bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">
+                  <div className="h-7 w-7 rounded-md bg-slate-50 flex items-center justify-center text-slate-500 shrink-0">
                     {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                   </div>
                 </button>
@@ -164,7 +164,7 @@ export default function StudentCoursesPage() {
                 {isExpanded && (
                   <div className="px-4 sm:px-6 pb-5 pt-1 space-y-2.5 border-t border-slate-100 bg-slate-50/50">
                     {courseModules.length === 0 ? (
-                      <div className="text-center py-6 text-xs text-slate-400 italic">
+                      <div className="text-center py-6 text-xs text-slate-500 italic">
                         No modules published for this course yet.
                       </div>
                     ) : (
@@ -180,7 +180,7 @@ export default function StudentCoursesPage() {
                               className="w-full flex items-center gap-3 p-3.5 cursor-pointer hover:bg-slate-50/70 transition-colors"
                               onClick={() => setExpandedModule(isModExpanded ? null : mod.id)}
                             >
-                              <div className={`h-6 w-6 rounded-md flex items-center justify-center shrink-0 ${isModComplete ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'}`}>
+                              <div className={`h-6 w-6 rounded-md flex items-center justify-center shrink-0 ${isModComplete ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
                                 {isModComplete ? <Check size={12} strokeWidth={3} /> : <span className="text-[10px] font-bold">{mIdx + 1}</span>}
                               </div>
                               <span className="text-xs font-bold text-slate-800 flex-1 truncate">{mod.title}</span>
@@ -217,14 +217,14 @@ export default function StudentCoursesPage() {
                                     })()}
                                   </>
                                 )}
-                                <span className="text-[10px] font-mono font-semibold text-slate-400">{completedCount}/{modTopics.length}</span>
+                                <span className="text-[10px] font-mono font-semibold text-slate-500">{completedCount}/{modTopics.length}</span>
                               </div>
                             </div>
 
                             {isModExpanded && (
                               <div className="p-3 space-y-1.5 border-t border-slate-100 bg-slate-50/40">
                                 {modTopics.length === 0 ? (
-                                  <p className="text-[11px] text-slate-400 italic text-center py-2">No lecture topics listed.</p>
+                                  <p className="text-[11px] text-slate-500 italic text-center py-2">No lecture topics listed.</p>
                                 ) : (
                                   modTopics.map((topic, tIdx) => {
                                     const isDone = topic.completedStudents?.includes(userProfile?.uid);
@@ -265,7 +265,7 @@ export default function StudentCoursesPage() {
                 <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Submit Academic Revision Appeal</h3>
                 <p className="text-[10px] text-slate-500 font-medium mt-0.5">{revisionModal.courseName} · {revisionModal.moduleTitle}</p>
               </div>
-              <button onClick={() => setRevisionModal(null)} className="p-1 text-slate-400 hover:text-slate-600 rounded">
+              <button aria-label="Close" onClick={() => setRevisionModal(null)} className="p-1 text-slate-500 hover:text-slate-600 rounded">
                 <X size={16} />
               </button>
             </div>
