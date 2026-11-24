@@ -4,6 +4,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Lock, Phone, Mail, Eye, EyeOff, ShieldCheck, GraduationCap, Shield } from 'lucide-react';
 import AmbientBackground from '../components/AmbientBackground';
 
+const isStaffRole = (role) => role === 'admin' || role === 'educator';
+
 export default function LoginPage() {
   const { userProfile, loading: authLoading, loginAdmin, loginStudent } = useAuth();
   const navigate = useNavigate();
@@ -20,9 +22,11 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!authLoading && userProfile) {
-      if (userProfile.role === 'admin') {
+      // Must match the roles in ProtectedRoute: sending a role to a portal that
+      // rejects it bounces back here and loops until the page goes white.
+      if (isStaffRole(userProfile.role)) {
         navigate('/admin/dashboard', { replace: true });
-      } else {
+      } else if (userProfile.role === 'student') {
         navigate('/student/dashboard', { replace: true });
       }
     }
@@ -40,7 +44,7 @@ export default function LoginPage() {
     setError('');
     try {
       const { profile } = await loginAdmin(email, password);
-      if (profile?.role === 'admin') {
+      if (isStaffRole(profile?.role)) {
         navigate('/admin/dashboard');
       } else {
         setError('This account does not have administrative privileges.');

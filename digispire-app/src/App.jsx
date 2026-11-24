@@ -1,4 +1,4 @@
-import { useEffect, lazy, Suspense } from 'react';
+import { useEffect, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { AdminRoute, StudentRoute } from './components/ProtectedRoute';
@@ -6,37 +6,39 @@ import InstallPrompt from './components/InstallPrompt';
 import NetworkStatusIndicator from './components/NetworkStatusIndicator';
 import PwaUpdateReload from './components/PwaUpdateReload';
 import NativeAppInitializer from './components/NativeAppInitializer';
+import ErrorBoundary from './components/ErrorBoundary';
+import { lazyPage } from './utils/lazyPage';
 
 import AdminLayout from './layouts/AdminLayout';
 import StudentLayout from './layouts/StudentLayout';
 
 // Lazy Loaded Pages for performance and fast initial load
-const LoginPage = lazy(() => import('./pages/LoginPage'));
+const LoginPage = lazyPage(() => import('./pages/LoginPage'));
 
 // Admin pages
-const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
-const StudentsPage = lazy(() => import('./pages/admin/StudentsPage'));
-const AttendancePage = lazy(() => import('./pages/admin/AttendancePage'));
-const CoursesPage = lazy(() => import('./pages/admin/CoursesPage'));
-const ContentPage = lazy(() => import('./pages/admin/ContentPage'));
-const AttendanceReportPage = lazy(() => import('./pages/admin/AttendanceReportPage'));
-const CourseCompletionReportPage = lazy(() => import('./pages/admin/CourseCompletionReportPage'));
-const StaffPage = lazy(() => import('./pages/admin/StaffPage'));
-const RevisionAppealsPage = lazy(() => import('./pages/admin/RevisionAppealsPage'));
-const SubmissionsPage = lazy(() => import('./pages/admin/SubmissionsPage'));
-const AnnouncementsPage = lazy(() => import('./pages/admin/AnnouncementsPage'));
-const EmailCenterPage = lazy(() => import('./pages/admin/EmailCenterPage'));
+const AdminDashboard = lazyPage(() => import('./pages/admin/AdminDashboard'));
+const StudentsPage = lazyPage(() => import('./pages/admin/StudentsPage'));
+const AttendancePage = lazyPage(() => import('./pages/admin/AttendancePage'));
+const CoursesPage = lazyPage(() => import('./pages/admin/CoursesPage'));
+const ContentPage = lazyPage(() => import('./pages/admin/ContentPage'));
+const AttendanceReportPage = lazyPage(() => import('./pages/admin/AttendanceReportPage'));
+const CourseCompletionReportPage = lazyPage(() => import('./pages/admin/CourseCompletionReportPage'));
+const StaffPage = lazyPage(() => import('./pages/admin/StaffPage'));
+const RevisionAppealsPage = lazyPage(() => import('./pages/admin/RevisionAppealsPage'));
+const SubmissionsPage = lazyPage(() => import('./pages/admin/SubmissionsPage'));
+const AnnouncementsPage = lazyPage(() => import('./pages/admin/AnnouncementsPage'));
+const EmailCenterPage = lazyPage(() => import('./pages/admin/EmailCenterPage'));
 
 // Student pages
-const StudentDashboard = lazy(() => import('./pages/student/StudentDashboard'));
-const StudentAttendancePage = lazy(() => import('./pages/student/StudentAttendancePage'));
-const StudentCoursesPage = lazy(() => import('./pages/student/StudentCoursesPage'));
-const StudentContentPage = lazy(() => import('./pages/student/StudentContentPage'));
-const StudentSubmissionsPage = lazy(() => import('./pages/student/StudentSubmissionsPage'));
+const StudentDashboard = lazyPage(() => import('./pages/student/StudentDashboard'));
+const StudentAttendancePage = lazyPage(() => import('./pages/student/StudentAttendancePage'));
+const StudentCoursesPage = lazyPage(() => import('./pages/student/StudentCoursesPage'));
+const StudentContentPage = lazyPage(() => import('./pages/student/StudentContentPage'));
+const StudentSubmissionsPage = lazyPage(() => import('./pages/student/StudentSubmissionsPage'));
 
 // Shared pages
-const ProfilePage = lazy(() => import('./pages/ProfilePage'));
-const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
+const ProfilePage = lazyPage(() => import('./pages/ProfilePage'));
+const PrivacyPolicyPage = lazyPage(() => import('./pages/PrivacyPolicyPage'));
 
 // Sleek minimal page loader during route transitions
 function PageLoader() {
@@ -78,6 +80,7 @@ function App() {
         <NetworkStatusIndicator />
         <PwaUpdateReload />
         <InstallPrompt />
+        <ErrorBoundary>
         <Suspense fallback={<PageLoader />}>
           <Routes>
             {/* Public */}
@@ -122,6 +125,7 @@ function App() {
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </Suspense>
+        </ErrorBoundary>
       </BrowserRouter>
     </AuthProvider>
   );
